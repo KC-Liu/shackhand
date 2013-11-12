@@ -1,0 +1,278 @@
+<html>
+
+<head>
+
+    <META Charset = "utf-8" />
+
+<link rel="stylesheet" type="text/css" class="ui" href="stylesheets/semantic.min.css">
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+<link rel="stylesheet" href="stylesheets/auto20.css" />
+
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+<![endif]-->
+
+
+<style>
+    #map { float: left; height: 800px; width: 73%; min-width: 420px;}
+    #join { float: right; height: 800px; width: 25%; min-width: 200px;}
+    #searchDiv { position:fixed; top: 20px; left: 60px; z-index: 1}
+    #chatDiv { display:block; position:fixed; bottom: 20px; left: 60px; z-index: 1;
+        width: 250px; height: 100px; background: white; border: 3px; border-radius: 10px; padding: 5px}
+
+
+
+    /* add media querry for mobile here */
+    
+</style>
+
+<script src="javascripts/lib/jquery-1.10.2.js"></script>
+<script src="javascripts/lib/jquery-ui.js"></script>
+<script src="javascripts/lib/underscore-min.js"></script>
+<script src="javascripts/lib/backbone-min.js"></script>
+
+<script src="javascripts/lib/tongwen_core.js"></script>
+<script src="javascripts/lib/tongwen_table_pt2s.js"></script>
+<script src="javascripts/lib/tongwen_table_t2s.js"></script>
+
+<script src='https://cdn.firebase.com/v0/firebase.js'></script>
+<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+<script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
+
+</head>
+
+<body>
+
+    <div id="searchDiv">
+        <form id="searchbox" action="">
+            <input id="search" type="text" data-ng-modle = "seekFriend" placeholder="輸入關鍵字找朋友">
+            <input id="submit" type="submit" value="尋找">
+        </form>
+    </div>
+
+    <div id="chatDiv">
+        Chat: adasdda <br/>
+        Chat2: adada Good!!
+        <div id="chatInputDiv">
+            <input type = 'text' placeholder = '輸入您的聊天訊息'></input>
+        </div>
+
+    </div>
+
+
+    <div id="map">
+    </div>
+    <div id="join">
+        <img src=""></img>
+        <h1>Join自學2.0 right now!</h1>
+        <div id = 'faq'><a>FAQ</a></div>
+        <form>
+
+            <h2>q1</h2>
+            <input type = 'text' placeholder = 'ex1'></input>
+            
+            <h2>q2</h2>
+            <input type = 'text' placeholder = 'ex1'></input>
+
+            <h2>q3</h2>
+            <input type = 'text' placeholder = 'ex1'></input>
+
+            <h2>q3</h2>
+            <input type = 'radio'>c1</input>
+            <input type = 'radio'>c2</input>
+            <input type = 'radio'>c3</input>
+
+            <h2>q3</h2>
+            <input type = 'checkbox'>自學家長</input>
+            <input type = 'checkbox'>自學生</input>
+            <input type = 'checkbox'>自主教師</input><br />
+            <input type = 'checkbox'>自學團體</input>
+            <input type = 'checkbox'>自主生活者</input>
+            <input type = 'checkbox'>自耕農</input><br />
+            <input type = 'checkbox'>微型創業者</input>
+
+
+            <h2>q3</h2>
+            <input type = 'text' placeholder = 'ex1'></input>
+
+            <h2>Tags(for Search Engine)</h2>
+            <span>ex tag1 <button>x</button></span>
+            <input type = 'text' placeholder = 'ex1'></input> <button>Add tag</button>            
+            <br/>
+            <button>預覽</button>           
+            <input type = 'submit'> 送出 </input>
+
+
+
+        </form>
+     </div>
+
+<script>
+    
+    map = L.map('map').setView([51.505, -0.09], 13);
+
+
+    Auto20 = Backbone.View.extend({
+        el: $('body'),
+
+        intro: '<p>歡迎使用「數學形成性教材」線上版！！若要紙本使用，請下載文件檔'
+            +'<button class = "ui small blue button" onclick = "location = location.href.replace(\'w/\', \'/\').replace(\'.htm\', \'.doc\')"'
+                +'style = "margin-left:2ex">'+document.title+'.doc</button></p>'
+            +'<p>本教材的特色在於階梯清楚、講解明確、循序漸近、平易近人，適合自學使用。🚲</p>'
+            +'<p>因為這原是紙本教材，有些活動需要紙筆和動手操作。請拿一張紙或筆記本、和一隻筆，當作輔助📝</p>'
+            +'<p>如果遇到空格【&nbsp;&nbsp;&nbsp;&nbsp;】，請想想看，填答後再按ENTER鍵</p>'
+            +'<p>（愛的小叮嚀：有會的人在旁邊，遇到關卡即時詢問，學習效果更佳）👼</p>',
+
+        events :{
+            'change input' : 'showHint',
+            'click div#start' : 'showStart',
+            'click input#feedback' : 'feedback'
+        },
+
+        initialize: function() {
+
+            _.bindAll(this, 'render', 'feedback');
+
+            
+            this.osmUrl='http://{s}.tile.cloudmade.com/1dc4012079d54f93b27789a1fc4491e9/997/256/{z}/{x}/{y}.png';
+
+            this.LeafIcon = L.Icon.extend({
+                    options: {
+                        shadowUrl: 'img/leaf-shadow.png',
+                        iconSize:     [38, 95],
+                        shadowSize:   [50, 64],
+                        iconAnchor:   [22, 94],
+                        labelAnchor:  [-3, -76],
+                        shadowAnchor: [4, 62],
+                        popupAnchor:  [-3, -76]
+                    }
+            });
+
+            this.icon = {green: new this.LeafIcon({iconUrl: 'img/leaf-green.png'}),
+                        red : new this.LeafIcon({iconUrl: 'img/leaf-red.png'}),
+                        orange : new this.LeafIcon({iconUrl: 'img/leaf-orange.png'})
+                    };
+
+            this.dataRef = new Firebase('https://we-autolearn.firebaseio.com');           
+            
+            this.render();
+        },
+
+        render: function() {
+
+            var icon = this.icon;
+
+//            var road_layer = new L.TileLayer(osmUrl, {
+//                minZoom: 8,
+  //              maxZoom: 18,
+    //            attribution: '<a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> CC-BY-SA, Tiles &copy; <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>',
+  //              subdomains: '1234'
+    //        });
+
+      //      map.addLayer(road_layer);
+
+            map.setView(new L.LatLng(23.654299340, 120.44776492196047), 7);
+
+            //    <iframe id = "auto20" scrolling="no" frameborder="no" src="https://www.google.com/fusiontables/embedviz?q=select+col3+from+1hAtE5KbGNPJWB5wTuNTZkEjbsEl_MGTQB4NScvA&amp;viz=MAP&amp;h=false&amp;lat=23.654299340691614&amp;lng=120.44776492196047&amp;t=1&amp;z=7&amp;l=col3&amp;y=4&amp;tmplt=6&amp;hml=GEOCODABLE">
+
+
+
+            L.tileLayer(this.osmUrl, {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+            maxZoom: 18
+        }).addTo(map);  
+
+
+            this.dataRef.once('value', function(dataSnapshot) {
+                // store dataSnapshot for use in below examples.
+                var markers = []; var circles = []; var labels = []
+                var autos = dataSnapshot.val();
+                console.log(autos);
+
+                console.log(autos.length);
+
+                for (var i = 0; i < autos.length; i++) {
+
+                    console.log(autos[i].latlngColumn.split());
+
+                    var colorIcon = icon.orange;
+
+                    console.log(autos[i].Style);
+                    switch (autos[i].Style) {
+                        case 'large_green' :
+                            colorIcon = icon.green;                    break;
+                        case 'large_yellow' :
+                            colorIcon = icon.orange;                    break;
+                        case 'large_blue' :
+                            colorIcon = icon.red;                    break;
+                        default:
+                            colorIcon = icon.orenge;
+                    }
+
+                    if (i < 3) {
+
+                        markers[i] = L.marker(autos[i].latlngColumn.split(','), {icon: colorIcon }).bindLabel(autos[i].name, { noHide: true })
+                            .addTo(map).showLabel();
+                    }
+                    else {
+                        markers[i] = L.marker(autos[i].latlngColumn.split(','), {icon: colorIcon }).addTo(map);
+                    }
+
+                    markers[i].bindPopup(autos[i].name+"<b>Hello world!</b><br>I am a popup.");
+
+                    circles[i] = L.circle(autos[i].latlngColumn.split(','), 500, {
+                        color: 'green',
+                        fillColor: '#3f0',
+                        fillOpacity: 0.3
+                    }).addTo(map);
+
+              //      labels[i] = new L.Label();
+                //    labels[i].setContent(autos[i].name);
+                  //  labels[i].setLatLng(autos[i].latlngColumn.split(','));
+                  //  map.showLabel(labels[i]);;
+
+                    var popup = L.popup();
+
+                    function onMapClick(e) {
+                        popup
+                            .setLatLng(e.latlng)
+                            .setContent("You clicked the map at " + e.latlng.toString())
+                            .openOn(map);
+                    }
+                    map.on('click', onMapClick);
+                };
+
+                var welcomeWord = L.popup().setLatLng([25.09, 121.56]).setContent("<div id = 'welcome' style = 'font-size:2rem'>Hi! 歡迎使用自學2.0<button type = 'submit' style = 'font-size:1.5rem'>插上您的旗幟</button></div>").openOn(map);
+            });
+        },
+
+        feedback: function() {
+        }
+
+    });
+    
+    var auto20 = new Auto20();
+    
+    
+
+
+    
+
+    
+//    var marker = L.marker([25.09, 121.535579]).addTo(map);
+  //  marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+//
+
+ //   var marker = L.marker([25.09, 121.5]).addTo(map);
+   // marker.bindPopup("<div class = 'first' style = 'font-size:2rem'><b>Hello world!</b><br>I am a popup.</div>").openPopup();
+
+    
+  //      $(".aaa").css('font-size', '200%');
+        
+
+</script>
+
+</body>
+
+
+</hmtl>

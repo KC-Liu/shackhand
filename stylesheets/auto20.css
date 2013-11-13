@@ -17,7 +17,7 @@
   overflow: hidden; /* Clear floats */
 }
 
-#search, #submit
+#search, #goSearch
 {
   float: left;
 }
@@ -41,7 +41,7 @@
 
 /* ----------------------- */
 
-#submit
+#goSearch
 {   
   background: #6cbb6b;
   background-image: -moz-linear-gradient(#95d788, #6cbb6b);
@@ -69,14 +69,14 @@
   text-shadow: 0 1px 0 rgba(255,255,255,0.5);
 }
 
-#submit:hover
+#goSearch:hover
 {   
   background: #95d788;
   background-image: -moz-linear-gradient(#6cbb6b, #95d788);
   background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #95d788),color-stop(1, #6cbb6b));
 } 
 
-#submit:active
+#goSearch:active
 {   
   background: #95d788;
   outline: none;
@@ -86,7 +86,7 @@
    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) inset;    
 }
 
-#submit::-moz-focus-inner
+#goSearch::-moz-focus-inner
 {
        border: 0;  /* Small centering fix for Firefox */
 }   

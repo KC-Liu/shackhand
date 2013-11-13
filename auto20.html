@@ -39,6 +39,8 @@
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
 
+
+<title>自學2.0--地圖式的互助通訊錄</title>
 </head>
 
 <body>
@@ -46,7 +48,7 @@
     <div id="searchDiv">
         <form id="searchbox" action="">
             <input id="search" type="text" data-ng-modle = "seekFriend" placeholder="輸入關鍵字找朋友">
-            <input id="submit" type="submit" value="尋找">
+            <input id="goSearch" type="submit" value="尋找">
         </form>
     </div>
 
@@ -64,7 +66,7 @@
     </div>
     <div id="join">
         <img src=""></img>
-        <h1>Join自學2.0 right now!</h1>
+        <h1>立即升起您的交友旗</h1>
         <div id = 'faq'><a>FAQ</a></div>
         <form>
 
@@ -109,24 +111,13 @@
 
 <script>
     
-    map = L.map('map').setView([51.505, -0.09], 13);
-
+    
 
     Auto20 = Backbone.View.extend({
         el: $('body'),
 
-        intro: '<p>歡迎使用「數學形成性教材」線上版！！若要紙本使用，請下載文件檔'
-            +'<button class = "ui small blue button" onclick = "location = location.href.replace(\'w/\', \'/\').replace(\'.htm\', \'.doc\')"'
-                +'style = "margin-left:2ex">'+document.title+'.doc</button></p>'
-            +'<p>本教材的特色在於階梯清楚、講解明確、循序漸近、平易近人，適合自學使用。🚲</p>'
-            +'<p>因為這原是紙本教材，有些活動需要紙筆和動手操作。請拿一張紙或筆記本、和一隻筆，當作輔助📝</p>'
-            +'<p>如果遇到空格【&nbsp;&nbsp;&nbsp;&nbsp;】，請想想看，填答後再按ENTER鍵</p>'
-            +'<p>（愛的小叮嚀：有會的人在旁邊，遇到關卡即時詢問，學習效果更佳）👼</p>',
-
         events :{
-            'change input' : 'showHint',
-            'click div#start' : 'showStart',
-            'click input#feedback' : 'feedback'
+            'click div#goSearch' : 'render'
         },
 
         initialize: function() {
@@ -135,6 +126,8 @@
 
             
             this.osmUrl='http://{s}.tile.cloudmade.com/1dc4012079d54f93b27789a1fc4491e9/997/256/{z}/{x}/{y}.png';
+
+            this.cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade';
 
             this.LeafIcon = L.Icon.extend({
                     options: {
@@ -171,78 +164,183 @@
 
       //      map.addLayer(road_layer);
 
-            map.setView(new L.LatLng(23.654299340, 120.44776492196047), 7);
-
-            //    <iframe id = "auto20" scrolling="no" frameborder="no" src="https://www.google.com/fusiontables/embedviz?q=select+col3+from+1hAtE5KbGNPJWB5wTuNTZkEjbsEl_MGTQB4NScvA&amp;viz=MAP&amp;h=false&amp;lat=23.654299340691614&amp;lng=120.44776492196047&amp;t=1&amp;z=7&amp;l=col3&amp;y=4&amp;tmplt=6&amp;hml=GEOCODABLE">
+//            map.setView(new L.LatLng(23.654299340, 120.44776492196047), 7);
 
 
+            // 如果存在，先清理一次   <==  待加
 
-            L.tileLayer(this.osmUrl, {
+            var tile = L.tileLayer(this.osmUrl, {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
             maxZoom: 18
-        }).addTo(map);  
+        });  
 
 
             this.dataRef.once('value', function(dataSnapshot) {
                 // store dataSnapshot for use in below examples.
-                var markers = []; var circles = []; var labels = []
+                var markers = []; var circles = [];
+     //           var markersIde = [];
+     //           var markersHome = [];
+      //          var markersGroup = [];
                 var autos = dataSnapshot.val();
-                console.log(autos);
 
-                console.log(autos.length);
+//                console.log(autos);
+  //              console.log(autos.length);
+
 
                 for (var i = 0; i < autos.length; i++) {
 
-                    console.log(autos[i].latlngColumn.split());
+                    console.log(i);
+
+                    var hand = autos[i];
+                    if (!hand.name) {
+                        console.log('略過無名氏'); continue
+                    }
+
+                    hand.latlngColumn.replace('(','').replace(')','');
+                    console.log(hand.latlngColumn.split());
 
                     var colorIcon = icon.orange;
 
-                    console.log(autos[i].Style);
-                    switch (autos[i].Style) {
+                    console.log(hand.name + hand.Style);
+                    switch (hand.Style) {
                         case 'large_green' :
                             colorIcon = icon.green;                    break;
                         case 'large_yellow' :
                             colorIcon = icon.orange;                    break;
                         case 'large_blue' :
                             colorIcon = icon.red;                    break;
+                        case 'large_red' :
+                            colorIcon = icon.red;                    break;
                         default:
-                            colorIcon = icon.orenge;
+                            colorIcon = icon.orange;
                     }
 
-                    if (i < 3) {
+                    var seek = !$('#search').val();
 
-                        markers[i] = L.marker(autos[i].latlngColumn.split(','), {icon: colorIcon }).bindLabel(autos[i].name, { noHide: true })
-                            .addTo(map).showLabel();
+//                    var flag = hand.name+"<b>Hello world!</b><br />I am a popup.";
+                    var flag = '<div class="flag" style="font-family: sans-serif;">'
+                        +'<font color = "grey">加入時間: '+hand.時間戳記+'</font><br />'
+                        +'<h2> 👪 '+hand.name+'😼</h2><br />'
+                        +hand.learner_birth+'年次的'+hand.learner_role+'，住在'+hand.address+'附近<br />'
+                        +'<font color = "grey">經緯度: '+hand.latlngColumn+'</font>'
+                        +'<br />'
+                        +'<a href = "http://map.alearn.org.tw" target ="_blank" title = "更多自學資訊，請上自學地圖"> <img height="100" width="120" src= "http://map.alearn.org.tw/images/automap.jpg" style = "float:right">  </a>'
+                        +'<br />'
+                        +'<b>網址: </b>'+hand.site+'<br />'
+                        +'<b>社群網址: </b>'+hand.site2+'<br />'
+                        +'<b>公開的聯絡方式:</b>'+hand.connect_me+'<br />'
+                        +'<p align = "center"><b>歡迎聯絡!!</b></p><br />'
+                        +'<br />'
+                        +'<b>興趣包含:</b>'+hand.learner_habit+'<br />'
+                        +'<br />'
+                        +'<b>可分享:</b>'+hand.share+'<br />'
+                        +'<b>需要:</b>'+hand.ask+'<br />'
+                        +'<br />'
+                        +'<b>自我介紹:</b>'+hand.note+'<br />'
+                        +'<br />'
+                        +'<hr>'
+                        +'<b> <a href = "mailto:bestianhelp@gmail.com?subject=回報名為'+hand.name+'、時間戳記為'+hand.時間戳記+'的資料錯誤&body=網站管理員您好: 我要回報名為'+hand.name+'的資料錯誤，詳請如下：" title="如遇錯誤與濫用，請按此回報，謝謝!!">  回報錯誤或濫用 </a> </b>'
+                        +'</div>'
+
+                    
+
+                    if (seek != true && flag.indexOf(seek) == -1) {
+                        console.log(seek+'：'+flag.indexOf(seek)+'略過'+hand.name);
+                        continue;
                     }
-                    else {
-                        markers[i] = L.marker(autos[i].latlngColumn.split(','), {icon: colorIcon }).addTo(map);
+
+                    if (hand.latlngColumn.split(',').length != 2) {
+                        console.log('LatLng:'+ hand.latlngColumn);
+                        continue;
                     }
 
-                    markers[i].bindPopup(autos[i].name+"<b>Hello world!</b><br>I am a popup.");
+                    markers[i] = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindLabel(hand.name, { noHide: true }).bindPopup(flag);
 
-                    circles[i] = L.circle(autos[i].latlngColumn.split(','), 500, {
-                        color: 'green',
-                        fillColor: '#3f0',
-                        fillOpacity: 0.3
-                    }).addTo(map);
+
+ //                   circles[i] = L.circle(autos[i].latlngColumn.split(','), 500, {
+   //                     color: 'green',
+    //                    fillColor: '#3f0',
+     //                   fillOpacity: 0.3
+      //              }).addTo(map);
 
               //      labels[i] = new L.Label();
                 //    labels[i].setContent(autos[i].name);
                   //  labels[i].setLatLng(autos[i].latlngColumn.split(','));
                   //  map.showLabel(labels[i]);;
 
-                    var popup = L.popup();
+  //                  var popup = L.popup();
 
-                    function onMapClick(e) {
-                        popup
-                            .setLatLng(e.latlng)
-                            .setContent("You clicked the map at " + e.latlng.toString())
-                            .openOn(map);
-                    }
-                    map.on('click', onMapClick);
+    //                function onMapClick(e) {
+        //                popup
+      //                      .setLatLng(e.latlng)
+            //                .setContent("You clicked the map at " + e.latlng.toString())
+          //                  .openOn(map);
+          //          }
+        //            map.on('click', onMapClick);
+
                 };
 
-                var welcomeWord = L.popup().setLatLng([25.09, 121.56]).setContent("<div id = 'welcome' style = 'font-size:2rem'>Hi! 歡迎使用自學2.0<button type = 'submit' style = 'font-size:1.5rem'>插上您的旗幟</button></div>").openOn(map);
+
+//                console.log("Mark"+markers);
+
+                var goodMarkers = [];
+
+                for (var i = 0; i < markers.length; i++) {
+                    if (!markers[i]) {
+                        console.log("Bad marker:"+i);
+                        continue;
+           //         console.log(markers[i]);
+             //       console.log(i);
+               //     console.log(Object.keys(markers[i]));
+                    }
+                    goodMarkers.push(markers[i]);
+                };
+
+
+                var hands = L.layerGroup(goodMarkers);  // 所有人
+
+                console.log("AAA");
+
+   //             addTo(map).showLabel(); 
+
+                        // 家庭
+
+//                var ides = L.layerGroup(markersIde); // 教育工作者
+
+                        // 團體
+
+
+ //               var minimal   = L.tileLayer(this.osmUrl, {styleId: 22677, attribution: this.cloudmadeAttribution}),
+  //                  midnight  = L.tileLayer(this.osmUrl, {styleId: 999,   attribution: this.cloudmadeAttribution}),
+    //                motorways = L.tileLayer(this.osmUrl, {styleId: 46561, attribution: this.cloudmadeAttribution});
+
+    //            var baseMaps = {
+      //              "Minimal": minimal,
+        //            "Night View": midnight
+          //      };
+
+
+                var map = L.map('map', {
+                    center: new L.LatLng(23.654299340, 120.44776492196047),
+                    zoom: 7,
+                    layers: [tile, hands]
+                });
+
+
+                var overlayMaps = {
+            //        "Motorways": motorways,
+                    "Hands": hands
+                };
+
+
+                L.control.layers(overlayMaps).addTo(map);  // 之後可以設圖層：家庭, 教師, 自學團體
+
+
+                var intro = '<p>歡迎使用「自學2.0」地圖式互助通訊錄！！'
+            +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>'
+            +'<button type = "submit" style = "font-size:1.5rem">插上您的旗幟</button>';
+
+                var welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'>"+intro+"</div>").openOn(map);
             });
         },
 
@@ -260,11 +358,11 @@
 
     
 //    var marker = L.marker([25.09, 121.535579]).addTo(map);
-  //  marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+  //  marker.bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
 //
 
  //   var marker = L.marker([25.09, 121.5]).addTo(map);
-   // marker.bindPopup("<div class = 'first' style = 'font-size:2rem'><b>Hello world!</b><br>I am a popup.</div>").openPopup();
+   // marker.bindPopup("<div class = 'first' style = 'font-size:2rem'><b>Hello world!</b><br />I am a popup.</div>").openPopup();
 
     
   //      $(".aaa").css('font-size', '200%');

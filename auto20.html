@@ -68,31 +68,80 @@
     <div id="join">
         <img src=""></img>
         <h1>立即升起您的交友旗</h1>
+
+        這份表單是為了自學家庭之間能相互認識，找到彼此。<br /><br />
+        如有兩位以上的孩子，請為他們各填一份表單。<br />
+
         <div id = 'faq'><a>FAQ</a></div>
-        <form>
 
-            <h2>q1</h2>
-            <input type = 'text' placeholder = 'ex1'></input>
+        <div>
+
+            <h2>*您的名字?</h2>
+            <input id = 'name' type = 'text' placeholder = '請輸入你的大名'></input>
             
-            <h2>q2</h2>
-            <input type = 'text' placeholder = 'ex1'></input>
+            <h2>*您的模糊地址?</h2>
+            <input id = 'address' type = 'text' placeholder = 'A縣B市C路D段'></input>
 
-            <h2>q3</h2>
-            <input type = 'text' placeholder = 'ex1'></input>
+            <h2>*可公開的聯絡方式，
+</h2>
+            <textarea id = 'connect_me ' rows = '5' cols = '30' placeholder = '如有多行，請在分行處加上<br>記號'></textarea>
+    
 
-            <h2>q3</h2>
-            <input type = 'radio'>c1</input>
-            <input type = 'radio'>c2</input>
-            <input type = 'radio'>c3</input>
+            <h2>*您的網址?</h2>
+            <input id = 'site' type = 'text' placeholder = '您的個人網址'></input>
+            
+            <h2>*您的社群網址?</h2>
+            <input id = 'site2' id = 'address' type = 'text' placeholder = '讓別人認識您的社群'></input>
 
-            <h2>q3</h2>
-            <input type = 'checkbox'>自學家長</input>
-            <input type = 'checkbox'>自學生</input>
-            <input type = 'checkbox'>自主教師</input><br />
-            <input type = 'checkbox'>自學團體</input>
-            <input type = 'checkbox'>自主生活者</input>
-            <input type = 'checkbox'>自耕農</input><br />
-            <input type = 'checkbox'>微型創業者</input>
+
+            <h2>*學習者的出生年份(西元)?</h2>
+            <input id = 'learner_birth' type = 'text' placeholder = '學習者 = 您或您的孩子'></input>
+            
+            <h2>*學習者的身份? (複選)</h2>
+            <p id = 'learner_role'>                
+                <input type = 'checkbox'>自學家長</input>
+                <input type = 'checkbox'>自學生</input>
+                <input type = 'checkbox'>自主教師</input><br />
+                <input type = 'checkbox'>自學團體</input>
+                <input type = 'checkbox'>自主生活者</input>
+                <input type = 'checkbox'>自耕農</input><br />
+                <input type = 'checkbox'>微型創業者</input>
+            </p>
+
+
+
+            <h2>*旗幟的顏色?</h2>
+            <p>自學團體=red, 自學家庭=yellow, 獨立教師=green, 其他朋友=blue</p>
+            
+            <p id = 'Style'>
+                <input name = 'Style' type = 'radio'>large_red</input>
+                <input name = 'Style' type = 'radio'>large_yellow</input>
+                <input name = 'Style' type = 'radio'>large_green</input>
+                <input name = 'Style' type = 'radio'>large_blue</input>
+            </p>
+
+
+            <h2>*學習者的興趣?</h2>
+            <input id = 'learner_habit' type = 'text' placeholder = '有助於關鍵字搜詢'></input>                      
+            <h2>*家庭可以分享、助人的領域?</h2>
+            <input id = 'share' type = 'text' placeholder = '有助於別人用關鍵字找到您，尋求支持'></input>                        
+
+
+            <h2>*家庭希望的支援?</h2>            
+            <input id = 'ask' type = 'text' placeholder = '有助於別人用關鍵字找到您，尋求支持'></input>            
+            <!--
+            note *
+            任何可以公開的自我自紹，幫助別人認識你。
+
+            check *
+            防呆裝置，請依下面提示來複選
+             請勾這格
+             不勾這格
+             要勾
+             別勾
+             勿勾選
+             勾本格
+            -->
 
 
             <h2>q3</h2>
@@ -103,11 +152,11 @@
             <input type = 'text' placeholder = 'ex1'></input> <button>Add tag</button>            
             <br/>
             <button>預覽</button>           
-            <input type = 'submit'> 送出 </input>
+            <button> 送出 </button>
 
+            <!-- address: 如有兩位以上相同，要修成略有不同，才會分別顯示出兩位的圖示。 -->
 
-
-        </form>
+        </div>
      </div>
 
 <script>
@@ -144,7 +193,8 @@
 
             this.icon = {green: new this.LeafIcon({iconUrl: 'img/leaf-green.png'}),
                         red : new this.LeafIcon({iconUrl: 'img/leaf-red.png'}),
-                        orange : new this.LeafIcon({iconUrl: 'img/leaf-orange.png'})
+                        orange : new this.LeafIcon({iconUrl: 'img/leaf-orange.png'}),            
+                        purple : new this.LeafIcon({iconUrl: 'img/leaf-purple.png'})
                     };
 
             this.dataRef = new Firebase('https://we-autolearn.firebaseio.com');           
@@ -228,7 +278,7 @@
                         case 'large_yellow' :
                             colorIcon = icon.orange;                    break;
                         case 'large_blue' :
-                            colorIcon = icon.red;                    break;
+                            colorIcon = icon.purple;                    break;
                         case 'large_red' :
                             colorIcon = icon.red;                    break;
                         default:

@@ -46,10 +46,10 @@
 <body>
 
     <div id="searchDiv">
-        <form id="searchbox" action="">
+        <div id="searchbox">
             <input id="search" type="text" data-ng-modle = "seekFriend" placeholder="輸入關鍵字找朋友">
-            <input id="goSearch" type="submit" value="尋找">
-        </form>
+            <button id="goSearch">Go!</button>
+        </div>
     </div>
 
     <div id="chatDiv">
@@ -64,6 +64,7 @@
 
     <div id="map">
     </div>
+
     <div id="join">
         <img src=""></img>
         <h1>立即升起您的交友旗</h1>
@@ -117,12 +118,12 @@
         el: $('body'),
 
         events :{
-            'click div#goSearch' : 'render'
+            'click button#goSearch' : 'changeHands'
         },
 
         initialize: function() {
 
-            _.bindAll(this, 'render', 'feedback');
+            _.bindAll(this, 'render', 'feedback', 'changeHands');
 
             
             this.osmUrl='http://{s}.tile.cloudmade.com/1dc4012079d54f93b27789a1fc4491e9/997/256/{z}/{x}/{y}.png';
@@ -149,6 +150,27 @@
             this.dataRef = new Firebase('https://we-autolearn.firebaseio.com');           
             
             this.render();
+        },
+
+        changeHands: function() {
+            console.log('call changeHands');
+
+            $("#map").fadeOut(1000)
+
+            setTimeout(function() {
+                $('#map').remove();
+                
+                $('body').append("<div id = 'map'></div>");
+
+                console.log('removeMap');
+
+                eval("auto20.render()");
+
+            }, 2000);
+
+
+            //...
+
         },
 
         render: function() {
@@ -215,7 +237,6 @@
                             colorIcon = icon.orange;
                     }
 
-                    var seek = !$('#search').val();
 
 //                    var flag = hand.name+"<b>Hello world!</b><br />I am a popup.";
                     var flag = '<div class="flag" style="font-family: sans-serif;">'
@@ -242,9 +263,9 @@
                         +'<b> <a href = "mailto:bestianhelp@gmail.com?subject=回報名為'+hand.name+'、時間戳記為'+hand.時間戳記+'的資料錯誤&body=網站管理員您好: 我要回報名為'+hand.name+'的資料錯誤，詳請如下：" title="如遇錯誤與濫用，請按此回報，謝謝!!">  回報錯誤或濫用 </a> </b>'
                         +'</div>'
 
-                    
+                    var seek = $('#search').val();
 
-                    if (seek != true && flag.indexOf(seek) == -1) {
+                    if (seek && flag.indexOf(seek) == -1) {
                         console.log(seek+'：'+flag.indexOf(seek)+'略過'+hand.name);
                         continue;
                     }
@@ -297,9 +318,7 @@
                 };
 
 
-                var hands = L.layerGroup(goodMarkers);  // 所有人
-
-                console.log("AAA");
+                this.hands = L.layerGroup(goodMarkers);  // 所有人
 
    //             addTo(map).showLabel(); 
 
@@ -319,29 +338,33 @@
         //            "Night View": midnight
           //      };
 
+//                if (!(this.map)) {
+                    this.map = L.map('map', {
+                        center: new L.LatLng(23.654299340, 120.44776492196047),
+                        zoom: 7,
+                        layers: [tile, this.hands]
+                    });
+//                }
 
-                var map = L.map('map', {
-                    center: new L.LatLng(23.654299340, 120.44776492196047),
-                    zoom: 7,
-                    layers: [tile, hands]
-                });
 
-
-                var overlayMaps = {
+                this.overlayMaps = {
             //        "Motorways": motorways,
-                    "Hands": hands
+                    "Hands": this.hands
                 };
 
 
-                L.control.layers(overlayMaps).addTo(map);  // 之後可以設圖層：家庭, 教師, 自學團體
-
+                L.control.layers(this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
 
                 var intro = '<p>歡迎使用「自學2.0」地圖式互助通訊錄！！'
-            +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>'
-            +'<button type = "submit" style = "font-size:1.5rem">插上您的旗幟</button>';
+                    +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>'
+                    +'<button type = "submit" style = "font-size:1.5rem">插上您的旗幟</button>';
 
-                var welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'>"+intro+"</div>").openOn(map);
+                var welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'>"+intro+"</div>").openOn(this.map);
+
+                console.log("render finished");
+
             });
+
         },
 
         feedback: function() {
@@ -351,9 +374,6 @@
     
     var auto20 = new Auto20();
     
-    
-
-
     
 
     

@@ -176,6 +176,8 @@
         render: function() {
 
             var icon = this.icon;
+            var osmUrl = this.osmUrl;
+            var attribution = this.cloudmadeAttribution;
 
 //            var road_layer = new L.TileLayer(osmUrl, {
 //                minZoom: 8,
@@ -191,10 +193,6 @@
 
             // 如果存在，先清理一次   <==  待加
 
-            var tile = L.tileLayer(this.osmUrl, {
-            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-            maxZoom: 18
-        });  
 
 
             this.dataRef.once('value', function(dataSnapshot) {
@@ -310,50 +308,55 @@
                     if (!markers[i]) {
                         console.log("Bad marker:"+i);
                         continue;
-           //         console.log(markers[i]);
-             //       console.log(i);
-               //     console.log(Object.keys(markers[i]));
                     }
+
                     goodMarkers.push(markers[i]);
                 };
 
 
-                this.hands = L.layerGroup(goodMarkers);  // 所有人
-
-   //             addTo(map).showLabel(); 
-
-                        // 家庭
-
-//                var ides = L.layerGroup(markersIde); // 教育工作者
-
-                        // 團體
+                var hands = {
+                 a: L.layerGroup(goodMarkers),  // 所有人
+                 f: L.layerGroup(goodMarkers),  // 所有人
+                 l: L.layerGroup(goodMarkers),  // 所有人
+                 e: L.layerGroup(goodMarkers),  // 所有人
+                 g: L.layerGroup(goodMarkers),  // 所有人
+                }
 
 
- //               var minimal   = L.tileLayer(this.osmUrl, {styleId: 22677, attribution: this.cloudmadeAttribution}),
-  //                  midnight  = L.tileLayer(this.osmUrl, {styleId: 999,   attribution: this.cloudmadeAttribution}),
-    //                motorways = L.tileLayer(this.osmUrl, {styleId: 46561, attribution: this.cloudmadeAttribution});
-
-    //            var baseMaps = {
-      //              "Minimal": minimal,
-        //            "Night View": midnight
-          //      };
-
-//                if (!(this.map)) {
-                    this.map = L.map('map', {
-                        center: new L.LatLng(23.654299340, 120.44776492196047),
-                        zoom: 7,
-                        layers: [tile, this.hands]
-                    });
-//                }
+                var minimal = L.tileLayer(osmUrl, {
+                    styleId: 113475,
+                    attribution: attribution,
+                    maxZoom: 18
+                }), 
+                    midnight  = L.tileLayer(osmUrl, {
+                    styleId: 113784,
+                    attribution: attribution,
+                    maxZoom: 18
+                });
 
 
-                this.overlayMaps = {
-            //        "Motorways": motorways,
-                    "Hands": this.hands
+                var baseMaps = {
+                    "白天": minimal,
+                    "黑夜": midnight    //bug here-- 沒有連到樣式
                 };
 
 
-                L.control.layers(this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
+                this.overlayMaps = {
+                    "所有交友旗幟": hands.a,
+                    "自學家庭": hands.f,
+                    "自學生": hands.l,
+                    "獨立教育工作者": hands.e,
+                    "自主團體教師": hands.g,
+                };
+
+                this.map = L.map('map', {
+                    center: new L.LatLng(23.654299340, 120.44776492196047),
+                    zoom: 7,
+                    layers: [minimal, hands.a]
+                });
+
+
+                L.control.layers(baseMaps, this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
 
                 var intro = '<p>歡迎使用「自學2.0」地圖式互助通訊錄！！'
                     +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>'

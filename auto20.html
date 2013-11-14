@@ -14,8 +14,13 @@
 
 
 <style>
-    #map { float: left; height: 800px; width: 73%; min-width: 420px;}
-    #join { float: right; height: 800px; width: 25%; min-width: 200px;}
+    body {
+        background-image: url("img/leaf-shadow.png");
+        background-color: rgba(255,255,200,1);
+    }
+    #map { float: left; height: 800px; width: 74%; min-width: 420px; border-radius: 15px}
+    #join { float: right; width: 25%; min-width: 200px; padding-left: 7px; border-radius: 15px;
+            background-color: rgba(255,255,255,0.7)}
     #searchDiv { position:fixed; top: 20px; left: 60px; z-index: 1}
     #chatDiv { display:block; position:fixed; bottom: 20px; left: 60px; z-index: 1;
         width: 250px; height: 100px; background: white; border: 3px; border-radius: 10px; padding: 5px}
@@ -39,6 +44,7 @@
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
 
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script> 
 
 <title>自學2.0--地圖式的互助通訊錄</title>
 </head>
@@ -66,13 +72,12 @@
     </div>
 
     <div id="join">
-        <img src=""></img>
-        <h1>立即升起您的交友旗</h1>
+        <h1>升起您的交友旗幟</h1>
 
         這份表單是為了自學家庭之間能相互認識，找到彼此。<br /><br />
         如有兩位以上的孩子，請為他們各填一份表單。<br />
 
-        <div id = 'faq'><a>FAQ</a></div>
+<!--        <div id = 'faq'><a>FAQ</a></div>  -->
 
         <div>
 
@@ -80,7 +85,7 @@
             <input id = 'name' type = 'text' placeholder = '請輸入你的大名'></input>
             
             <h2>*您的模糊地址?</h2>
-            <input id = 'address' type = 'text' placeholder = 'A縣B市C路D段'></input>
+            <input id = 'address' type = 'text' placeholder = 'A縣B市C路'></input>
 
             <h2>*可公開的聯絡方式，
 </h2>
@@ -99,25 +104,27 @@
             
             <h2>*學習者的身份? (複選)</h2>
             <p id = 'learner_role'>                
-                <input type = 'checkbox'>自學家長</input>
-                <input type = 'checkbox'>自學生</input>
-                <input type = 'checkbox'>自主教師</input><br />
-                <input type = 'checkbox'>自學團體</input>
-                <input type = 'checkbox'>自主生活者</input>
-                <input type = 'checkbox'>自耕農</input><br />
-                <input type = 'checkbox'>微型創業者</input>
+                <input type = 'checkbox' id = '自學家長'>自學家長</input>
+                <input type = 'checkbox' id = '自學生'>自學生</input>
+                <input type = 'checkbox' id = '獨立教育工作者'>獨立教育工作者</input><br />
+                <input type = 'checkbox' id = '自學團體'>自學團體</input>
+                <input type = 'checkbox' id = '自主生活者'>自主生活者</input>
+                <input type = 'checkbox' id = '自耕農'>自耕農</input><br />
+                <input type = 'checkbox' id = '微型創業者'>微型創業者</input>
             </p>
 
 
 
+
             <h2>*旗幟的顏色?</h2>
-            <p>自學團體=red, 自學家庭=yellow, 獨立教師=green, 其他朋友=blue</p>
+            <p>自學團體=red, 自學家庭=yellow,<br />
+                獨立教師=green, 其他朋友=blue</p>
             
             <p id = 'Style'>
-                <input name = 'Style' type = 'radio'>large_red</input>
-                <input name = 'Style' type = 'radio'>large_yellow</input>
-                <input name = 'Style' type = 'radio'>large_green</input>
-                <input name = 'Style' type = 'radio'>large_blue</input>
+                <input name = 'Style' type = 'radio' id = 'large_red'>large_red</input>
+                <input name = 'Style' type = 'radio' id = 'large_yellow'>large_yellow</input>
+                <input name = 'Style' type = 'radio' id = 'large_green'>large_green</input>
+                <input name = 'Style' type = 'radio' id = 'large_blue'>large_blue</input>
             </p>
 
 
@@ -129,30 +136,16 @@
 
             <h2>*家庭希望的支援?</h2>            
             <input id = 'ask' type = 'text' placeholder = '有助於別人用關鍵字找到您，尋求支持'></input>            
-            <!--
-            note *
-            任何可以公開的自我自紹，幫助別人認識你。
+            <h2>*公開的自我介紹?</h2>
+            <textarea id = 'note' rows = '5' cols = '30' placeholder = '任何可以公開的自我介紹，幫助別人認識你。'></textarea>
 
-            check *
-            防呆裝置，請依下面提示來複選
-             請勾這格
-             不勾這格
-             要勾
-             別勾
-             勿勾選
-             勾本格
-            -->
-
-
-            <h2>q3</h2>
-            <input type = 'text' placeholder = 'ex1'></input>
-
-            <h2>Tags(for Search Engine)</h2>
+            
+<!--            <h2>Tags(for Search Engine)</h2>
             <span>ex tag1 <button>x</button></span>
-            <input type = 'text' placeholder = 'ex1'></input> <button>Add tag</button>            
+            <input type = 'text' placeholder = 'ex1'></input> <button>Add tag</button> -->            
             <br/>
-            <button>預覽</button>           
-            <button> 送出 </button>
+            <button id = 'formPerview' class = 'ui blue button'>預覽</button>           
+            <button id = 'formSubmit' class = 'ui green button'>送出</button>
 
             <!-- address: 如有兩位以上相同，要修成略有不同，才會分別顯示出兩位的圖示。 -->
 
@@ -167,12 +160,14 @@
         el: $('body'),
 
         events :{
-            'click button#goSearch' : 'changeHands'
+            'click button#goSearch' : 'changeHands',
+            'click button#formPerview' : 'formPerview',
+            'click button#formSubmit' : 'formSubmit'
         },
 
         initialize: function() {
 
-            _.bindAll(this, 'render', 'feedback', 'changeHands');
+            _.bindAll(this, 'render', 'feedback', 'changeHands', 'formPerview', 'formSubmit');
 
             
             this.osmUrl='http://{s}.tile.cloudmade.com/1dc4012079d54f93b27789a1fc4491e9/997/256/{z}/{x}/{y}.png';
@@ -198,7 +193,9 @@
                     };
 
             this.dataRef = new Firebase('https://we-autolearn.firebaseio.com');           
-            
+
+            this.preview = false;
+
             this.render();
         },
 
@@ -225,6 +222,7 @@
 
         render: function() {
 
+            var preview = this.preview;
             var icon = this.icon;
             var osmUrl = this.osmUrl;
             var attribution = this.cloudmadeAttribution;
@@ -255,7 +253,7 @@
 
 //                console.log(autos);
   //              console.log(autos.length);
-
+                if (preview) autos.push(preview);
 
                 for (var i = 0; i < autos.length; i++) {
 
@@ -323,7 +321,7 @@
                         continue;
                     }
 
-                    markers[i] = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindLabel(hand.name, { noHide: true }).bindPopup(flag);
+                    markers[i] = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindPopup(flag).bindLabel(hand.name, { noHide: true });
 
 
  //                   circles[i] = L.circle(autos[i].latlngColumn.split(','), 500, {
@@ -366,10 +364,11 @@
 
                 var hands = {
                  a: L.layerGroup(goodMarkers),  // 所有人
-                 f: L.layerGroup(goodMarkers),  // 所有人
-                 l: L.layerGroup(goodMarkers),  // 所有人
-                 e: L.layerGroup(goodMarkers),  // 所有人
-                 g: L.layerGroup(goodMarkers),  // 所有人
+                 m: L.layerGroup(goodMarkers),  // 當月新人
+                 f: L.layerGroup(goodMarkers),  // 自學家庭
+                 l: L.layerGroup(goodMarkers),  // 自學生
+                 e: L.layerGroup(goodMarkers),  // 教育工作者
+                 g: L.layerGroup(goodMarkers),  // 自學團體
                 }
 
 
@@ -393,6 +392,7 @@
 
                 this.overlayMaps = {
                     "所有交友旗幟": hands.a,
+                    "當月新人": hands.m,
                     "自學家庭": hands.f,
                     "自學生": hands.l,
                     "獨立教育工作者": hands.e,
@@ -409,14 +409,85 @@
                 L.control.layers(baseMaps, this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
 
                 var intro = '<p>歡迎使用「自學2.0」地圖式互助通訊錄！！'
-                    +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>'
-                    +'<button type = "submit" style = "font-size:1.5rem">插上您的旗幟</button>';
+                    +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>';
 
                 var welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'>"+intro+"</div>").openOn(this.map);
+
+                $( this.el ).scrollTop( 0 );
 
                 console.log("render finished");
 
             });
+
+        },
+
+        formPerview: function() {
+            var d = new Date();
+            var curr_hour = d.getHours();
+            (curr_hour > 12) ? curr_hour = ' 下午 ' + (curr_hour - 12) : curr_hour = ' 上午 ' + curr_hour;
+            var curr_date = d.getDate();
+            var curr_month = d.getMonth() + 1; //Months are zero based
+            var curr_year = d.getFullYear();
+
+            var timeStamp = curr_year +"/" + curr_month + "/" + curr_date + curr_hour;
+
+
+            // 這段待修 === google geocoder說明文件：
+            // https://developers.google.com/maps/documentation/geocoding/?hl=zh-TW&csw=1
+
+            function parseLatLng (blurAddr){
+                var geocoder = google.maps.Geocoder(); // 待修
+                
+                geocoder.geocode( { 'address': blurAddr}, function(results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            console.log(results[0].geometry.location); //should have valid info
+
+                            return results[0].geometry.location;                    
+                        }
+                });
+                
+            }
+            var latlngColumn = parseLatLng($('#address').val());
+
+            var roles = ['自學家長','自學生','自學團體','獨立教育工作者','自主生活者','自耕農','微型創業者'], goodRoles = [];
+            for (var i = 0; i < roles.length; i++) {
+                if (document.getElementById(roles[i]).checked) goodRoles.push(roles[i]);
+            };
+
+            var styles = ['large_red','large_yellow','large_green','large_blue'], goodStyle = '';
+            for (var i = 0; i < styles.length; i++) {
+                if (document.getElementById(styles[i]).checked) { goodStyle = styles[i]; break }
+            };
+
+            this.preview = {
+                時間戳記: timeStamp,
+                name: $('#name').val(),
+                address: $('#address').val(),
+                latlngColumn : latlngColumn,
+                connect_me: $('#connect_me').val(),
+                site: $('#site').val(),
+                site2: $('#site2').val(),
+                learner_birth: $('#learner_birth').val(),
+                connect_me: $('#connect_me').attr('title'),
+                learner_role: goodRoles.join(),
+                Style: goodStyle,
+                learner_habit: $('#learner_habit').val(),
+                share: $('#share').val(),
+                ask: $('#ask').val(),
+                note: $('#note').val(),
+            };
+/*
+                               
+            <h2>Tags(for Search Engine)</h2>
+            <span>ex tag1 <button>x</button></span>
+            <input type = 'text' placeholder = 'ex1'></input> <button>Add tag</button>       
+ 
+*/
+
+            this.changeHands();
+        },
+
+        formSubmit: function() {
 
         },
 
@@ -428,17 +499,6 @@
     var auto20 = new Auto20();
     
     
-
-    
-//    var marker = L.marker([25.09, 121.535579]).addTo(map);
-  //  marker.bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
-//
-
- //   var marker = L.marker([25.09, 121.5]).addTo(map);
-   // marker.bindPopup("<div class = 'first' style = 'font-size:2rem'><b>Hello world!</b><br />I am a popup.</div>").openPopup();
-
-    
-  //      $(".aaa").css('font-size', '200%');
         
 
 </script>

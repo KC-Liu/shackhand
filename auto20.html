@@ -85,19 +85,21 @@
     </div>
 
     <script type="text/javascript">
-        var myDataRef = new Firebase('https://af93lsxvgl1.firebaseio-demo.com/'); //待修
-        $('#messageInput').keypress(function (e) {
+        var myDataRef = new Firebase('https://shackhand-autolearn.firebaseio.com'); 
+            $('#messageInput').keypress(function (e) {
             if (e.keyCode == 13) {
                 var name = $('#nameInput').val();
                 var text = $('#messageInput').val();
                 var time = makeTimeStamp()
                     time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
-                myDataRef.push({name: name, text: text, time: time});
+
+                myDataRef.child('chat').push({name: name, text: text, time: time});
+                myDataRef.child('chatNew').child(makeTimeStamp()).set({name: name, text: text, time: time});
                 $('#messageInput').val('');
             }
         });
 
-        myDataRef.on('child_added', function(snapshot) {
+        myDataRef.child('chat').on('child_added', function(snapshot) {
             var message = snapshot.val();    
             displayChatMessage(message.name, message.text, message.time);
         });
@@ -235,13 +237,14 @@
                         purple : new this.LeafIcon({iconUrl: 'img/leaf-purple.png'})
                     };
 
-            this.dataRef = new Firebase('https://we-autolearn.firebaseio.com');           
             preview = false;
 
             if (location.hash.replace('#','').length > 0) {
             	$('input#search').val(location.hash.replace('#',''));
 
             };
+
+            this.welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
 
             this.render();
         },
@@ -255,7 +258,7 @@
         changeHands: function() {
             console.log('call changeHands');
 
-            location.hash = '#' + $('input#search').val();
+            location.hash = '#' + encodeURI($('input#search').val());
 
             $("#map").fadeOut(1000);
 
@@ -275,7 +278,7 @@
             var attribution = this.cloudmadeAttribution;
 
 
-            this.dataRef.once('value', function(dataSnapshot) {
+            myDataRef.child('hands').once('value', function(dataSnapshot) {
                 var markers = [];
                 var fMarkers = [];
                 var lMarkers = [];
@@ -284,10 +287,8 @@
                 var mMarkers = [];  
                 var latlngUsed = [];
 
-                var intro = '<p>歡迎使用「自學2.0」地圖式互助通訊錄！！'
-                    +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>';
-
-                var welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'>"+intro+"</div>");
+                
+                var welcomeWord = this.welcomeWord;
 
                 var autos = dataSnapshot.val();
                 userNum = autos.length;
@@ -370,6 +371,9 @@
                         +'<b> <a href = "mailto:bestianhelp@gmail.com?subject=回報名為'+hand.name+'、時間戳記為'+hand.時間戳記+'的資料錯誤&body=網站管理員您好: 我要回報名為'+hand.name+'的資料錯誤，詳請如下：" title="如遇錯誤與濫用，請按此回報，謝謝!!">  回報錯誤或濫用 </a> </b>'
                         +'</div>'
 
+                    if (seek) {
+                        myDataRef.child('seek').child(makeTimeStamp()).set({seek: seek});
+                    };
 
                     if (seek && flag.indexOf(seek) == -1) {
                         console.log(seek+'：'+flag.indexOf(seek)+'略過'+hand.name);
@@ -461,7 +465,10 @@
 
                 L.control.layers(this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
 
-                if (welcomeWord) welcomeWord.openOn(this.map);
+                if (welcomeWord) {
+                    welcomeWord.openOn(this.map);
+                    this.welcomeWord = '';
+                 }
 
                 $( this.el ).scrollTop( 0 );
 
@@ -482,8 +489,6 @@
         makePrev: function(command) {
 
         	console.log("preview started");
-
-        	var dataRef = this.dataRef;
 
         	$.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ $('#address').val() +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
 
@@ -542,36 +547,12 @@
 
 		         	if (preview.note.length < 20) {alert('請輸入完整的自我介紹'); return};
 
-		            dataRef.child('hands').child(userNum).set(preview);
+		            mydataRef.child('hands').child(userNum).set(preview);
 		            preview = false;
 		            
 	                eval("auto20.changeHands()");
 	            }
-        	});
-			
-
-
-     //       function parseLatLng (blurAddr){
-  //          	xmlhttp=new XMLHttpRequest();
-//            	xmlhttp.open("GET","http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22台南市府前路一段%22+and+locale%3D%22zh_TW%22&format=json",true);
-	//			xmlhttp.send();
-
-	//			setTimeout (function (){console.log(xmlhttp.responseText);        
-	//				}, 2000);
-      //      }
-
-
-
-
-     //       var latlngColumn = parseLatLng($('#address').val());
-
-            
-
-           
-
-
-
-            
+        	});            
         },
 
         feedback: function() {

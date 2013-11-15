@@ -16,14 +16,15 @@
 <style>
     body {
         background-image: url("img/leaf-shadow.png");
-        background-color: rgba(255,255,200,1);
+        background-color: rgba(200,200,155,1);
     }
     #map { float: left; height: 800px; width: 74%; min-width: 420px; border-radius: 15px}
     #join { float: right; width: 25%; min-width: 200px; padding-left: 7px; border-radius: 15px;
             background-color: rgba(255,255,255,0.7)}
     #searchDiv { position:fixed; top: 20px; left: 60px; z-index: 1}
     #chatDiv { display:block; position:fixed; bottom: 20px; left: 60px; z-index: 1;
-        width: 250px; height: 100px; background: white; border: 3px; border-radius: 10px; padding: 5px}
+        width: 250px; height: 100px; background: rgba(200,200,200,0.5); border: 3px; border-radius: 10px; padding: 5px; overflow: auto; }
+    #chatMessageDiv { overflow: auto;}
 
 
 
@@ -47,31 +48,73 @@
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script> 
 
 <title>自學2.0--地圖式的互助通訊錄</title>
+
+    <script type="text/javascript">        
+        function makeTimeStamp(){
+            var d = new Date();
+
+            var curr_second = d.getSeconds();
+            var curr_minute = d.getMinutes();
+            var curr_hour = d.getHours();
+            (curr_hour > 12) ? curr_hour = ' 下午 ' + (curr_hour - 12) : curr_hour = ' 上午 ' + curr_hour;
+            var curr_date = d.getDate();
+            var curr_month = d.getMonth() + 1; //Months are zero based
+            var curr_year = d.getFullYear();
+
+            return curr_year +"/" + curr_month + "/" + curr_date + curr_hour + ':' + curr_minute +':'+ curr_second;
+        }
+    </script>
+
 </head>
 
 <body>
 
-    <div id="searchDiv">
+    <div id="searchDiv">            <!-- Point:Search  Status: Usable lev 1-->
         <div id="searchbox">
             <input id="search" type="text" data-ng-modle = "seekFriend" placeholder="輸入關鍵字找朋友">
             <button id="goSearch">Go!</button>
         </div>
     </div>
 
-    <div id="chatDiv">
-        Chat: adasdda <br/>
-        Chat2: adada Good!!
-        <div id="chatInputDiv">
-            <input type = 'text' placeholder = '輸入您的聊天訊息'></input>
+    <div id="chatDiv">              <!-- Point:Chat    Status: Demo-->
+        <div id="messageDiv">
         </div>
-
+        <div id="chatInputDiv">
+            <input type = 'text' id = 'nameInput' placeholder = '輸入您的名字'></input>
+            <input type = 'text' id = 'messageInput' placeholder = '輸入您的聊天訊息'></input>
+        </div>
     </div>
 
+    <script type="text/javascript">
+        var myDataRef = new Firebase('https://af93lsxvgl1.firebaseio-demo.com/'); //待修
+        $('#messageInput').keypress(function (e) {
+            if (e.keyCode == 13) {
+                var name = $('#nameInput').val();
+                var text = $('#messageInput').val();
+                var time = makeTimeStamp()
+                    time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
+                myDataRef.push({name: name, text: text, time: time});
+                $('#messageInput').val('');
+            }
+        });
 
-    <div id="map">
+        myDataRef.on('child_added', function(snapshot) {
+            var message = snapshot.val();    
+            displayChatMessage(message.name, message.text, message.time);
+        });
+
+        function displayChatMessage(name, text, time) {
+            $('<div/>').text(time).prepend($('<em/>').text(text)).prepend($('<em/>').text(name+': ')).appendTo($('#messageDiv'));
+            $('#messageDiv')[0].scrollTop = $('#messageDiv')[0].scrollHeight;
+        };
+
+      </script>
+
+
+    <div id="map">                          <!-- Point: Main-Map   Status: Usable lev0 -->
     </div>
 
-    <div id="join">
+    <div id="join">                         <!-- Point:Form  -->
         <h1>升起您的交友旗幟</h1>
 
         這份表單是為了自學家庭之間能相互認識，找到彼此。<br /><br />
@@ -153,13 +196,14 @@
      </div>
 
 <script>
-    
+
     
 
     Auto20 = Backbone.View.extend({
         el: $('body'),
 
         events :{
+            'keypress button#goSearch' : 'maybeSearch',
             'click button#goSearch' : 'changeHands',
             'click button#formPerview' : 'formPerview',
             'click button#formSubmit' : 'formSubmit'
@@ -167,7 +211,7 @@
 
         initialize: function() {
 
-            _.bindAll(this, 'render', 'feedback', 'changeHands', 'formPerview', 'formSubmit');
+            _.bindAll(this, 'feedback', 'maybeSearch','changeHands', 'formPerview', 'formSubmit', 'makePrev', 'render');
 
             
             this.osmUrl='http://{s}.tile.cloudmade.com/1dc4012079d54f93b27789a1fc4491e9/997/256/{z}/{x}/{y}.png';
@@ -197,6 +241,12 @@
             this.preview = false;
 
             this.render();
+        },
+
+        maybeSearch: function(ev) {
+            if ( ev.which === 13 ) { 
+                this.changeHands;
+            }
         },
 
         changeHands: function() {
@@ -245,10 +295,15 @@
 
             this.dataRef.once('value', function(dataSnapshot) {
                 // store dataSnapshot for use in below examples.
-                var markers = []; var circles = [];
-     //           var markersIde = [];
-     //           var markersHome = [];
-      //          var markersGroup = [];
+                var markers = [];
+                var fMarkers = [];
+                var lMarkers = [];
+                var eMarkers = [];
+                var gMarkers = [];
+                var mMarkers = [];
+  
+                var circles = [];
+
                 var autos = dataSnapshot.val();
 
 //                console.log(autos);
@@ -323,6 +378,15 @@
 
                     markers[i] = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindPopup(flag).bindLabel(hand.name, { noHide: true });
 
+                    if (hand.learner_role.indexOf('自學家長') > -1) fMarkers.push(markers[i]);
+                    if (hand.learner_role.indexOf('自學生') > -1) lMarkers.push(markers[i]);
+                    if (hand.learner_role.indexOf('獨立教育工作者') > -1) eMarkers.push(markers[i]);
+                    if (hand.learner_role.indexOf('自學團體') > -1) gMarkers.push(markers[i]);
+//                    if (hand.時間戳記  ~~  makeTimeStamp()) {
+  //                      mMarkers.push(markers[i]);
+    //                }
+
+
 
  //                   circles[i] = L.circle(autos[i].latlngColumn.split(','), 500, {
    //                     color: 'green',
@@ -335,18 +399,8 @@
                   //  labels[i].setLatLng(autos[i].latlngColumn.split(','));
                   //  map.showLabel(labels[i]);;
 
-  //                  var popup = L.popup();
-
-    //                function onMapClick(e) {
-        //                popup
-      //                      .setLatLng(e.latlng)
-            //                .setContent("You clicked the map at " + e.latlng.toString())
-          //                  .openOn(map);
-          //          }
-        //            map.on('click', onMapClick);
 
                 };
-
 
 //                console.log("Mark"+markers);
 
@@ -354,21 +408,20 @@
 
                 for (var i = 0; i < markers.length; i++) {
                     if (!markers[i]) {
-                        console.log("Bad marker:"+i);
+                        console.log("Null marker:"+i);
                         continue;
                     }
-
                     goodMarkers.push(markers[i]);
                 };
 
 
                 var hands = {
-                 a: L.layerGroup(goodMarkers),  // 所有人
+                 a: L.layerGroup(goodMarkers),  // 所有人           good!
+                 f: L.layerGroup(fMarkers),  // 自學家庭         
+                 l: L.layerGroup(lMarkers),  // 自學生
+                 e: L.layerGroup(eMarkers),  // 教育工作者
+                 g: L.layerGroup(mMarkers),  // 自學團體
                  m: L.layerGroup(goodMarkers),  // 當月新人
-                 f: L.layerGroup(goodMarkers),  // 自學家庭
-                 l: L.layerGroup(goodMarkers),  // 自學生
-                 e: L.layerGroup(goodMarkers),  // 教育工作者
-                 g: L.layerGroup(goodMarkers),  // 自學團體
                 }
 
 
@@ -391,18 +444,18 @@
 
 
                 this.overlayMaps = {
-                    "所有交友旗幟": hands.a,
-                    "當月新人": hands.m,
                     "自學家庭": hands.f,
                     "自學生": hands.l,
                     "獨立教育工作者": hands.e,
-                    "自主團體教師": hands.g,
+                    "自學團體": hands.g,
+                    "顯示當月新人": hands.m,
+                    "顯示全部": hands.a,
                 };
 
                 this.map = L.map('map', {
                     center: new L.LatLng(23.654299340, 120.44776492196047),
                     zoom: 7,
-                    layers: [minimal, hands.a]
+                    layers: [minimal, hands.f, hands.l, hands.e, hands.g]
                 });
 
 
@@ -421,30 +474,36 @@
 
         },
 
-        formPerview: function() {
-            var d = new Date();
-            var curr_hour = d.getHours();
-            (curr_hour > 12) ? curr_hour = ' 下午 ' + (curr_hour - 12) : curr_hour = ' 上午 ' + curr_hour;
-            var curr_date = d.getDate();
-            var curr_month = d.getMonth() + 1; //Months are zero based
-            var curr_year = d.getFullYear();
+        formPerview: function() {    //預覽
+            this.makePrev();
+            this.changeHands();
+        },
 
-            var timeStamp = curr_year +"/" + curr_month + "/" + curr_date + curr_hour;
+        formSubmit: function() {    //送出表單
+
+            this.makePrev();
+            this.dataRef().push(this.preview);  this.preview = '';
+            this.changeHands();
+        },
+
+        makePrev: function() {
+
+            var timeStamp = makeTimeStamp();
 
 
             // 這段待修 === google geocoder說明文件：
             // https://developers.google.com/maps/documentation/geocoding/?hl=zh-TW&csw=1
 
             function parseLatLng (blurAddr){
-                var geocoder = google.maps.Geocoder(); // 待修
+ //               var geocoder = google.maps.Geocoder(); // 待修
                 
-                geocoder.geocode( { 'address': blurAddr}, function(results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {
-                            console.log(results[0].geometry.location); //should have valid info
+   //             geocoder.geocode( { 'address': blurAddr}, function(results, status) {
+     //                   if (status == google.maps.GeocoderStatus.OK) {
+       //                     console.log(results[0].geometry.location); //should have valid info
 
-                            return results[0].geometry.location;                    
-                        }
-                });
+         //                   return results[0].geometry.location;                    
+           //             }
+           //    });
                 
             }
             var latlngColumn = parseLatLng($('#address').val());
@@ -476,23 +535,12 @@
                 ask: $('#ask').val(),
                 note: $('#note').val(),
             };
-/*
-                               
-            <h2>Tags(for Search Engine)</h2>
-            <span>ex tag1 <button>x</button></span>
-            <input type = 'text' placeholder = 'ex1'></input> <button>Add tag</button>       
- 
-*/
-
-            this.changeHands();
-        },
-
-        formSubmit: function() {
-
         },
 
         feedback: function() {
-        }
+        },
+
+
 
     });
     

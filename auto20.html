@@ -203,7 +203,7 @@
         el: $('body'),
 
         events :{
-            'keypress button#goSearch' : 'maybeSearch',
+            'keypress input#search' : 'maybeSearch',
             'click button#goSearch' : 'changeHands',
             'click button#formPerview' : 'formPerview',
             'click button#formSubmit' : 'formSubmit'
@@ -245,7 +245,7 @@
 
         maybeSearch: function(ev) {
             if ( ev.which === 13 ) { 
-                this.changeHands;
+                this.changeHands();
             }
         },
 
@@ -338,6 +338,7 @@
                             colorIcon = icon.orange;
                     }
 
+                    var seek = $('#search').val();
 
 //                    var flag = hand.name+"<b>Hello world!</b><br />I am a popup.";
                     var flag = '<div class="flag" style="font-family: sans-serif;">'
@@ -364,12 +365,16 @@
                         +'<b> <a href = "mailto:bestianhelp@gmail.com?subject=回報名為'+hand.name+'、時間戳記為'+hand.時間戳記+'的資料錯誤&body=網站管理員您好: 我要回報名為'+hand.name+'的資料錯誤，詳請如下：" title="如遇錯誤與濫用，請按此回報，謝謝!!">  回報錯誤或濫用 </a> </b>'
                         +'</div>'
 
-                    var seek = $('#search').val();
 
                     if (seek && flag.indexOf(seek) == -1) {
                         console.log(seek+'：'+flag.indexOf(seek)+'略過'+hand.name);
                         continue;
                     }
+
+                    if (seek && flag) {
+                        flag = flag.replace(seek,'<span style = "background-color: rgba(255,255,155,1) ">' + seek + '</span>')
+                    }
+
 
                     if (hand.latlngColumn.split(',').length != 2) {
                         console.log('LatLng:'+ hand.latlngColumn);

@@ -45,7 +45,6 @@
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
 
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script> 
 
 <title>自學2.0--地圖式的互助通訊錄</title>
 
@@ -197,7 +196,7 @@
 
 <script>
 
-    
+    var preview = false;
 
     Auto20 = Backbone.View.extend({
         el: $('body'),
@@ -238,7 +237,7 @@
 
             this.dataRef = new Firebase('https://we-autolearn.firebaseio.com');           
 
-            this.preview = false;
+            preview = false;
 
             this.render();
         },
@@ -272,7 +271,6 @@
 
         render: function() {
 
-            var preview = this.preview;
             var icon = this.icon;
             var osmUrl = this.osmUrl;
             var attribution = this.cloudmadeAttribution;
@@ -292,7 +290,6 @@
             // 如果存在，先清理一次   <==  待加
 
 
-
             this.dataRef.once('value', function(dataSnapshot) {
                 // store dataSnapshot for use in below examples.
                 var markers = [];
@@ -300,15 +297,23 @@
                 var lMarkers = [];
                 var eMarkers = [];
                 var gMarkers = [];
-                var mMarkers = [];
-  
+                var mMarkers = [];  
                 var circles = [];
+
+                var intro = '<p>歡迎使用「自學2.0」地圖式互助通訊錄！！'
+                    +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>';
+
+                var welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'>"+intro+"</div>");
 
                 var autos = dataSnapshot.val();
 
 //                console.log(autos);
   //              console.log(autos.length);
-                if (preview) autos.push(preview);
+                if (preview) {
+                	autos =[preview];
+                	preview = '';
+                	welcomeWord = false;
+                }
 
                 for (var i = 0; i < autos.length; i++) {
 
@@ -413,7 +418,7 @@
 
                 for (var i = 0; i < markers.length; i++) {
                     if (!markers[i]) {
-                        console.log("Null marker:"+i);
+                        console.log("null marker:"+i);
                         continue;
                     }
                     goodMarkers.push(markers[i]);
@@ -466,10 +471,7 @@
 
                 L.control.layers(baseMaps, this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
 
-                var intro = '<p>歡迎使用「自學2.0」地圖式互助通訊錄！！'
-                    +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>';
-
-                var welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'>"+intro+"</div>").openOn(this.map);
+                if (welcomeWord) welcomeWord.openOn(this.map);
 
                 $( this.el ).scrollTop( 0 );
 
@@ -493,53 +495,77 @@
 
         makePrev: function() {
 
-            var timeStamp = makeTimeStamp();
+        	console.log("preview started");
+
+        	$.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ $('#address').val() +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
+
+        		console.log(data);
+
+        		var lat = data.query.results.Result.latitude;
+        		var lng = data.query.results.Result.longitude;
+        		var latlngColumn = lat+','+lng;
+
+        		console.log(latlngColumn);
+
+            	var timeStamp = makeTimeStamp();
+
+            	var roles = ['自學家長','自學生','自學團體','獨立教育工作者','自主生活者','自耕農','微型創業者'], goodRoles = [];
+	            for (var i = 0; i < roles.length; i++) {
+	                if (document.getElementById(roles[i]).checked) goodRoles.push(roles[i]);
+	            };
+
+	             var styles = ['large_red','large_yellow','large_green','large_blue'], goodStyle = '';
+
+	            for (var i = 0; i < styles.length; i++) {
+	                if (document.getElementById(styles[i]).checked) { goodStyle = styles[i]; break }
+	            };
+
+	            preview = {
+	                時間戳記: timeStamp,
+	                name: $('#name').val(),
+	                address: $('#address').val(),
+	                latlngColumn : latlngColumn,
+	                connect_me: $('#connect_me').val(),
+	                site: $('#site').val(),
+	                site2: $('#site2').val(),
+	                learner_birth: $('#learner_birth').val(),
+	                connect_me: $('#connect_me').attr('title'),
+	                learner_role: goodRoles.join(),
+	                Style: goodStyle,
+	                learner_habit: $('#learner_habit').val(),
+	                share: $('#share').val(),
+	                ask: $('#ask').val(),
+	                note: $('#note').val(),
+	            };
 
 
-            // 這段待修 === google geocoder說明文件：
-            // https://developers.google.com/maps/documentation/geocoding/?hl=zh-TW&csw=1
+            	console.log(preview);
 
-            function parseLatLng (blurAddr){
- //               var geocoder = google.maps.Geocoder(); // 待修
-                
-   //             geocoder.geocode( { 'address': blurAddr}, function(results, status) {
-     //                   if (status == google.maps.GeocoderStatus.OK) {
-       //                     console.log(results[0].geometry.location); //should have valid info
+        	});
+			
 
-         //                   return results[0].geometry.location;                    
-           //             }
-           //    });
-                
-            }
-            var latlngColumn = parseLatLng($('#address').val());
 
-            var roles = ['自學家長','自學生','自學團體','獨立教育工作者','自主生活者','自耕農','微型創業者'], goodRoles = [];
-            for (var i = 0; i < roles.length; i++) {
-                if (document.getElementById(roles[i]).checked) goodRoles.push(roles[i]);
-            };
+     //       function parseLatLng (blurAddr){
+  //          	xmlhttp=new XMLHttpRequest();
+//            	xmlhttp.open("GET","http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22台南市府前路一段%22+and+locale%3D%22zh_TW%22&format=json",true);
+	//			xmlhttp.send();
 
-            var styles = ['large_red','large_yellow','large_green','large_blue'], goodStyle = '';
-            for (var i = 0; i < styles.length; i++) {
-                if (document.getElementById(styles[i]).checked) { goodStyle = styles[i]; break }
-            };
+	//			setTimeout (function (){console.log(xmlhttp.responseText);        
+	//				}, 2000);
+      //      }
 
-            this.preview = {
-                時間戳記: timeStamp,
-                name: $('#name').val(),
-                address: $('#address').val(),
-                latlngColumn : latlngColumn,
-                connect_me: $('#connect_me').val(),
-                site: $('#site').val(),
-                site2: $('#site2').val(),
-                learner_birth: $('#learner_birth').val(),
-                connect_me: $('#connect_me').attr('title'),
-                learner_role: goodRoles.join(),
-                Style: goodStyle,
-                learner_habit: $('#learner_habit').val(),
-                share: $('#share').val(),
-                ask: $('#ask').val(),
-                note: $('#note').val(),
-            };
+
+
+
+     //       var latlngColumn = parseLatLng($('#address').val());
+
+            
+
+           
+
+
+
+            
         },
 
         feedback: function() {

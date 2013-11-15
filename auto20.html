@@ -131,7 +131,7 @@
 
             <h2>*可公開的聯絡方式，
 </h2>
-            <textarea id = 'connect_me ' rows = '5' cols = '30' placeholder = '如有多行，請在分行處加上<br>記號'></textarea>
+            <textarea id = 'connect_me' rows = '5' cols = '30' placeholder = '如有多行，請在分行處加上<br>記號'></textarea>
     
 
             <h2>*您的網址?</h2>
@@ -196,7 +196,7 @@
 
 <script>
 
-    var preview = false;
+    var preview = false; var userNum;
 
     Auto20 = Backbone.View.extend({
         el: $('body'),
@@ -236,8 +236,12 @@
                     };
 
             this.dataRef = new Firebase('https://we-autolearn.firebaseio.com');           
-
             preview = false;
+
+            if (location.hash.replace('#','').length > 0) {
+            	$('input#search').val(location.hash.replace('#',''));
+
+            };
 
             this.render();
         },
@@ -251,21 +255,16 @@
         changeHands: function() {
             console.log('call changeHands');
 
-            $("#map").fadeOut(1000)
+            location.hash = '#' + $('input#search').val();
+
+            $("#map").fadeOut(1000);
 
             setTimeout(function() {
                 $('#map').remove();
-                
                 $('body').append("<div id = 'map'></div>");
-
                 console.log('removeMap');
-
                 eval("auto20.render()");
-
             }, 2000);
-
-
-            //...
 
         },
 
@@ -275,30 +274,15 @@
             var osmUrl = this.osmUrl;
             var attribution = this.cloudmadeAttribution;
 
-//            var road_layer = new L.TileLayer(osmUrl, {
-//                minZoom: 8,
-  //              maxZoom: 18,
-    //            attribution: '<a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> CC-BY-SA, Tiles &copy; <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>',
-  //              subdomains: '1234'
-    //        });
-
-      //      map.addLayer(road_layer);
-
-//            map.setView(new L.LatLng(23.654299340, 120.44776492196047), 7);
-
-
-            // 如果存在，先清理一次   <==  待加
-
 
             this.dataRef.once('value', function(dataSnapshot) {
-                // store dataSnapshot for use in below examples.
                 var markers = [];
                 var fMarkers = [];
                 var lMarkers = [];
                 var eMarkers = [];
                 var gMarkers = [];
                 var mMarkers = [];  
-                var circles = [];
+                var latlngUsed = [];
 
                 var intro = '<p>歡迎使用「自學2.0」地圖式互助通訊錄！！'
                     +'<p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p>';
@@ -306,9 +290,8 @@
                 var welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'>"+intro+"</div>");
 
                 var autos = dataSnapshot.val();
+                userNum = autos.length;
 
-//                console.log(autos);
-  //              console.log(autos.length);
                 if (preview) {
                 	autos =[preview];
                 	preview = '';
@@ -324,7 +307,24 @@
                         console.log('略過無名氏'); continue
                     }
 
-                    hand.latlngColumn.replace('(','').replace(')','');
+                    hand.latlngColumn = hand.latlngColumn.replace('(','').replace(')','').replace('附近','');
+
+                    var uniqueLatLng = false;
+                    while (!uniqueLatLng) {
+                    	uniqueLatLng = true;
+
+	                    for (var j = 0; j < latlngUsed.length; j++) {
+	                    	if (latlngUsed[j] == hand.latlngColumn) {
+	                    		hand.latlngColumn = hand.latlngColumn + '5';
+		                    	uniqueLatLng = false;
+		                    	break;
+	                    	}
+	                    	else {
+	                    		latlngUsed.push(hand.latlngColumn)
+	                    	}
+	                    };
+	                }
+
                     console.log(hand.latlngColumn.split());
 
                     var colorIcon = icon.orange;
@@ -343,7 +343,7 @@
                             colorIcon = icon.orange;
                     }
 
-                    var seek = $('#search').val();
+                    var seek = $('input#search').val();
 
 //                    var flag = hand.name+"<b>Hello world!</b><br />I am a popup.";
                     var flag = '<div class="flag" style="font-family: sans-serif;">'
@@ -392,27 +392,17 @@
                     if (hand.learner_role.indexOf('自學生') > -1) lMarkers.push(markers[i]);
                     if (hand.learner_role.indexOf('獨立教育工作者') > -1) eMarkers.push(markers[i]);
                     if (hand.learner_role.indexOf('自學團體') > -1) gMarkers.push(markers[i]);
-//                    if (hand.時間戳記  ~~  makeTimeStamp()) {
-  //                      mMarkers.push(markers[i]);
-    //                }
+
+                    var flagT = hand.時間戳記.split('/'); 
+                    var nowT = makeTimeStamp().split('/');
 
 
+            //        console.log(parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30));
 
- //                   circles[i] = L.circle(autos[i].latlngColumn.split(','), 500, {
-   //                     color: 'green',
-    //                    fillColor: '#3f0',
-     //                   fillOpacity: 0.3
-      //              }).addTo(map);
-
-              //      labels[i] = new L.Label();
-                //    labels[i].setContent(autos[i].name);
-                  //  labels[i].setLatLng(autos[i].latlngColumn.split(','));
-                  //  map.showLabel(labels[i]);;
-
-
+                    if ( parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30) < 31) {
+                        mMarkers.push(markers[i]);
+                    }
                 };
-
-//                console.log("Mark"+markers);
 
                 var goodMarkers = [];
 
@@ -439,18 +429,18 @@
                     styleId: 113475,
                     attribution: attribution,
                     maxZoom: 18
-                }), 
-                    midnight  = L.tileLayer(osmUrl, {
-                    styleId: 113784,
-                    attribution: attribution,
-                    maxZoom: 18
-                });
+                }); 
+  //            var midnight  = L.tileLayer(osmUrl, {
+  //                  styleId: 113784,
+  //                  attribution: attribution,
+  //                  maxZoom: 18
+  //              });
 
 
-                var baseMaps = {
-                    "白天": minimal,
-                    "黑夜": midnight    //bug here-- 沒有連到樣式
-                };
+  //              var baseMaps = {
+  //                  "白天": minimal,
+  //                  "黑夜": midnight    //bug here-- 沒有連到樣式
+  //              };
 
 
                 this.overlayMaps = {
@@ -469,7 +459,7 @@
                 });
 
 
-                L.control.layers(baseMaps, this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
+                L.control.layers(this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
 
                 if (welcomeWord) welcomeWord.openOn(this.map);
 
@@ -482,20 +472,18 @@
         },
 
         formPerview: function() {    //預覽
-            this.makePrev();
-            this.changeHands();
+            this.makePrev('changeHands');
         },
 
         formSubmit: function() {    //送出表單
-
-            this.makePrev();
-            this.dataRef().push(this.preview);  this.preview = '';
-            this.changeHands();
+         	this.makePrev('formSubmit');
         },
 
-        makePrev: function() {
+        makePrev: function(command) {
 
         	console.log("preview started");
+
+        	var dataRef = this.dataRef;
 
         	$.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ $('#address').val() +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
 
@@ -529,7 +517,6 @@
 	                site: $('#site').val(),
 	                site2: $('#site2').val(),
 	                learner_birth: $('#learner_birth').val(),
-	                connect_me: $('#connect_me').attr('title'),
 	                learner_role: goodRoles.join(),
 	                Style: goodStyle,
 	                learner_habit: $('#learner_habit').val(),
@@ -538,9 +525,28 @@
 	                note: $('#note').val(),
 	            };
 
-
             	console.log(preview);
 
+            	if(command == 'changeHands') {	            	
+	                eval("auto20.changeHands()");
+	            	return;
+	            }
+
+	            if(command == 'formSubmit') {
+
+	            	var keys = Object.keys(preview);
+
+	            	for (var i = 0; i < keys.length; i++) {
+	            		if (!preview[keys[i]]) {alert('請輸入'+keys[i]); return};
+	            	};
+
+		         	if (preview.note.length < 20) {alert('請輸入完整的自我介紹'); return};
+
+		            dataRef.child('hands').child(userNum).set(preview);
+		            preview = false;
+		            
+	                eval("auto20.changeHands()");
+	            }
         	});
 			
 

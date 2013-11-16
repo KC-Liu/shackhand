@@ -347,6 +347,8 @@
                     }
 
                     var seek = $('input#search').val();
+                    var seeks = seek.split(/\s+/);
+                    console.log(seeks);
 
 //                    var flag = hand.name+"<b>Hello world!</b><br />I am a popup.";
                     var flag = '<div class="flag" style="font-family: sans-serif;">'
@@ -375,16 +377,33 @@
 
                     if (seek) {
                         myDataRef.child('seek').child(makeTimeStamp()).set({seek: seek});
+
+                        var seekGood = false;
+                        for (var j = 0; j < seeks.length; j++) {
+                            var look = seeks[j]
+                        	if (seek[j] && flag.search(look) > -1) {
+//                                console.log("aaa"+flag.search('高雄'));
+                                seekGood = true;
+                            }
+                        };
+
+                        if (!seekGood) {
+                            console.log(seeks.join()+'：'+flag.search(look)+'略過'+hand.name);
+                            continue;
+                        }
+
+                        if (flag) {
+                        	for (var j = 0; j < seeks.length; j++) {
+                                var look = seeks[j];
+                        		if (look){
+                                    console.log(look);
+                            //        var re = new RegExp(seek[j],"g");
+                                   flag = flag.replace(look,'<span style = "background-color: rgba(255,255,155,1) ">' + look + '</span>')
+    	                    	}
+                        	};                        
+                        }
+
                     };
-
-                    if (seek && flag.indexOf(seek) == -1) {
-                        console.log(seek+'：'+flag.indexOf(seek)+'略過'+hand.name);
-                        continue;
-                    }
-
-                    if (seek && flag) {
-                        flag = flag.replace(seek,'<span style = "background-color: rgba(255,255,155,1) ">' + seek + '</span>')
-                    }
 
 
                     if (hand.latlngColumn.split(',').length != 2) {
@@ -403,9 +422,9 @@
                     var flagT = hand.時間戳記.split('/'); 
                     var nowT = makeTimeStamp().split('/');
 
-                    console.log(nowT.join());
-                    console.log(flagT.join());
-                    console.log(parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30));
+    //                console.log(nowT.join());
+    //                console.log(flagT.join());
+     //               console.log(parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30));
 
                     if ( (parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30)) < 31) {
                         console.log('Pushed')

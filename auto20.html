@@ -241,7 +241,7 @@
             preview = false;
 
             if (location.hash.replace('#','').length > 0) {
-            	$('input#search').val(location.hash.replace('#',''));
+            	$('input#search').val(decodeURIComponent(location.hash.replace('#','')));
 
             };
 

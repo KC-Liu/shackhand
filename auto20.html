@@ -13,7 +13,17 @@
 <![endif]-->
 
 
-<style>    
+<style>  
+
+    .mapLabel {
+        float: left;
+        color: blue;
+    }
+    .mapPopup {
+        width: 400px;
+        border-radius: 15px;
+        background-color: rgba(255,255,255,0.8); 
+    }
 </style>
 
 <script src="javascripts/lib/jquery-1.10.2.js"></script>
@@ -28,6 +38,7 @@
 <script src='https://cdn.firebase.com/v0/firebase.js'></script>
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
+
 
 
 <title>自學2.0--地圖式的互助通訊錄</title>
@@ -210,7 +221,7 @@
                         iconSize:     [38, 95],
                         shadowSize:   [50, 64],
                         iconAnchor:   [22, 94],
-                        labelAnchor:  [-3, -76],
+                        labelAnchor:  [0, 0],
                         shadowAnchor: [4, 62],
                         popupAnchor:  [-3, -76]
                     }
@@ -394,7 +405,13 @@
                         continue;
                     }
 
-                    markers[i] = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindPopup(flag).bindLabel(hand.name, { noHide: true });
+                    var marker = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindPopup(flag, {
+                                className: 'mapPopup' }).bindLabel(hand.name, {
+                                    noHide: true,
+                                    className: 'mapLabel',
+                                    });
+
+                    markers[i] =  marker;
 
                     if (hand.learner_role.indexOf('自學家長') > -1) fMarkers.push(markers[i]);
                     if (hand.learner_role.indexOf('自學生') > -1) lMarkers.push(markers[i]);
@@ -480,6 +497,61 @@
 
 
                 L.control.layers(this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
+
+                hands.a.eachLayer(function (marker) {
+                    marker.showLabel();
+                });
+/* 待測的程式碼
+
+        // Place and label location
+        var foci = [],
+            labels = [];
+
+        // Store the projected coordinates of the places for the foci and the labels
+        places.features.forEach(function(d, i) {
+            var c = projection(d.geometry.coordinates);
+            foci.push({x: c[0], y: c[1]});
+            labels.push({x: c[0], y: c[1], label: d.properties.name})
+        });
+
+        // Create the force layout with a slightly weak charge
+        var force = d3.layout.force()
+            .nodes(labels)
+            .charge(-20)
+            .gravity(0)
+            .size([width, height]);
+
+        // Append the place labels, setting their initial positions to
+        // the feature's centroid
+        var placeLabels = svg.selectAll('.place-label')
+            .data(labels)
+            .enter()
+            .append('text')
+            .attr('class', 'place-label')
+            .attr('x', function(d) { return d.x; })
+            .attr('y', function(d) { return d.y; })
+            .attr('text-anchor', 'middle')
+            .text(function(d) { return d.label; });
+
+        force.on("tick", function(e) {
+            var k = .1 * e.alpha;
+            labels.forEach(function(o, j) {
+                // The change in the position is proportional to the distance
+                // between the label and the corresponding place (foci)
+                o.y += (foci[j].y - o.y) * k;
+                o.x += (foci[j].x - o.x) * k;
+            });
+
+            // Update the position of the text element
+            svg.selectAll("text.place-label")
+                .attr("x", function(d) { return d.x; })
+                .attr("y", function(d) { return d.y; });
+        });
+
+        force.start();
+
+
+*/             
 
                 if (welcomeWord) {
                     welcomeWord.openOn(this.map);

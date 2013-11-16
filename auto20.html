@@ -70,7 +70,7 @@
 
     <div id="searchDiv">            <!-- Point:Search  Status: Usable lev 1-->
         <div id="searchbox">
-            <input id="search" type="text" data-ng-modle = "seekFriend" placeholder="輸入關鍵字找朋友">
+            <input id="search" type="text" data-ng-modle = "seekFriend" placeholder="輸入關鍵字再按「Go!」找朋友">
             <button id="goSearch">Go!</button>
         </div>
     </div>
@@ -457,12 +457,12 @@
                     "自學生": hands.l,
                     "獨立教育工作者": hands.e,
                     "自學團體": hands.g,
-                    "顯示當月新人": hands.m,
+                    "顯示當月新人": hands.m,         
+                    "顯示全部": hands.a,
                 };
 
-                this.allMaps = {                    
-                    "顯示全部": hands.a,
-                }
+         //       this.allMaps = {           
+      //          }
 
                 this.map = L.map('map', {
                     center: new L.LatLng(23.654299340, 120.44776492196047),
@@ -471,7 +471,7 @@
                 });
 
 
-                L.control.layers(this.overlayMaps, this.allMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
+                L.control.layers(this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
 
                 if (welcomeWord) {
                     welcomeWord.openOn(this.map);

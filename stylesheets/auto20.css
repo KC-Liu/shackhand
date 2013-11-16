@@ -1,3 +1,25 @@
+body {
+    background-image: url("../img/leaf-shadow.png");
+    background-color: rgba(200,200,155,1);
+}
+
+#map { float: left; height: 800px; width: 74%; min-width: 420px; border-radius: 15px}
+#join { float: right; height: 800px;width: 25%; min-width: 200px;
+    padding-left: 7px; border-radius: 15px;
+    background-color: rgba(255,255,255,0.7); overflow: :auto;
+    color: rgba(0,0,0,0.1);
+}
+#searchDiv { position:fixed; top: 20px; left: 60px; z-index: 1}
+#chatDiv { display:block; position:fixed; bottom: 20px; left: 60px; z-index: 1;
+    width: 250px; height: 100px;
+    background: rgba(200,200,200,0.5);
+    border: 3px; border-radius: 10px; padding: 5px; overflow: auto;
+    opacity:0.3;
+    filter:alpha(opacity=30); /* 適用 IE8 及早期版本 */ }
+#chatMessageDiv { overflow: auto;}
+
+
+
 #searchbox
 {
   background: #eaf8fc;
@@ -15,7 +37,31 @@
   padding: 10px;
   margin: 20px auto 50px;
   overflow: hidden; /* Clear floats */
+  opacity:0.3;
+  filter:alpha(opacity=30); /* 適用 IE8 及早期版本 */
 }
+
+#join:hover {
+  color: rgba(0,0,0,1);
+  -webkit-transition: all .2s ease;
+  -moz-transition: all .2s ease;
+  -ms-transition: all .2s ease;
+  -o-transition: all .2s ease;
+  transition: all .2s ease;
+}
+
+#chatDiv:hover, #searchbox:hover {
+  opacity:1;
+  filter:alpha(opacity=100); /* 適用 IE8 及早期版本 */
+  -webkit-transition: all .2s ease;
+  -moz-transition: all .2s ease;
+  -ms-transition: all .2s ease;
+  -o-transition: all .2s ease;
+  transition: all .2s ease;
+
+}
+
+
 
 #search, #goSearch
 {
@@ -89,4 +135,35 @@
 #goSearch::-moz-focus-inner
 {
        border: 0;  /* Small centering fix for Firefox */
-}   
+} 
+
+
+/* 手機使用 */
+
+@media (max-width: 900px) {
+
+  #map {
+  	float: none;
+  	width: 100%;
+  	font-size: 2rem;
+  }
+  #join {
+    display: none;
+  }
+  #chatDiv {
+    display: none;
+  }
+  #searchbox {
+  	width: 85%;
+  	position: fixed;
+  	bottom: 0px;
+  }
+  #search {
+  	width: 75%;
+  }
+  #goSearch {
+  	width: 20%;
+  }
+
+}
+  

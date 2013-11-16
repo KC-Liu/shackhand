@@ -13,23 +13,7 @@
 <![endif]-->
 
 
-<style>
-    body {
-        background-image: url("img/leaf-shadow.png");
-        background-color: rgba(200,200,155,1);
-    }
-    #map { float: left; height: 800px; width: 74%; min-width: 420px; border-radius: 15px}
-    #join { float: right; width: 25%; min-width: 200px; padding-left: 7px; border-radius: 15px;
-            background-color: rgba(255,255,255,0.7)}
-    #searchDiv { position:fixed; top: 20px; left: 60px; z-index: 1}
-    #chatDiv { display:block; position:fixed; bottom: 20px; left: 60px; z-index: 1;
-        width: 250px; height: 100px; background: rgba(200,200,200,0.5); border: 3px; border-radius: 10px; padding: 5px; overflow: auto; }
-    #chatMessageDiv { overflow: auto;}
-
-
-
-    /* add media querry for mobile here */
-    
+<style>    
 </style>
 
 <script src="javascripts/lib/jquery-1.10.2.js"></script>
@@ -245,7 +229,7 @@
 
             };
 
-            this.welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
+            this.welcomeWord = L.popup().setLatLng([22.01, 123.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
 
 
             this.render();
@@ -278,7 +262,7 @@
             var icon = this.icon;
             var osmUrl = this.osmUrl;
             var attribution = this.cloudmadeAttribution;
-
+            var welcomeWord = this.welcomeWord;
 
             myDataRef.child('hands').once('value', function(dataSnapshot) {
                 var markers = [];
@@ -290,7 +274,6 @@
                 var latlngUsed = [];
 
                 
-                var welcomeWord = this.welcomeWord;
 
                 var autos = dataSnapshot.val();
                 userNum = autos.length;
@@ -351,7 +334,7 @@
                     console.log(seeks);
 
 //                    var flag = hand.name+"<b>Hello world!</b><br />I am a popup.";
-                    var flag = '<div class="flag" style="font-family: sans-serif;">'
+                    var flag = '<div class="flag">'
                         +'<font color = "grey">加入時間: '+hand.時間戳記+'</font><br />'
                         +'<h2> 👪 '+hand.name+'😼</h2><br />'
                         +hand.learner_birth+'年次的'+hand.learner_role+'，住在'+hand.address+'附近<br />'
@@ -442,6 +425,12 @@
                     goodMarkers.push(markers[i]);
                 };
 
+                for (var i = 0; i < goodMarkers.length; i++) {
+                    var currentMarker = goodMarkers[i];
+//                    currentMarker.on('mouseover', currentMarker.openPopup.bind(currentMarker));
+
+                    currentMarker.on('click', currentMarker.closePopup.bind(currentMarker));
+                };
 
                 var hands = {
                  a: L.layerGroup(goodMarkers),  // 所有人           good!

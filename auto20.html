@@ -107,6 +107,7 @@
         function displayChatMessage(name, text, time) {
             $('<div/>').text(time).prepend($('<em/>').text(text)).prepend($('<em/>').text(name+': ')).appendTo($('#messageDiv'));
             $('#messageDiv')[0].scrollTop = $('#messageDiv')[0].scrollHeight;
+            $('#chatDiv').scrollTop($('#chatDiv').height());
         };
 
       </script>
@@ -245,6 +246,7 @@
             };
 
             this.welcomeWord = L.popup().setLatLng([22.01, 124.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
+
 
             this.render();
         },
@@ -397,13 +399,16 @@
                     if (hand.learner_role.indexOf('獨立教育工作者') > -1) eMarkers.push(markers[i]);
                     if (hand.learner_role.indexOf('自學團體') > -1) gMarkers.push(markers[i]);
 
+
                     var flagT = hand.時間戳記.split('/'); 
                     var nowT = makeTimeStamp().split('/');
 
+                    console.log(nowT.join());
+                    console.log(flagT.join());
+                    console.log(parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30));
 
-            //        console.log(parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30));
-
-                    if ( parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30) < 31) {
+                    if ( (parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30)) < 31) {
+                        console.log('Pushed')
                         mMarkers.push(markers[i]);
                     }
                 };
@@ -424,8 +429,8 @@
                  f: L.layerGroup(fMarkers),  // 自學家庭         
                  l: L.layerGroup(lMarkers),  // 自學生
                  e: L.layerGroup(eMarkers),  // 教育工作者
-                 g: L.layerGroup(mMarkers),  // 自學團體
-                 m: L.layerGroup(goodMarkers),  // 當月新人
+                 g: L.layerGroup(gMarkers),  // 自學團體
+                 m: L.layerGroup(mMarkers),  // 當月新人
                 }
 
 
@@ -453,17 +458,20 @@
                     "獨立教育工作者": hands.e,
                     "自學團體": hands.g,
                     "顯示當月新人": hands.m,
-                    "顯示全部": hands.a,
                 };
+
+                this.allMaps = {                    
+                    "顯示全部": hands.a,
+                }
 
                 this.map = L.map('map', {
                     center: new L.LatLng(23.654299340, 120.44776492196047),
                     zoom: 7,
-                    layers: [minimal, hands.f, hands.l, hands.e, hands.g]
+                    layers: [minimal, hands.a]
                 });
 
 
-                L.control.layers(this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
+                L.control.layers(this.overlayMaps, this.allMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
 
                 if (welcomeWord) {
                     welcomeWord.openOn(this.map);
@@ -471,6 +479,8 @@
                  }
 
                 $( this.el ).scrollTop( 0 );
+
+
 
                 console.log("render finished");
 

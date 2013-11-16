@@ -6,7 +6,11 @@
 
 <link rel="stylesheet" type="text/css" class="ui" href="stylesheets/semantic.min.css">
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+
+<link rel="stylesheet" href="stylesheets/Icon.Label.css" />
+
 <link rel="stylesheet" href="stylesheets/auto20.css" />
+
 
 <!--[if lte IE 8]>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
@@ -36,9 +40,14 @@
 <script src="javascripts/lib/tongwen_table_t2s.js"></script>
 
 <script src='https://cdn.firebase.com/v0/firebase.js'></script>
-<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+
+<script src="javascripts/lib/leaflet-src.js"></script>
+<script src="javascripts/lib/leaflet.js"></script>
+
 <script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
 
+	<script src="javascripts/lib/Marker.Label.js"></script>
+	<script src="javascripts/lib/Icon.Label.js"></script>
 
 
 <title>自學2.0--地圖式的互助通訊錄</title>
@@ -240,6 +249,8 @@
 
             };
 
+
+
             this.welcomeWord = L.popup().setLatLng([22.01, 123.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
 
 
@@ -283,11 +294,25 @@
                 var gMarkers = [];
                 var mMarkers = [];  
                 var latlngUsed = [];
-
-                
+                var labels = new L.FeatureGroup();
 
                 var autos = dataSnapshot.val();
                 userNum = autos.length;
+
+                this.map = L.map('map', {
+                    center: new L.LatLng(23.654299340, 120.44776492196047),
+                    zoom: 7,
+//                    layers: [minimal, hands.a]
+                });
+
+                this.map.addLayer(labels);   /* 待把 scr 解決 */
+
+   //              labels.addLayer(
+	//					new L.Marker(
+	//						getRandomLatLng(this.map),
+	//						{ icon: new L.Icon.Label.Default({ labelText: "A label" }), revealing: true }
+	//					)
+	//				);
 
                 if (preview) {
                 	autos =[preview];
@@ -405,13 +430,15 @@
                         continue;
                     }
 
-                    var marker = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindPopup(flag, {
+                    markers[i] = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindPopup(flag, {
                                 className: 'mapPopup' }).bindLabel(hand.name, {
                                     noHide: true,
                                     className: 'mapLabel',
+                                    direction: 'auto'
                                     });
+					
+                   
 
-                    markers[i] =  marker;
 
                     if (hand.learner_role.indexOf('自學家長') > -1) fMarkers.push(markers[i]);
                     if (hand.learner_role.indexOf('自學生') > -1) lMarkers.push(markers[i]);
@@ -489,72 +516,43 @@
          //       this.allMaps = {           
       //          }
 
-                this.map = L.map('map', {
-                    center: new L.LatLng(23.654299340, 120.44776492196047),
-                    zoom: 7,
-                    layers: [minimal, hands.a]
-                });
+                this.map.addLayer(minimal);
+                this.map.addLayer(hands.a);
+                
 
 
                 L.control.layers(this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
 
+                function getRandomLatLng(map) {
+									var bounds = map.getBounds(),
+										southWest = bounds.getSouthWest(),
+										northEast = bounds.getNorthEast(),
+										lngSpan = northEast.lng - southWest.lng,
+										latSpan = northEast.lat - southWest.lat;
+
+									return new L.LatLng(
+										southWest.lat + latSpan * Math.random(),
+										southWest.lng + lngSpan * Math.random()
+									);
+								}
+
+//				for (var j = 0; j < 20; j++) {
+//					labels.addLayer(
+//						new L.Marker(
+//							getRandomLatLng(this.map),
+//							{ icon: new L.Icon.Label.Default({ labelText: "A label" }) }
+//						)
+//					);
+//				};
+
+
                 hands.a.eachLayer(function (marker) {
                     marker.showLabel();
                 });
-/* 待測的程式碼
 
-        // Place and label location
-        var foci = [],
-            labels = [];
-
-        // Store the projected coordinates of the places for the foci and the labels
-        places.features.forEach(function(d, i) {
-            var c = projection(d.geometry.coordinates);
-            foci.push({x: c[0], y: c[1]});
-            labels.push({x: c[0], y: c[1], label: d.properties.name})
-        });
-
-        // Create the force layout with a slightly weak charge
-        var force = d3.layout.force()
-            .nodes(labels)
-            .charge(-20)
-            .gravity(0)
-            .size([width, height]);
-
-        // Append the place labels, setting their initial positions to
-        // the feature's centroid
-        var placeLabels = svg.selectAll('.place-label')
-            .data(labels)
-            .enter()
-            .append('text')
-            .attr('class', 'place-label')
-            .attr('x', function(d) { return d.x; })
-            .attr('y', function(d) { return d.y; })
-            .attr('text-anchor', 'middle')
-            .text(function(d) { return d.label; });
-
-        force.on("tick", function(e) {
-            var k = .1 * e.alpha;
-            labels.forEach(function(o, j) {
-                // The change in the position is proportional to the distance
-                // between the label and the corresponding place (foci)
-                o.y += (foci[j].y - o.y) * k;
-                o.x += (foci[j].x - o.x) * k;
-            });
-
-            // Update the position of the text element
-            svg.selectAll("text.place-label")
-                .attr("x", function(d) { return d.x; })
-                .attr("y", function(d) { return d.y; });
-        });
-
-        force.start();
-
-
-*/             
 
                 if (welcomeWord) {
-                    welcomeWord.openOn(this.map);
+        //            welcomeWord.openOn(this.map);
                     this.welcomeWord = '';
                  }
 

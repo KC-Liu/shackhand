@@ -20,15 +20,18 @@
 <style>  
 
     .mapLabel {
+    	text-align: center;
         color: rgba(0,0,0,1);
         background-color: rgba(255,255,255,1);
-        max-width: 5rem;
+        max-width: 6rem;
+        max-height: 1rem;
         overflow: hidden;
     }
     .mapLabel:hover {
         background-color: rgba(200,255,255,1);
         font-size: 2rem;
-        max-width: none;
+        max-width: 15rem;
+        max-height: 15rem;
     }
     .leaflet-clickable:hover { z-index: 99999 !important; }
     .mapPopup {
@@ -273,13 +276,15 @@
 
                         console.log(data);
 
-                        if (data.query.results.Result.line1.replace($('input#search').val(),'').length < 3) {
+                        if(!data) location.hash = '#search/' + encodeURI($('input#search').val());
+
+                        else if (data.query.results.Result.line1.replace($('input#search').val(),'').length < 3) {
                             location.hash = '#focus/' + encodeURI($('input#search').val());
+                            return;
                         }
                         else {
-                            location.hash = '#search/' + encodeURI($('input#search').val());
-       //                     this.model.set({ search: $('input#search').val() });
-                        }
+	                        location.hash = '#search/' + encodeURI($('input#search').val());
+	                    }
 
                   });               
 
@@ -346,7 +351,17 @@
                         console.log('略過無名氏'); continue
                     }
 
+                    if (hand.site && hand.site.indexOf('http') == -1 && hand.site.indexOf('@') == -1) hand.site = 'http://' + hand.site;
+                    if (hand.site.indexOf('@') > -1) {
+                    	hand.site = '<a href = "mailto:'+hand.site+'?subject=您好&body='+hand.name+'您好：我在自學2.0上看到您的交友旗幟，想和你碰個面，我是">'+hand.site+'</a>';
+                    }
+                    else {
+	                    hand.site = '<a href = '+hand.site+'>'+hand.site+'</a>';
+	                }
 
+                    if (hand.site2 && hand.site2.indexOf('http') == -1) hand.site2 = 'http://' + hand.site2;
+
+                
                     hand.latlngColumn = hand.latlngColumn.replace('(','').replace(')','').replace('附近','');
 
                     var uniqueLatLng = false;
@@ -381,10 +396,9 @@
                         +'<a href = "http://map.alearn.org.tw" target ="_blank" title = "更多自學資訊，請上自學地圖"> <img height="100" width="120" src= "http://map.alearn.org.tw/images/automap.jpg" style = "float:right">  </a>'
                         +'<br />'
                         +'<b>網址: </b>'+hand.site+'<br />'
-                        +'<b>社群網址: </b>'+hand.site2+'<br />'
+                        +'<b>社群網址: </b><a href = '+hand.site2+'>'+hand.site2+'</a><br />'
                         +'<b>公開的聯絡方式:</b>'+hand.connect_me+'<br />'
-                        +'<p align = "center"><b>歡迎聯絡!!</b></p><br />'
-                        +'<br />'
+                        +'<p align = "center"><b>歡迎聯絡!!</b></p>'
                         +'<b>興趣包含:</b>'+hand.learner_habit+'<br />'
                         +'<br />'
                         +'<b>可分享:</b>'+hand.share+'<br />'
@@ -393,7 +407,7 @@
                         +'<b>自我介紹:</b>'+hand.note+'<br />'
                         +'<br />'
                         +'<hr>'
-                        +'<b> <a href = "mailto:bestianhelp@gmail.com?subject=回報名為'+hand.name+'、時間戳記為'+hand.時間戳記+'的資料錯誤&body=網站管理員您好: 我要回報名為'+hand.name+'的資料錯誤，詳請如下：" title="如遇錯誤與濫用，請按此回報，謝謝!!">  回報錯誤或濫用 </a> </b>'
+                        +'<b> <a href = "mailto:bestian@gmail.com?subject=回報名為'+hand.name+'、時間戳記為'+hand.時間戳記+'的資料錯誤&body=網站管理員您好: 我要回報名為'+hand.name+'的資料錯誤，詳請如下：" title="更新資料，或是遇到錯誤與濫用，請按此回報，謝謝!!">  更新資料或是回報錯誤 </a> </b>'
                         +'</div>'
 
                     if (seek) {
@@ -465,7 +479,9 @@
                                         hand.latlngColumn.split(',')[0],
                                         hand.latlngColumn.split(',')[1]
                                     ),
-                            { icon: new SweetIcon({ iconUrl: colorUrl, labelText: hand.name }) }
+                            { icon: new SweetIcon({ iconUrl: colorUrl, labelText: hand.name + '<br/>興趣：' + hand.learner_habit
+                            				+ '<br/>分享：' + hand.share
+                            				+ '<br/>需要：' + hand.ask}) }
                         ).bindPopup(flag, {
                                 className: 'mapPopup' });
 			

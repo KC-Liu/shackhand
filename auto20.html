@@ -22,6 +22,13 @@
     .mapLabel {
         color: rgba(0,0,0,1);
         background-color: rgba(255,255,255,1);
+        max-width: 5rem;
+        overflow: hidden;
+    }
+    .mapLabel:hover {
+        background-color: rgba(200,255,255,1);
+        font-size: 2rem;
+        max-width: none;
     }
     .mapPopup {
  /*       width: 400px;
@@ -232,7 +239,7 @@
 
         events: {
             'keypress input#search' : 'maybeSearch',
-            'click button#goSearch' : 'changeHands',
+            'click button#goSearch' : 'maybeSearch',
             'click button#formPerview' : 'formPerview',
             'click button#formSubmit' : 'formSubmit'
         },
@@ -259,9 +266,22 @@
         },
 
         maybeSearch: function(ev) {
-            if ( ev.which === 13 ) {
-                location.hash = '#search/' + encodeURI($('input#search').val());
-                this.model.set({ search: $('input#search').val() });
+            console.log(ev.target);
+            if ( ev.which === 13 || $(ev.target).attr('id') == 'goSearch' ) {
+                $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ $('input#search').val() +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
+
+                        console.log(data);
+
+                        if (data.query.results.Result.line1.replace($('input#search').val(),'').length < 3) {
+                            location.hash = '#focus/' + encodeURI($('input#search').val());
+                        }
+                        else {
+                            location.hash = '#search/' + encodeURI($('input#search').val());
+       //                     this.model.set({ search: $('input#search').val() });
+                        }
+
+                  });               
+
             }
         },
 
@@ -651,7 +671,9 @@ var Router = Backbone.Router.extend({
  
   search : function(keys) {
     $('input#search').val(decodeURIComponent(keys.split('/')[0]));
-    auto20.changeHands('search');
+
+    auto20.model.set({ search: $('input#search').val() });
+//    auto20.changeHands('search');
   },
 
   focus : function(addr) {

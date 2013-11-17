@@ -5,10 +5,10 @@
     <META Charset = "utf-8" />
 
 <link rel="stylesheet" type="text/css" class="ui" href="stylesheets/semantic.min.css">
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+<link rel="stylesheet" href="Leaflet.iconlabel-master/lib/leaflet-dist/leaflet.css" />
 
-<link rel="stylesheet" href="stylesheets/Icon.Label.css" />
-
+<link rel="stylesheet" href="Leaflet.iconlabel-master/dist/leaflet.iconlabel.css" />
+<link rel="stylesheet" href="Leaflet.iconlabel-master/src/Icon.Label.css" />
 <link rel="stylesheet" href="stylesheets/auto20.css" />
 
 
@@ -20,13 +20,13 @@
 <style>  
 
     .mapLabel {
-        float: left;
-        color: blue;
+        color: rgba(0,0,0,1);
+        background-color: rgba(255,255,255,1);
     }
     .mapPopup {
-        width: 400px;
+ /*       width: 400px;
         border-radius: 15px;
-        background-color: rgba(255,255,255,0.8); 
+        background-color: rgba(255,255,255,0.8); */
     }
 </style>
 
@@ -41,14 +41,19 @@
 
 <script src='https://cdn.firebase.com/v0/firebase.js'></script>
 
+<!--
 <script src="javascripts/lib/leaflet-src.js"></script>
-<script src="javascripts/lib/leaflet.js"></script>
+<script src="javascripts/lib/leaflet.js"></script> -->
 
-<script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script>
+<script src="Leaflet.iconlabel-master/lib/leaflet-dist/leaflet.js"></script>
+<script src="Leaflet.iconlabel-master/lib/leaflet-dist/leaflet-src.js"></script>
+
+<!--<script src="http://leaflet.github.io/Leaflet.label/leaflet.label.js"></script> -->
 
 	<script src="javascripts/lib/Marker.Label.js"></script>
 	<script src="javascripts/lib/Icon.Label.js"></script>
-
+    <script src="javascripts/lib/Icon.Label.Default.js"></script>
+    <script src="Leaflet.iconlabel-master/dist/leaflet.iconlabel.js"></script>
 
 <title>自學2.0--地圖式的互助通訊錄</title>
 
@@ -224,24 +229,7 @@
 
             this.cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade';
 
-            this.LeafIcon = L.Icon.extend({
-                    options: {
-                        shadowUrl: 'img/leaf-shadow.png',
-                        iconSize:     [38, 95],
-                        shadowSize:   [50, 64],
-                        iconAnchor:   [22, 94],
-                        labelAnchor:  [0, 0],
-                        shadowAnchor: [4, 62],
-                        popupAnchor:  [-3, -76]
-                    }
-            });
-
-            this.icon = {green: new this.LeafIcon({iconUrl: 'img/leaf-green.png'}),
-                        red : new this.LeafIcon({iconUrl: 'img/leaf-red.png'}),
-                        orange : new this.LeafIcon({iconUrl: 'img/leaf-orange.png'}),            
-                        purple : new this.LeafIcon({iconUrl: 'img/leaf-purple.png'})
-                    };
-
+   
             preview = false;
 
             if (location.hash.replace('#','').length > 0) {
@@ -281,7 +269,6 @@
 
         render: function() {
 
-            var icon = this.icon;
             var osmUrl = this.osmUrl;
             var attribution = this.cloudmadeAttribution;
             var welcomeWord = this.welcomeWord;
@@ -307,12 +294,6 @@
 
                 this.map.addLayer(labels);   /* 待把 scr 解決 */
 
-   //              labels.addLayer(
-	//					new L.Marker(
-	//						getRandomLatLng(this.map),
-	//						{ icon: new L.Icon.Label.Default({ labelText: "A label" }), revealing: true }
-	//					)
-	//				);
 
                 if (preview) {
                 	autos =[preview];
@@ -325,9 +306,14 @@
                     console.log(i);
 
                     var hand = autos[i];
+
+                    if (!hand) {
+                        console.log('略過空格'); continue
+                    }
                     if (!hand.name) {
                         console.log('略過無名氏'); continue
                     }
+
 
                     hand.latlngColumn = hand.latlngColumn.replace('(','').replace(')','').replace('附近','');
 
@@ -337,7 +323,7 @@
 
 	                    for (var j = 0; j < latlngUsed.length; j++) {
 	                    	if (latlngUsed[j] == hand.latlngColumn) {
-	                    		hand.latlngColumn = hand.latlngColumn + '5';
+	                    		hand.latlngColumn = hand.latlngColumn.split(',')[0] + '5' + ',' + hand.latlngColumn.split(',')[1] + '5';
 		                    	uniqueLatLng = false;
 		                    	break;
 	                    	}
@@ -348,22 +334,6 @@
 	                }
 
                     console.log(hand.latlngColumn.split());
-
-                    var colorIcon = icon.orange;
-
-                    console.log(hand.name + hand.Style);
-                    switch (hand.Style) {
-                        case 'large_green' :
-                            colorIcon = icon.green;                    break;
-                        case 'large_yellow' :
-                            colorIcon = icon.orange;                    break;
-                        case 'large_blue' :
-                            colorIcon = icon.purple;                    break;
-                        case 'large_red' :
-                            colorIcon = icon.red;                    break;
-                        default:
-                            colorIcon = icon.orange;
-                    }
 
                     var seek = $('input#search').val();
                     var seeks = seek.split(/\s+/);
@@ -430,16 +400,49 @@
                         continue;
                     }
 
-                    markers[i] = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindPopup(flag, {
-                                className: 'mapPopup' }).bindLabel(hand.name, {
-                                    noHide: true,
-                                    className: 'mapLabel',
-                                    direction: 'auto'
-                                    });
-					
-                   
+          //          markers[i] = L.marker(hand.latlngColumn.split(','), {icon: colorIcon }).bindPopup(flag, {
+      //                          className: 'mapPopup' });
 
+                    
+                    
+                    var colorUrl = 'img/leaf-green.png';
 
+                        console.log(hand.name + hand.Style);
+                    switch (hand.Style) {
+                        case 'large_green' :
+                            colorUrl = 'img/leaf-green.png';                break;
+                        case 'large_yellow' :
+                            colorUrl = 'img/leaf-yellow.png';               break;
+                        case 'large_blue' :
+                            colorUrl = 'img/leaf-purple.png';               break;
+                        case 'large_red' :
+                            colorUrl = 'img/leaf-red.png';               break;
+                        default:
+                            colorUrl = 'img/leaf-green.png';
+                    }
+
+                    var SweetIcon = L.Icon.Label.extend({
+                        options: {
+               //             iconUrl: colorUrl,
+                  //          shadowUrl: 'img/leaf-green.png',
+                            iconSize: new L.Point(35, 70),
+                            iconAnchor: new L.Point(-12, -65),
+                            labelAnchor: new L.Point(20, -50),
+                            wrapperAnchor: new L.Point(12, 13),
+                            labelClassName: 'mapLabel'
+                        }
+                    });
+
+                    markers[i] = new L.Marker(
+                            new L.LatLng(
+                                        hand.latlngColumn.split(',')[0],
+                                        hand.latlngColumn.split(',')[1]
+                                    ),
+                            { icon: new SweetIcon({ iconUrl: colorUrl, labelText: hand.name }) }
+                        ).bindPopup(flag, {
+                                className: 'mapPopup' });
+			
+ 
                     if (hand.learner_role.indexOf('自學家長') > -1) fMarkers.push(markers[i]);
                     if (hand.learner_role.indexOf('自學生') > -1) lMarkers.push(markers[i]);
                     if (hand.learner_role.indexOf('獨立教育工作者') > -1) eMarkers.push(markers[i]);
@@ -449,12 +452,12 @@
                     var flagT = hand.時間戳記.split('/'); 
                     var nowT = makeTimeStamp().split('/');
 
-    //                console.log(nowT.join());
+     //               console.log(nowT.join());
     //                console.log(flagT.join());
      //               console.log(parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30));
 
                     if ( (parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30)) < 31) {
-                        console.log('Pushed')
+                        console.log('Pushed to monthyly newer')
                         mMarkers.push(markers[i]);
                     }
                 };
@@ -471,13 +474,14 @@
 
                 for (var i = 0; i < goodMarkers.length; i++) {
                     var currentMarker = goodMarkers[i];
-//                    currentMarker.on('mouseover', currentMarker.openPopup.bind(currentMarker));
+      //              currentMarker.on('mouseover', currentMarker.openPopup.bind(currentMarker));
+     //               currentMarker.on('click', currentMarker.closePopup.bind(currentMarker));
 
-                    currentMarker.on('click', currentMarker.closePopup.bind(currentMarker));
+                    labels.addLayer(goodMarkers[i]);
                 };
 
                 var hands = {
-                 a: L.layerGroup(goodMarkers),  // 所有人           good!
+      //           a: L.layerGroup(goodMarkers),  // 所有人           good!
                  f: L.layerGroup(fMarkers),  // 自學家庭         
                  l: L.layerGroup(lMarkers),  // 自學生
                  e: L.layerGroup(eMarkers),  // 教育工作者
@@ -489,19 +493,19 @@
                 var minimal = L.tileLayer(osmUrl, {
                     styleId: 113475,
                     attribution: attribution,
-                    maxZoom: 18
+                    maxZoom: 20
                 }); 
   //            var midnight  = L.tileLayer(osmUrl, {
   //                  styleId: 113784,
   //                  attribution: attribution,
-  //                  maxZoom: 18
+  //                  maxZoom: 20
   //              });
 
 
-  //              var baseMaps = {
-  //                  "白天": minimal,
+                var baseMaps = {
+                    "白天": minimal,
   //                  "黑夜": midnight    //bug here-- 沒有連到樣式
-  //              };
+                };
 
 
                 this.overlayMaps = {
@@ -510,45 +514,16 @@
                     "獨立教育工作者": hands.e,
                     "自學團體": hands.g,
                     "顯示當月新人": hands.m,         
-                    "顯示全部": hands.a,
+                    "顯示全部": labels,
                 };
 
-         //       this.allMaps = {           
-      //          }
 
                 this.map.addLayer(minimal);
-                this.map.addLayer(hands.a);
+            //    this.map.addLayer(hands.a);
                 
+                L.control.layers(baseMaps, this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體       
 
 
-                L.control.layers(this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體
-
-                function getRandomLatLng(map) {
-									var bounds = map.getBounds(),
-										southWest = bounds.getSouthWest(),
-										northEast = bounds.getNorthEast(),
-										lngSpan = northEast.lng - southWest.lng,
-										latSpan = northEast.lat - southWest.lat;
-
-									return new L.LatLng(
-										southWest.lat + latSpan * Math.random(),
-										southWest.lng + lngSpan * Math.random()
-									);
-								}
-
-//				for (var j = 0; j < 20; j++) {
-//					labels.addLayer(
-//						new L.Marker(
-//							getRandomLatLng(this.map),
-//							{ icon: new L.Icon.Label.Default({ labelText: "A label" }) }
-//						)
-//					);
-//				};
-
-
-                hands.a.eachLayer(function (marker) {
-                    marker.showLabel();
-                });
 
 
                 if (welcomeWord) {

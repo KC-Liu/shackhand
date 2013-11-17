@@ -210,6 +210,8 @@
 
     var preview = false; var userNum;
 
+
+
     Auto20 = Backbone.View.extend({
         el: $('body'),
 
@@ -232,14 +234,18 @@
    
             preview = false;
 
-            if (location.hash.replace('#','').length > 0) {
-            	$('input#search').val(decodeURIComponent(location.hash.replace('#','')));
+    //        if (location.hash.replace('#','').length > 0) {
+   //         	$('input#search').val(decodeURIComponent(location.hash.replace('#','')));
 
-            };
-
+    //        };
 
 
             this.welcomeWord = L.popup().setLatLng([22.01, 123.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
+
+            this.centerZoom = {
+                    center: new L.LatLng(23.654299340, 120.44776492196047),
+                    zoom: 7
+                };
 
 
             this.render();
@@ -251,10 +257,16 @@
             }
         },
 
-        changeHands: function() {
+        changeHands: function(action) {
+
             console.log('call changeHands');
 
-            location.hash = '#' + encodeURI($('input#search').val());
+            if (action == 'search') {
+                location.hash = '#search/' + encodeURI($('input#search').val());
+            }
+            else {
+                location.hash = '#'+encodeURI(action);
+            }
 
             $("#map").fadeOut(1000);
 
@@ -273,6 +285,8 @@
             var attribution = this.cloudmadeAttribution;
             var welcomeWord = this.welcomeWord;
 
+            var centerZoom = this.centerZoom;
+
             myDataRef.child('hands').once('value', function(dataSnapshot) {
                 var markers = [];
                 var fMarkers = [];
@@ -286,13 +300,9 @@
                 var autos = dataSnapshot.val();
                 userNum = autos.length;
 
-                this.map = L.map('map', {
-                    center: new L.LatLng(23.654299340, 120.44776492196047),
-                    zoom: 7,
-//                    layers: [minimal, hands.a]
-                });
+                var map = L.map('map', centerZoom);
 
-                this.map.addLayer(labels);   /* 待把 scr 解決 */
+                map.addLayer(labels);   /* 待把 scr 解決 */
 
 
                 if (preview) {
@@ -518,10 +528,10 @@
                 };
 
 
-                this.map.addLayer(minimal);
+                map.addLayer(minimal);
             //    this.map.addLayer(hands.a);
                 
-                L.control.layers(baseMaps, this.overlayMaps).addTo(this.map);  // 之後可以設圖層：家庭, 教師, 自學團體       
+                L.control.layers(baseMaps, this.overlayMaps).addTo(map);  // 之後可以設圖層：家庭, 教師, 自學團體       
 
 
 
@@ -570,7 +580,7 @@
 	                if (document.getElementById(roles[i]).checked) goodRoles.push(roles[i]);
 	            };
 
-	             var styles = ['large_red','large_yellow','large_green','large_blue'], goodStyle = '';
+	           var styles = ['large_red','large_yellow','large_green','large_blue'], goodStyle = '';
 
 	            for (var i = 0; i < styles.length; i++) {
 	                if (document.getElementById(styles[i]).checked) { goodStyle = styles[i]; break }
@@ -625,7 +635,40 @@
 
     });
     
-    var auto20 = new Auto20();
+var auto20 = new Auto20();
+
+var Router = Backbone.Router.extend({
+  routes: {
+    "search/:keys" : "search",
+    "focus/:addr" : "focus"
+  },
+ 
+  search : function(keys) {
+    $('input#search').val(decodeURIComponent(keys.split('/')[0]));
+    auto20.changeHands('search');
+  },
+
+  focus : function(addr) {
+
+    $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ addr +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
+
+            var lat = data.query.results.Result.latitude;
+            var lng = data.query.results.Result.longitude;
+
+            auto20.centerZoom = {
+                            center: new L.LatLng(lat, lng),
+                            zoom: 11 };
+            auto20.changeHands('focus/'+addr);
+    });
+
+  }
+
+});
+ 
+var yC = new this.Router;
+ 
+Backbone.history.start();
+    
     
     
         

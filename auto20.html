@@ -276,7 +276,7 @@
 
                         console.log(data);
 
-                        if(!data) location.hash = '#search/' + encodeURI($('input#search').val());
+                        if(!data.query.results.Result.line1) location.hash = '#search/' + encodeURI($('input#search').val());
 
                         else if (data.query.results.Result.line1.replace($('input#search').val(),'').length < 3) {
                             location.hash = '#focus/' + encodeURI($('input#search').val());

@@ -296,6 +296,8 @@
 
             $("#map").fadeOut(1000);
 
+       ///     alert('aaa');
+
             setTimeout(function() {
                 $('#map').remove();
                 $('body').append("<div id = 'map'></div>");
@@ -704,9 +706,6 @@ var Router = Backbone.Router.extend({
             auto20.model.set( {centerZoom : {
                             center: new L.LatLng(lat, lng),
                             zoom: 11 } });
-
-            auto20.changeHands();
-
 
       });
     }

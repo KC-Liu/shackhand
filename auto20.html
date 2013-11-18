@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
 <![endif]-->
 
-<style>  
+<style>
 
     .mapLabel {
     	text-align: center;
@@ -28,11 +28,14 @@
     }
     .mapLabel:hover {
         background-color: rgba(200,255,255,1);
-        font-size: 2rem;
-        max-width: 15rem;
+        font-size: 1.1rem;
+        max-width: 420px;
         max-height: 15rem;
     }
-    .leaflet-clickable:hover { z-index: 99999 !important; }
+    .leaflet-clickable:hover {
+        z-index: 99999 !important;
+    }
+
     .mapPopup {
  /*       width: 400px;
         border-radius: 15px;
@@ -131,6 +134,11 @@
         };
 
       </script>
+
+    <div id="backUp">            <!-- Point:Backup  Status: Usable lev 1-->
+ 
+        <button id="goBackUp" onclick = "location = 'https://shackhand-autolearn.firebaseio.com/.json?print=pretty&format=export&download=shackhand-autolearn-export.json'">備份.json資料</button>
+    </div>
 
 
     <div id="map">                          <!-- Point: Main-Map   Status: Usable lev0 -->
@@ -447,29 +455,35 @@
                     }
                     
                     
-                    var colorUrl = 'img/leaf-green.png';
+                    var color = {Url: 'img/leaf-green.png', h: 70};
 
-                        console.log(hand.name + hand.Style);
+                    console.log(hand.name + hand.Style);
+
                     switch (hand.Style) {
                         case 'large_green' :
-                            colorUrl = 'img/leaf-green.png';                break;
+                            color.Url = 'img/leaf-green.png';
+               //             color.h = 50;
+             //               color.w = 50;
+                            break;
                         case 'large_yellow' :
-                            colorUrl = 'img/leaf-yellow.png';               break;
+                            color.Url = 'img/leaf-yellow.png';               break;
                         case 'large_blue' :
-                            colorUrl = 'img/leaf-purple.png';               break;
+                            color.Url = 'img/leaf-purple.png';               break;
                         case 'large_red' :
-                            colorUrl = 'img/leaf-red.png';               break;
+                            color.Url = 'img/leaf-red.png';
+            //                color.h = 100;
+                            break;
                         default:
-                            colorUrl = 'img/leaf-green.png';
+                            color.Url = 'img/leaf-green.png';
                     }
 
                     var SweetIcon = L.Icon.Label.extend({
                         options: {
                //             iconUrl: colorUrl,
                   //          shadowUrl: 'img/leaf-green.png',
-                            iconSize: new L.Point(35, 70),
-                            iconAnchor: new L.Point(-12, -65),
-                            labelAnchor: new L.Point(20, -50),
+                            iconSize: new L.Point(35, color.h),
+                            iconAnchor: new L.Point(-12, -5-color.h),
+                            labelAnchor: new L.Point(20, 20-color.h),
                             wrapperAnchor: new L.Point(12, 13),
                             labelClassName: 'mapLabel'
                         }
@@ -480,9 +494,13 @@
                                         hand.latlngColumn.split(',')[0],
                                         hand.latlngColumn.split(',')[1]
                                     ),
-                            { icon: new SweetIcon({ iconUrl: colorUrl, labelText: hand.name + '<br/>興趣：' + hand.learner_habit
+                            { icon: new SweetIcon({ iconUrl: color.Url, labelText: hand.name
+                             + '<br/>興趣：' + hand.learner_habit
                             				+ '<br/>分享：' + hand.share
-                            				+ '<br/>需要：' + hand.ask}) }
+                            				+ '<br/>需要：' + hand.ask
+
+                             + '<br/>' + hand.site                                      
+                             + '<br/>' + hand.connect_me}) }
                         ).bindPopup(flag, {
                                 className: 'mapPopup' });
 			

@@ -290,22 +290,8 @@
         maybeSearch: function(ev) {
             console.log(ev.target);
             if ( ev.which === 13 || $(ev.target).attr('id') == 'goSearch' ) {
-                $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ $('input#search').val() +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
-
-                        console.log(data);
-
-                        if(!data.query.results.Result.line1) location.hash = '#search/' + encodeURI($('input#search').val());
-
-                        else if (data.query.results.Result.line1.replace($('input#search').val(),'').length < 3) {
-                            location.hash = '#focus/' + encodeURI($('input#search').val());
-                            return;
-                        }
-                        else {
-	                        location.hash = '#search/' + encodeURI($('input#search').val());
-	                    }
-
-                  });               
-
+                      
+                location.hash = '#' + encodeURI($('#search').val());
             }
         },
 
@@ -723,17 +709,18 @@ var auto20 = new Auto20();
 var Router = Backbone.Router.extend({
   routes: {
     "search/:keys" : "search",
-    "focus/:addr" : "focus"
+    "focus/:addr" : "focus",
+    ":word" : "maybe"
   },
  
-  search : function(keys) {
+  search: function(keys) {
     $('input#search').val(decodeURIComponent(keys.split('/')[0]));
 
     auto20.model.set({ search: $('input#search').val() });
 //    auto20.changeHands('search');
   },
 
-  focus : function(addr) {
+  focus: function(addr) {
 
     $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ addr +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
 
@@ -747,7 +734,27 @@ var Router = Backbone.Router.extend({
                             zoom: 11 } });
 
       });
-    }
+    },
+  maybe: function (word){
+
+    $('input#search').val(word);
+
+    $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ $('input#search').val() +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
+
+            console.log(data);
+
+            if(!data.query.results.Result.line1) location.hash = '#search/' + encodeURI($('input#search').val());
+
+            else if (data.query.results.Result.line1.replace($('input#search').val(),'').length < 3) {
+                location.hash = '#focus/' + encodeURI($('input#search').val());
+                return;
+            }
+            else {
+                location.hash = '#search/' + encodeURI($('input#search').val());
+            }
+
+      });         
+  }
 
 });
  

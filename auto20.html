@@ -7,14 +7,16 @@
 <link rel="stylesheet" type="text/css" class="ui" href="stylesheets/semantic.min.css">
 <link rel="stylesheet" href="Leaflet.iconlabel-master/lib/leaflet-dist/leaflet.css" />
 
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+
+
 <link rel="stylesheet" href="Leaflet.iconlabel-master/dist/leaflet.iconlabel.css" />
 <link rel="stylesheet" href="Leaflet.iconlabel-master/src/Icon.Label.css" />
 <link rel="stylesheet" href="stylesheets/auto20.css" />
 
 
-<!--[if lte IE 8]>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
-<![endif]-->
+
 
 <style>
 
@@ -40,6 +42,14 @@
  /*       width: 400px;
         border-radius: 15px;
         background-color: rgba(255,255,255,0.8); */
+    }
+
+    #warning {
+        display: block;
+        position: relative;
+        top: 100px; left: 100px;
+        font-size: 4rem;
+        color: rgba(100,100,100,1);
     }
 </style>
 
@@ -142,6 +152,7 @@
 
 
     <div id="map">                          <!-- Point: Main-Map   Status: Usable lev0 -->
+        <div id = "warning">本地圖不支援IE瀏覽器<br/>若無法顯示，請改用<a href = "http://moztw.org/firefox/" target = "_blank">Firefox瀏覽器</a><br/>謝謝您的支持。</div>
     </div>
 
     <div id="join">                         <!-- Point:Form  -->
@@ -373,21 +384,31 @@
                 
                     hand.latlngColumn = hand.latlngColumn.replace('(','').replace(')','').replace('附近','');
 
-                    var uniqueLatLng = false;
-                    while (!uniqueLatLng) {
-                    	uniqueLatLng = true;
+                    //重覆座標的解決，待測
 
-	                    for (var j = 0; j < latlngUsed.length; j++) {
-	                    	if (latlngUsed[j] == hand.latlngColumn) {
-	                    		hand.latlngColumn = hand.latlngColumn.split(',')[0] + '5' + ',' + hand.latlngColumn.split(',')[1] + '5';
-		                    	uniqueLatLng = false;
-		                    	break;
-	                    	}
-	                    	else {
-	                    		latlngUsed.push(hand.latlngColumn)
-	                    	}
-	                    };
-	                }
+                    var counter = 0;
+                    for (var j = 0; j < latlngUsed.length; j++) {
+                    	if (latlngUsed[j] == hand.latlngColumn) counter++ ;
+                    };
+
+                    function modifyLatLng (latlngColumn, counter) {   //  "lat,lng"
+                        var lat = parseFloat(latlngColumn.split(',')[0]);
+                        var lng = parseFloat(latlngColumn.split(',')[1]);
+
+                        var r = counter / 100;
+                        var theta = counter * Math.PI / 3;
+
+                        var lngOffSet = r * Math.cos(theta);    // x
+                        var latOffSet = r * Math.sin(theta);    // y
+
+                        console.log(latOffSet + ',' + lngOffSet);
+
+                        return ((lat + latOffSet) + ',' + (lng + lngOffSet));
+                    }
+
+                    latlngUsed.push(hand.latlngColumn);
+                    hand.latlngColumn = modifyLatLng(hand.latlngColumn, counter);
+
 
                     console.log(hand.latlngColumn.split());
 
@@ -395,7 +416,7 @@
                     var seeks = seek.split(/\s+/);
                     console.log(seeks);
 
-//                    var flag = hand.name+"<b>Hello world!</b><br />I am a popup.";
+
                     var flag = '<div class="flag">'
                         +'<font color = "grey">加入時間: '+hand.時間戳記+'</font><br />'
                         +'<h2> 👪 '+hand.name+'😼</h2><br />'

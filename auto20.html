@@ -192,7 +192,7 @@
 
 
             <h2>*學習者的出生年份(西元)?</h2>
-            <input id = 'learner_birth' type = 'text' placeholder = '學習者 = 您或您的孩子'></input>
+            <input id = 'learner_birth' type = 'text' placeholder = '程式會由年次自動計算歲數'></input>
             
             <h2>*學習者的身份? (複選)</h2>
             <p id = 'learner_role'>                
@@ -375,7 +375,7 @@
                     if (hand.site && hand.site.indexOf('http') == -1 && hand.site.indexOf('@') == -1) hand.site = 'http://' + hand.site;
 
                     if (hand.site.indexOf('@') > -1) {
-                    	hand.site = '<a href = "mailto:'+hand.site+'?subject=您好&body='+hand.name+'您好：我在自學2.0上看到您的交友旗幟，想和你碰個面，我是">'+hand.site+'</a>';
+                    	hand.site = '<a href = "mailto:'+hand.site+'?subject=您好&body='+hand.name+'您好：我在自學2.0上看到您的交友旗幟，我是">'+hand.site+'</a>';
                     }
                     else {
 	                    hand.site = hand.site.replace(/(.*?)(http.+)\s*/, '$1 <a href = $2> $2 </a>');
@@ -422,6 +422,8 @@
                     else {
                         hand.ageMark = '(' + hand.age + '歲)';
                     }
+
+                    hand.connect_me = hand.connect_me.replace(/(\S+@\S+)/,'<a href = "mailto:$1?subject=您好&body='+hand.name+'您好：我在自學2.0上看到您的交友旗幟，我是"> $1 </a>');
 
 
                     var flag = '<div class="flag">'
@@ -674,7 +676,7 @@
 	            var preview = {
 	                時間戳記: timeStamp,
 	                name: $('#name').val(),
-	                address: $('#address').val(),
+	                address: $('#address').val().replace(/\d+樓$/, '').replace(/\d+號$/, ''),
 	                latlngColumn : latlngColumn,
 	                connect_me: $('#connect_me').val(),
 	                site: $('#site').val(),

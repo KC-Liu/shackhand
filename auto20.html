@@ -245,7 +245,7 @@
     AutoModel = Backbone.Model.extend({
             defaults: {
                     preview: false,
-                    search: false,
+                    search: '',
                     centerZoom: {
                         center: new L.LatLng(23.654299340, 120.44776492196047),
                         zoom: 7
@@ -272,7 +272,7 @@
 
             _.bindAll(this, 'feedback', 'maybeSearch','changeHands', 'formPerview', 'formSubmit', 'makePrev', 'render');
 
-            this.model.bind('change:search', this.changeHands);
+  //          this.model.bind('change:search', this.changeHands);
   //          this.model.bind('change:preview', this.changeHands);
             this.model.bind('change:centerZoom', this.changeHands);
 
@@ -321,6 +321,11 @@
             var centerZoom = this.model.get('centerZoom');
             var preview = this.model.get('preview');
 
+            var seek = this.model.get('search');
+         //   var seek = $('input#search').val();
+            var seeks = seek.split(/\s+/);
+    //        console.log(seeks);
+
             myDataRef.child('hands').once('value', function(dataSnapshot) {
                 var markers = [];
                 var fMarkers = [];
@@ -330,6 +335,7 @@
                 var mMarkers = [];  
                 var latlngUsed = [];
                 var labels = new L.FeatureGroup();
+
 
                 var autos = dataSnapshot.val();
                 userNum = autos.length;
@@ -347,7 +353,7 @@
 
                 for (var i = 0; i < autos.length; i++) {
 
-                    console.log(i);
+     //               console.log(i);
                     var hand = autos[i];
 
                     if (!hand) {
@@ -385,7 +391,7 @@
                         var theta = counter * Math.PI / 3;
 
                         var lngOffSet = r * Math.cos(theta);    // x
-                        var latOffSet = r * Math.sin(theta);    // y
+                        var latOffSet = r * Math.sin(theta) / 2;    // y
 
                         console.log(latOffSet + ',' + lngOffSet);
 
@@ -393,14 +399,10 @@
                     }
 
                     latlngUsed.push(hand.latlngColumn);
-                    hand.latlngColumn = modifyLatLng(hand.latlngColumn, counter);
+                    if (counter > 0) hand.latlngColumn = modifyLatLng(hand.latlngColumn, counter);
 
 
-                    console.log(hand.latlngColumn.split());
-
-                    var seek = $('input#search').val();
-                    var seeks = seek.split(/\s+/);
-                    console.log(seeks);
+        //            console.log(hand.latlngColumn.split());
 
 
                     var flag = '<div class="flag">'
@@ -439,7 +441,7 @@
                         };
 
                         if (!seekGood) {
-                            console.log(seeks.join()+'：'+flag.search(look)+'略過'+hand.name);
+       //                     console.log(seeks.join()+'：'+flag.search(look)+'略過'+hand.name);
                             continue;
                         }
 
@@ -447,7 +449,7 @@
                         	for (var j = 0; j < seeks.length; j++) {
                                 var look = seeks[j];
                         		if (look){
-                                   console.log(look);
+             //                      console.log(look);
                                    flag = flag.replace(look,'<span style = "background-color: rgba(255,255,155,1) ">' + look + '</span>')
     	                    	}
                         	};                        
@@ -457,14 +459,14 @@
 
 
                     if (hand.latlngColumn.split(',').length != 2) {
-                        console.log('LatLng:'+ hand.latlngColumn);
+      //                  console.log('LatLng:'+ hand.latlngColumn);
                         continue;
                     }
                     
                     
                     var color = {Url: 'img/leaf-green.png', h: 70};
 
-                    console.log(hand.name + hand.Style);
+    //                console.log(hand.name + hand.Style);
 
                     switch (hand.Style) {
                         case 'large_green' :
@@ -526,7 +528,7 @@
      //               console.log(parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30));
 
                     if ( (parseInt(nowT[0]) * 365 + parseInt(nowT[1]) * 30 - (parseInt(flagT[0]) * 365 + parseInt(flagT[1]) * 30)) < 31) {
-                        console.log('Pushed to monthyly newer')
+           //             console.log('Pushed to monthyly newer')
                         mMarkers.push(markers[i]);
                     }
                 };
@@ -535,7 +537,7 @@
 
                 for (var i = 0; i < markers.length; i++) {
                     if (!markers[i]) {
-                        console.log("null marker:"+i);
+        //                console.log("null marker:"+i);
                         continue;
                     }
                     goodMarkers.push(markers[i]);
@@ -715,9 +717,8 @@ var Router = Backbone.Router.extend({
  
   search: function(keys) {
     $('input#search').val(decodeURIComponent(keys.split('/')[0]));
-
     auto20.model.set({ search: $('input#search').val() });
-//    auto20.changeHands('search');
+    auto20.changeHands();
   },
 
   focus: function(addr) {
@@ -728,10 +729,12 @@ var Router = Backbone.Router.extend({
             var lng = data.query.results.Result.longitude;
 
             location.hash = '#focus/'+ encodeURI(addr);
+            $('input#search').val(addr);
 
             auto20.model.set( {centerZoom : {
                             center: new L.LatLng(lat, lng),
-                            zoom: 11 } });
+                            zoom: 11 },
+                            search : ''});
 
       });
     },
@@ -739,18 +742,30 @@ var Router = Backbone.Router.extend({
 
     $('input#search').val(word);
 
-    $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ $('input#search').val() +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
+    $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ word +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
 
-            console.log(data);
+            var obj = data.query.results.Result;
+            console.log(obj);
 
-            if(!data.query.results.Result.line1) location.hash = '#search/' + encodeURI($('input#search').val());
-
-            else if (data.query.results.Result.line1.replace($('input#search').val(),'').length < 3) {
-                location.hash = '#focus/' + encodeURI($('input#search').val());
+            if(!data.query.results.Result.latitude) {
+                location.hash = '#search/' + encodeURI(word);
                 return;
             }
+
             else {
-                location.hash = '#search/' + encodeURI($('input#search').val());
+
+                var checklist = ['line1','line2','line3','line4'];
+
+                for (var i = 0; i < checklist.length; i++) {
+                    if (!obj[checklist[i]]) continue;
+                    if (obj[checklist[i]].replace(word,'').length < 3) {
+                        location.hash = '#focus/' + encodeURI(word);
+                        return;
+                    }
+                };
+
+                location.hash = '#search/' + encodeURI(word);
+                return;
             }
 
       });         

@@ -17,7 +17,6 @@
 
 
 
-
 <style>
 
     .mapLabel {
@@ -34,8 +33,9 @@
         max-width: 420px;
         max-height: 15rem;
     }
+
     .leaflet-clickable:hover {
-        z-index: 99999 !important;
+        z-index: 99999; /* important */
     }
 
     .mapPopup {
@@ -48,7 +48,10 @@
         display: block;
         position: relative;
         top: 100px; left: 100px;
-        font-size: 4rem;
+        font-size: 3rem;
+        color: rgba(100,100,100,1);
+    }
+    #warning > a{
         color: rgba(100,100,100,1);
     }
 </style>
@@ -153,6 +156,11 @@
 
     <div id="map">                          <!-- Point: Main-Map   Status: Usable lev0 -->
         <div id = "warning">本地圖不支援IE瀏覽器<br/>若無法顯示，請改用<a href = "http://moztw.org/firefox/" target = "_blank">Firefox瀏覽器</a><br/>謝謝您的支持。</div>
+
+        <script type="text/javascript">
+            $('#warning').hide();
+            setTimeout(function(){$('#warning').show();}, 2000);
+        </script>
     </div>
 
     <div id="join">                         <!-- Point:Form  -->
@@ -364,11 +372,12 @@
                     }
 
                     if (hand.site && hand.site.indexOf('http') == -1 && hand.site.indexOf('@') == -1) hand.site = 'http://' + hand.site;
+
                     if (hand.site.indexOf('@') > -1) {
                     	hand.site = '<a href = "mailto:'+hand.site+'?subject=您好&body='+hand.name+'您好：我在自學2.0上看到您的交友旗幟，想和你碰個面，我是">'+hand.site+'</a>';
                     }
                     else {
-	                    hand.site = '<a href = '+hand.site+'>'+hand.site+'</a>';
+	                    hand.site = hand.site.replace(/(.*?)(http.+)\s*/, '$1 <a href = $2> $2 </a>');
 	                }
 
                     if (hand.site2 && hand.site2.indexOf('http') == -1) hand.site2 = 'http://' + hand.site2;
@@ -457,6 +466,10 @@
 
                     };
 
+                    if (!hand.latlngColumn) {
+                        console.log('Error: Null LatLng:' + i + 'th');
+                        continue;
+                    }
 
                     if (hand.latlngColumn.split(',').length != 2) {
       //                  console.log('LatLng:'+ hand.latlngColumn);
@@ -685,14 +698,18 @@
 
 		         	if (preview.note.length < 20) {alert('請輸入完整的自我介紹'); return};
 
-		            myDataRef.child('hands').child(userNum).set(preview);
+                    if (preview.latlngColumn.length < 5) {
+                        alert('地址有誤，請略為修改')
+                    }
+                    else {
 
-//		            preview = false;
-                    auto20.model.set({ preview: false });
+    		            myDataRef.child('hands').child(userNum).set(preview);
 
-                    location.hash = '#'+encodeURI('focus/'+preview.address);	
+                        auto20.model.set({ preview: false });
 
-                    auto20.changeHands();
+                        location.hash = '#'+encodeURI('focus/'+preview.address);	
+                        auto20.changeHands();
+                    }
 
 	            }
         	});            
@@ -712,12 +729,15 @@ var Router = Backbone.Router.extend({
   routes: {
     "search/:keys" : "search",
     "focus/:addr" : "focus",
+    "get/:addr" : "get",
     ":word" : "maybe"
   },
  
   search: function(keys) {
     $('input#search').val(decodeURIComponent(keys.split('/')[0]));
-    auto20.model.set({ search: $('input#search').val() });
+    auto20.model.set({ search: keys });
+
+    console.log("search:"+ keys);
     auto20.changeHands();
   },
 
@@ -729,7 +749,7 @@ var Router = Backbone.Router.extend({
             var lng = data.query.results.Result.longitude;
 
             location.hash = '#focus/'+ encodeURI(addr);
-            $('input#search').val(addr);
+            $('input#search').val(decodeURIComponent(addr));
 
             auto20.model.set( {centerZoom : {
                             center: new L.LatLng(lat, lng),
@@ -738,6 +758,17 @@ var Router = Backbone.Router.extend({
 
       });
     },
+
+  get: function(addr) {
+    $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ addr +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
+
+            var lat = data.query.results.Result.latitude;
+            var lng = data.query.results.Result.longitude;
+
+            console.log(lat+','+lng);
+            location.hash = '#get/'+(lat+','+lng);
+      });
+  },
   maybe: function (word){
 
     $('input#search').val(word);

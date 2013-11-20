@@ -257,7 +257,8 @@
                     centerZoom: {
                         center: new L.LatLng(23.654299340, 120.44776492196047),
                         zoom: 7
-                    }
+                    },
+                    showType: 'a'
                 },
             initialize: function(model) {
  //               alert('aaa');
@@ -334,6 +335,8 @@
             var seeks = seek.split(/\s+/);
     //        console.log(seeks);
 
+            var showType = this.model.get('showType');
+
             myDataRef.child('hands').once('value', function(dataSnapshot) {
                 var markers = [];
                 var fMarkers = [];
@@ -349,8 +352,6 @@
                 userNum = autos.length;
 
                 var map = L.map('map', centerZoom);
-
-                map.addLayer(labels);   /* 待把 scr 解決 */
 
 
                 if (preview) {
@@ -412,6 +413,15 @@
 
 
         //            console.log(hand.latlngColumn.split());
+
+                    hand.age = parseInt(makeTimeStamp().split('/')[0]) - hand.learner_birth;
+                    if (hand.age == 0) hand.age = 1;
+                    if (!hand.age) {
+                        hand.ageMark = ''
+                    }
+                    else {
+                        hand.ageMark = '(' + hand.age + '歲)';
+                    }
 
 
                     var flag = '<div class="flag">'
@@ -517,6 +527,7 @@
                                         hand.latlngColumn.split(',')[1]
                                     ),
                             { icon: new SweetIcon({ iconUrl: color.Url, labelText: hand.name
+                             + hand.ageMark
                              + '<br/>興趣：' + hand.learner_habit
                             				+ '<br/>分享：' + hand.share
                             				+ '<br/>需要：' + hand.ask
@@ -565,7 +576,7 @@
                 };
 
                 var hands = {
-      //           a: L.layerGroup(goodMarkers),  // 所有人           good!
+                 a: labels,  // 所有人           good!
                  f: L.layerGroup(fMarkers),  // 自學家庭         
                  l: L.layerGroup(lMarkers),  // 自學生
                  e: L.layerGroup(eMarkers),  // 教育工作者
@@ -598,13 +609,13 @@
                     "獨立教育工作者": hands.e,
                     "自學團體": hands.g,
                     "顯示當月新人": hands.m,         
-                    "顯示全部": labels,
+                    "顯示全部": hands.a,
                 };
 
 
-                map.addLayer(minimal);
-            //    this.map.addLayer(hands.a);
-                
+                map.addLayer(minimal);                
+                map.addLayer(hands[showType]);  
+
                 L.control.layers(baseMaps, this.overlayMaps).addTo(map);  // 之後可以設圖層：家庭, 教師, 自學團體       
 
 
@@ -729,6 +740,8 @@ var Router = Backbone.Router.extend({
   routes: {
     "search/:keys" : "search",
     "focus/:addr" : "focus",
+    "near/:addr" : "near",
+    "show/:type" : "show",
     "get/:addr" : "get",
     ":word" : "maybe"
   },
@@ -741,23 +754,36 @@ var Router = Backbone.Router.extend({
     auto20.changeHands();
   },
 
-  focus: function(addr) {
+  focus: function(addr, num, command) {
+
+    if(!num) num = 12;
+    if(!command) command = '#focus/';
 
     $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ addr +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
 
             var lat = data.query.results.Result.latitude;
             var lng = data.query.results.Result.longitude;
 
-            location.hash = '#focus/'+ encodeURI(addr);
+            location.hash = command + encodeURI(addr);
             $('input#search').val(decodeURIComponent(addr));
 
             auto20.model.set( {centerZoom : {
                             center: new L.LatLng(lat, lng),
-                            zoom: 11 },
+                            zoom: num },
                             search : ''});
 
       });
-    },
+  },
+
+  near: function (addr) {
+    this.focus(addr, 14,'#near/');
+  },
+
+
+  show: function (type) {
+    auto20.model.set( {showType : type } );
+    auto20.changeHands();
+  },
 
   get: function(addr) {
     $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ addr +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
@@ -770,6 +796,8 @@ var Router = Backbone.Router.extend({
       });
   },
   maybe: function (word){
+
+    if (/^[amfleg]$/.test(word)) {location.hash = '#show/' + encodeURI(word); return}
 
     $('input#search').val(word);
 
@@ -790,7 +818,13 @@ var Router = Backbone.Router.extend({
                 for (var i = 0; i < checklist.length; i++) {
                     if (!obj[checklist[i]]) continue;
                     if (obj[checklist[i]].replace(word,'').length < 3) {
-                        location.hash = '#focus/' + encodeURI(word);
+
+                        if (word.length < 4) {
+                            location.hash = '#focus/' + encodeURI(word);
+                        }
+                        else {
+                            location.hash = '#near/' + encodeURI(word);
+                        }
                         return;
                     }
                 };

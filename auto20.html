@@ -127,12 +127,15 @@
                 var name = $('#nameInput').val();
                 if (!name) name = 'guest';
                 var text = $('#messageInput').val();
-                var time = makeTimeStamp()
-                    time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
+                
+                var time = makeTimeStamp();                
+                time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
 
                 myDataRef.child('chat').push({name: name, text: text, time: time});
                 myDataRef.child('chatNew').child(makeTimeStamp()).set({name: name, text: text, time: time});
+
                 $('#messageInput').val('');
+       //        if ($('#nameInput').val() == '[log]') $('#nameInput').val('');
             }
         });
 
@@ -142,12 +145,18 @@
         });
 
         function displayChatMessage(name, text, time) {
-            $('<div/>').text(time).prepend($('<em/>').text(text)).prepend($('<em/>').text(name+': ')).appendTo($('#messageDiv'));
-            $('#messageDiv')[0].scrollTop = $('#messageDiv')[0].scrollHeight;
-            $('#chatDiv').scrollTop($('#chatDiv').height());
+
+            $('#messageDiv').append("<br />" + name + ' ： ' + text + time);
+
+  //          $('<div/>').text(time).prepend($('<em/>').text(text)).prepend($('<em/>').text(name+': ')).appendTo($('#messageDiv'));
+
+            $('#messageDiv').scrollTop = $('#messageDiv').scrollHeight;
+            $('#chatDiv').scrollTop($('#chatDiv').height() + 1000);
         };
 
       </script>
+
+  <!--  <div id="news"></div>  -->
 
     <div id="backUp">            <!-- Point:Backup  Status: Usable lev 1-->
  
@@ -232,15 +241,11 @@
             <h2>*公開的自我介紹?</h2>
             <textarea id = 'note' rows = '5' cols = '30' placeholder = '任何可以公開的自我介紹，幫助別人認識你。'></textarea>
 
-            
-<!--            <h2>Tags(for Search Engine)</h2>
-            <span>ex tag1 <button>x</button></span>
-            <input type = 'text' placeholder = 'ex1'></input> <button>Add tag</button> -->            
+                        
             <br/>
             <button id = 'formPerview' class = 'ui blue button'>預覽</button>           
             <button id = 'formSubmit' class = 'ui green button'>送出</button>
 
-            <!-- address: 如有兩位以上相同，要修成略有不同，才會分別顯示出兩位的圖示。 -->
 
         </div>
      </div>
@@ -387,34 +392,7 @@
                 
                     hand.latlngColumn = hand.latlngColumn.replace('(','').replace(')','').replace('附近','');
 
-                    //重覆座標的解決，待測
-
-                    var counter = 0;
-                    for (var j = 0; j < latlngUsed.length; j++) {
-                    	if (latlngUsed[j] == hand.latlngColumn) counter++ ;
-                    };
-
-                    function modifyLatLng (latlngColumn, counter) {   //  "lat,lng"
-                        var lat = parseFloat(latlngColumn.split(',')[0]);
-                        var lng = parseFloat(latlngColumn.split(',')[1]);
-
-                        var r = counter / 100;
-                        var theta = counter * Math.PI / 3;
-
-                        var lngOffSet = r * Math.cos(theta);    // x
-                        var latOffSet = r * Math.sin(theta) / 2;    // y
-
-                        console.log(latOffSet + ',' + lngOffSet);
-
-                        return ((lat + latOffSet) + ',' + (lng + lngOffSet));
-                    }
-
-                    latlngUsed.push(hand.latlngColumn);
-                    if (counter > 0) hand.latlngColumn = modifyLatLng(hand.latlngColumn, counter);
-
-
-        //            console.log(hand.latlngColumn.split());
-
+                    
                     hand.age = parseInt(makeTimeStamp().split('/')[0]) - parseInt(hand.learner_birth.split(',')[0].split('年')[0].split('/')[0]);
                     if (hand.age == 0) hand.age = 1;
                     if (!hand.age) {
@@ -488,6 +466,35 @@
       //                  console.log('LatLng:'+ hand.latlngColumn);
                         continue;
                     }
+
+                    //重覆座標的解決，待測   displacement algorithm
+
+                    var counter = 0;
+                    for (var j = 0; j < latlngUsed.length; j++) {
+                        if (latlngUsed[j] == hand.latlngColumn) counter++ ;
+                    };
+
+                    function modifyLatLng (latlngColumn, counter) {   //  "lat,lng"
+                        var lat = parseFloat(latlngColumn.split(',')[0]);
+                        var lng = parseFloat(latlngColumn.split(',')[1]);
+
+                        var r = counter / 1000;
+                        var theta = counter * Math.PI / 12;
+
+                        var lngOffSet = r * Math.cos(theta);    // x
+                        var latOffSet = r * Math.sin(theta) / 2;    // y
+
+                        console.log(latOffSet + ',' + lngOffSet);
+
+                        return ((lat + latOffSet) + ',' + (lng + lngOffSet));
+                    }
+
+                    latlngUsed.push(hand.latlngColumn);
+                    if (counter > 0) hand.latlngColumn = modifyLatLng(hand.latlngColumn, counter);
+
+
+        //            console.log(hand.latlngColumn.split());
+
                     
                     
                     var color = {Url: 'img/leaf-green.png', h: 70};
@@ -571,9 +578,6 @@
                 };
 
                 for (var i = 0; i < goodMarkers.length; i++) {
-                    var currentMarker = goodMarkers[i];
-      //              currentMarker.on('mouseover', currentMarker.openPopup.bind(currentMarker));
-     //               currentMarker.on('click', currentMarker.closePopup.bind(currentMarker));
 
                     labels.addLayer(goodMarkers[i]);
                 };
@@ -625,7 +629,7 @@
 
 
                 if (welcomeWord) {
-        //            welcomeWord.openOn(this.map);
+      //              welcomeWord.openOn(this.map);
                     this.welcomeWord = '';
                  }
 
@@ -719,12 +723,18 @@
 
     		            myDataRef.child('hands').child(userNum).set(preview);
 
-                        auto20.model.set({ preview: false });
+                        var log = preview.name + "登上自學2.0了!! <a href = '#near/"+preview.address + "'>前往認識</a>";
 
+                        var time = makeTimeStamp();                
+                        time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
+
+                        myDataRef.child('chat').push({name: '[log]', text: log, time: time});
+                            myDataRef.child('chatNew').child(makeTimeStamp()).set({name: '[log]', text: log, time: time});
+
+                        auto20.model.set({ preview: false });
                         location.hash = '#'+encodeURI('focus/'+preview.address);	
                         auto20.changeHands();
                     }
-
 	            }
         	});            
         },

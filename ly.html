@@ -525,6 +525,7 @@ var Router = Backbone.Router.extend({
             var lat = data.query.results.Result.latitude;
             var lng = data.query.results.Result.longitude;
 
+            $('input#search').val('');
             location.hash = '#focus/'+ encodeURI(addr);
 
             auto20.model.set( {centerZoom : {

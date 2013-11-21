@@ -114,7 +114,7 @@
         <div id="messageDiv">
         </div>
         <div id="chatInputDiv">
-            <input type = 'text' id = 'nameInput' placeholder = '輸入您的名字'></input>
+            <input type = 'text' id = 'nameInput' placeholder = '輸入名字或當guest'></input>
             <input type = 'text' id = 'messageInput' placeholder = '輸入您的聊天訊息'></input>
         </div>
     </div>
@@ -125,6 +125,7 @@
             $('#messageInput').keypress(function (e) {
             if (e.keyCode == 13) {
                 var name = $('#nameInput').val();
+                if (!name) name = 'guest';
                 var text = $('#messageInput').val();
                 var time = makeTimeStamp()
                     time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');

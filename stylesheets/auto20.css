@@ -163,9 +163,10 @@ body {
   	width: 100%;
   	font-size: 2rem;
   }
-  #join, #chatDiv, #news {
+  #join, #chatDiv, #news, #backUp, #searchbox {
     display: none;
   }
+  
   #searchbox {
   	width: 85%;
   	position: fixed;

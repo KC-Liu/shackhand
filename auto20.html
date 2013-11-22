@@ -293,8 +293,9 @@
   //          this.model.bind('change:preview', this.changeHands);
             this.model.bind('change:centerZoom', this.changeHands);
 
+            this.osmUrl = 'http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
             
-            this.osmUrl='http://{s}.tile.cloudmade.com/1dc4012079d54f93b27789a1fc4491e9/997/256/{z}/{x}/{y}.png';
+     //       this.osmUrl='http://{s}.tile.cloudmade.com/1dc4012079d54f93b27789a1fc4491e9/997/256/{z}/{x}/{y}.png';
 
             this.cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade';   
 
@@ -322,14 +323,17 @@
 
             setTimeout(function() {
                 $('#map').remove();
+//                $('.leaflet-clickable').remove();    Todo
+
                 $('body').append("<div id = 'map'></div>");
                 console.log('removeMap');
-                eval("auto20.render()");
+                eval("auto20.render(true)");
+
             }, 2000);
 
         },
 
-        render: function() {
+        render: function() {  //change
 
             var osmUrl = this.osmUrl;
             var attribution = this.cloudmadeAttribution;
@@ -359,6 +363,7 @@
                 var autos = dataSnapshot.val();
                 userNum = autos.length;
 
+               // if (!change)
                 var map = L.map('map', centerZoom);
 
 
@@ -395,7 +400,7 @@
                     hand.latlngColumn = hand.latlngColumn.replace('(','').replace(')','').replace('附近','');
 
                     
-                    hand.age = parseInt(makeTimeStamp().split('/')[0]) - parseInt(hand.learner_birth.split(',')[0].split('年')[0].split('/')[0]);
+                    hand.age = parseInt(makeTimeStamp().split('/')[0]) - parseInt(hand.learner_birth.split(',')[0].split('年')[0].split('/')[0].substr(0,4));
                     if (hand.age == 0) hand.age = 1;
                     if (!hand.age) {
                         hand.ageMark = ''
@@ -622,11 +627,14 @@
                 };
 
 
-                map.addLayer(minimal);                
+         //       if(!change) 
+                map.addLayer(minimal);
+
+           //     if(!change) 
                 map.addLayer(hands[showType]);  
 
-                L.control.layers(baseMaps, this.overlayMaps).addTo(map);  // 之後可以設圖層：家庭, 教師, 自學團體       
-
+             //   if(!change) 
+             L.control.layers(baseMaps, this.overlayMaps).addTo(map);
 
 
 
@@ -849,7 +857,22 @@ var Router = Backbone.Router.extend({
             }
 
       });         
-  }
+  },
+
+
+   // 測試中的功能
+
+   stick: function(latLng) {
+        var lat = latLng.split(',')[0];
+        var lng = latLng.split(',')[1];
+
+        $('input#search').val('');
+        location.hash = '#stick/'+ lat + ',' + lng;
+
+        lyMap.model.set( {centerZoom : {
+                        center: new L.LatLng(lat, lng),
+                        zoom: 11 } });
+   },
 
 });
  
@@ -858,7 +881,24 @@ var yC = new this.Router;
 Backbone.history.start();
     
     
+       // 測試中的功能
+function focusOn(position) {
+    console.log( '#stick/'+ position.coords.latitude + ',' +  position.coords.longitude );
+    location.hash = '#stick/'+ position.coords.latitude + ',' +  position.coords.longitude;
+}   
     
+   // 測試中的功能
+function getLocation()  {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(focusOn);
+    }
+    else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+}
+   // 測試中的功能
+
+// getLocation();
         
 
 </script>

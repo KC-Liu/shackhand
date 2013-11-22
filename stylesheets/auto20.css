@@ -4,7 +4,7 @@ body {
 }
 
 #map { float: left; height: 800px; width: 74%; min-width: 420px; border-radius: 15px}
-#join { float: right; height: 800px;width: 25%; min-width: 200px;
+#join { float: right; max-height: 800px; width: 25%; min-width: 200px;
     padding-left: 7px; border-radius: 15px;
     background-color: rgba(255,255,255,0.7); overflow: auto;
     color: rgba(0,0,0,0.1);
@@ -165,7 +165,14 @@ body {
   	width: 100%;
   	font-size: 2rem;
   }
-  #join, #chatDiv, #news, #backUp, #searchbox {
+
+  #join {
+    float: none;
+    width: 100%;
+    max-height: none;
+  }
+
+  #chatDiv, #news, #backUp, #searchbox {
     display: none;
   }
   

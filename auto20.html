@@ -263,10 +263,11 @@
     AutoModel = Backbone.Model.extend({
             defaults: {
                     preview: false,
+                    welcome: true,
                     search: '',
                     centerZoom: {
-                        center: new L.LatLng(23.654299340, 120.44776492196047),
-                        zoom: 4,
+                        center: new L.LatLng(28.054299340, 120.44776492196047),
+                        zoom: 5,
                         minZoom: 0,
                         maxZoom: 16,
                     },
@@ -303,7 +304,9 @@
 
             this.cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade';   
 
-            this.welcomeWord = L.popup().setLatLng([5.01, 155.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
+            this.welcomeWord = L.popup().setLatLng([18.01, 140.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
+
+            $('button#formSubmit').hide();
 
 
             this.render();
@@ -331,7 +334,7 @@
 
                 $('body').append("<div id = 'map'></div>");
                 console.log('removeMap');
-                eval("auto20.render(true)");
+                auto20.render();
 
             }, 2000);
 
@@ -345,6 +348,7 @@
 
             var centerZoom = this.model.get('centerZoom');
             var preview = this.model.get('preview');
+            var welcome = this.model.get('welcome');
 
             var seek = this.model.get('search');
          //   var seek = $('input#search').val();
@@ -641,8 +645,8 @@
 
 
                 if (!userNum) {
-                    welcomeWord.openOn(map);
                     userNum = autos.length;
+                    if (welcome) welcomeWord.openOn(map);
                 }
 
                $( "body").scrollTop( 0 );
@@ -655,10 +659,13 @@
         },
 
         formPerview: function() {    //預覽
+
+            $('button#formSubmit').show();
             this.makePrev('changeHands');
         },
 
         formSubmit: function() {    //送出表單
+            $('button#formSubmit').hide();
          	this.makePrev('formSubmit');
         },
 
@@ -711,8 +718,17 @@
             	if(command == 'changeHands') {	
 
                     auto20.model.set({ preview: preview  });
-                    location.hash = '#'+encodeURI('focus/'+preview.address);
-//	                eval("auto20.changeHands()");
+
+                //    if (location.hash != '#'+encodeURI('focus/'+preview.address))
+                    //    { 
+
+                    location.hash = '#'+encodeURI('focus/'+preview.address)
+                    
+               //     }
+                 //   else {
+                        auto20.changeHands();
+                   // };
+
 	            	return;
 
 	            }
@@ -776,7 +792,7 @@ var Router = Backbone.Router.extend({
  
   search: function(keys) {
     $('input#search').val(decodeURIComponent(keys.split('/')[0]));
-    auto20.model.set({ search: keys });
+    auto20.model.set({ search: keys, welcome: false });
 
     console.log("search:"+ keys);
     auto20.changeHands();
@@ -798,7 +814,8 @@ var Router = Backbone.Router.extend({
             auto20.model.set( {centerZoom : {
                             center: new L.LatLng(lat, lng),
                             zoom: num },
-                            search : ''});
+                            search: '',
+                            welcome: false});
 
       });
   },
@@ -809,7 +826,7 @@ var Router = Backbone.Router.extend({
 
 
   show: function (type) {
-    auto20.model.set( {showType : type } );
+    auto20.model.set( {showType : type, welcome: false } );
     auto20.changeHands();
   },
 

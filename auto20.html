@@ -17,6 +17,8 @@
 <link rel="stylesheet" href="Leaflet.iconlabel-master/src/Icon.Label.css" />
 <link rel="stylesheet" href="stylesheets/auto20.css" />
 
+<!--  Todo: 同文堂 -->
+
 
 
 <style>
@@ -264,7 +266,9 @@
                     search: '',
                     centerZoom: {
                         center: new L.LatLng(23.654299340, 120.44776492196047),
-                        zoom: 7
+                        zoom: 4,
+                        minZoom: 0,
+                        maxZoom: 16,
                     },
                     showType: 'a'
                 },
@@ -299,7 +303,7 @@
 
             this.cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade';   
 
-            this.welcomeWord = L.popup().setLatLng([22.01, 123.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
+            this.welcomeWord = L.popup().setLatLng([5.01, 155.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
 
 
             this.render();
@@ -361,7 +365,6 @@
 
 
                 var autos = dataSnapshot.val();
-                userNum = autos.length;
 
                // if (!change)
                 var map = L.map('map', centerZoom);
@@ -531,7 +534,7 @@
                //             iconUrl: colorUrl,
                   //          shadowUrl: 'img/leaf-green.png',
                             iconSize: new L.Point(35, color.h),
-                            iconAnchor: new L.Point(-12, -5-color.h),
+                            iconAnchor: new L.Point(-11, -1-color.h),
                             labelAnchor: new L.Point(20, 20-color.h),
                             wrapperAnchor: new L.Point(12, 13),
                             labelClassName: 'mapLabel'
@@ -637,14 +640,12 @@
              L.control.layers(baseMaps, this.overlayMaps).addTo(map);
 
 
+                if (!userNum) {
+                    welcomeWord.openOn(map);
+                    userNum = autos.length;
+                }
 
-                if (welcomeWord) {
-      //              welcomeWord.openOn(this.map);
-                    this.welcomeWord = '';
-                 }
-
-                $( this.el ).scrollTop( 0 );
-
+               $( "body").scrollTop( 0 );
 
 
                 console.log("render finished");
@@ -726,8 +727,9 @@
 
 		         	if (preview.note.length < 20) {alert('請輸入完整的自我介紹'); return};
 
-                    if (preview.latlngColumn.length < 5) {
-                        alert('地址有誤，請略為修改')
+                    if (!lat) {
+                        alert('地址有誤，請校對筆誤');
+                        return;
                     }
                     else {
 
@@ -735,15 +737,18 @@
 
                         var log = preview.name + "登上自學2.0了!! <a href = '#near/"+preview.address + "'>前往認識</a>";
 
+
                         var time = makeTimeStamp();                
                         time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
 
                         myDataRef.child('chat').push({name: '[log]', text: log, time: time});
-                            myDataRef.child('chatNew').child(makeTimeStamp()).set({name: '[log]', text: log, time: time});
+                        
+                        myDataRef.child('chatNew').child(makeTimeStamp()).set({name: '[log]', text: log, time: time});
 
                         auto20.model.set({ preview: false });
                         location.hash = '#'+encodeURI('focus/'+preview.address);	
                         auto20.changeHands();
+
                     }
 	            }
         	});            

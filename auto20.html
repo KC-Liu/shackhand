@@ -735,17 +735,16 @@
 
 	            if(command == 'formSubmit') {
 	            	
-	            	var auto20;
+	            	var autos;
 	            	myDataRef.child('hands').once('value', function(dataSnapshot) {
-	            		auto20 = dataSnapshot.val();
+	            		autos = dataSnapshot.val();
 	            		
-	            		if (auto20[auto20.length - 1].name == preview.name) {
-	            			userNum = auto20.length -1;
+	            		if (autos[autos.length - 1].name == preview.name) {
+	            			userNum = autos.length -1;
 		            	}
 		            	else {
-		            		userNum = auto20.length;
+		            		userNum = autos.length;
 		            	}
-	            	
 	            	
 
 		            	var keys = Object.keys(preview);

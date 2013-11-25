@@ -745,41 +745,42 @@
 		            	else {
 		            		userNum = auto20.length;
 		            	}
-	            		
-	            	});
+	            	
 	            	
 
-	            	var keys = Object.keys(preview);
-
-	            	for (var i = 0; i < keys.length; i++) {
-	            		if (!preview[keys[i]]) {alert('請輸入'+keys[i]); return};
-	            	};
-
-		         	if (preview.note.length < 20) {alert('請輸入完整的自我介紹'); return};
-
-                    if (!lat) {
-                        alert('地址有誤，請校對筆誤');
-                        return;
-                    }
-                    else {
-
-    		        myDataRef.child('hands').child(userNum).set(preview);
-
-                        var log = preview.name + "登上自學2.0了!! <a href = '#near/"+preview.address + "'>前往認識</a>";
-
-
-                        var time = makeTimeStamp();                
-                        time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
-
-                        myDataRef.child('chat').push({name: '[log]', text: log, time: time});
-                        
-                        myDataRef.child('chatNew').child(makeTimeStamp()).set({name: '[log]', text: log, time: time});
-
-                        auto20.model.set({ preview: false });
-                        location.hash = '#'+encodeURI('focus/'+preview.address);	
-                        auto20.changeHands();
-
-                    }
+		            	var keys = Object.keys(preview);
+	
+		            	for (var i = 0; i < keys.length; i++) {
+		            		if (!preview[keys[i]]) {alert('請輸入'+keys[i]); return};
+		            	};
+	
+			        if (preview.note.length < 20) {alert('請輸入完整的自我介紹'); return};
+	
+		                if (!lat) {
+		                    alert('地址有誤，請校對筆誤');
+		                    return;
+		                }
+		                else {
+		
+		    		    myDataRef.child('hands').child(userNum).set(preview);
+		
+		                    var log = preview.name + "登上自學2.0了!! <a href = '#near/"+preview.address + "'>前往認識</a>";
+		
+		
+		                    var time = makeTimeStamp();                
+		                    time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
+		
+		                    myDataRef.child('chat').push({name: '[log]', text: log, time: time});
+		                        
+		                    myDataRef.child('chatNew').child(makeTimeStamp()).set({name: '[log]', text: log, time: time});
+		
+		                    auto20.model.set({ preview: false });
+		                    location.hash = '#'+encodeURI('focus/'+preview.address);	
+		                    auto20.changeHands();
+		
+		                }
+	                	
+	            	});
 	            }
         	});            
         },

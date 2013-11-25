@@ -738,14 +738,16 @@
 	            	var auto20;
 	            	myDataRef.child('hands').once('value', function(dataSnapshot) {
 	            		auto20 = dataSnapshot.val();
-	            	}
+	            		
+	            		if (auto20[auto20.length - 1].name == preview.name) {
+	            			userNum = auto20.length -1;
+		            	}
+		            	else {
+		            		userNum = auto20.length;
+		            	}
+	            		
+	            	});
 	            	
-	            	if (auto20[auto20.length - 1].name == preview.name) {
-	            		userNum = auto20.length -1;
-	            	}
-	            	else {
-	            		userNum = auto20.length;
-	            	}
 
 	            	var keys = Object.keys(preview);
 
@@ -761,7 +763,7 @@
                     }
                     else {
 
-    		            myDataRef.child('hands').child(userNum).set(preview);
+    		        myDataRef.child('hands').child(userNum).set(preview);
 
                         var log = preview.name + "登上自學2.0了!! <a href = '#near/"+preview.address + "'>前往認識</a>";
 

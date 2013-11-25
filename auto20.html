@@ -734,6 +734,18 @@
 	            }
 
 	            if(command == 'formSubmit') {
+	            	
+	            	var auto20;
+	            	myDataRef.child('hands').once('value', function(dataSnapshot) {
+	            		auto20 = dataSnapshot.val();
+	            	}
+	            	
+	            	if (auto20[auto20.length - 1].name == preview.name) {
+	            		userNum = auto20.length -1;
+	            	}
+	            	else {
+	            		userNum = auto20.length;
+	            	}
 
 	            	var keys = Object.keys(preview);
 

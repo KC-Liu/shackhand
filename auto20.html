@@ -148,6 +148,13 @@
             displayChatMessage(message.name, message.text, message.time);
         });
 
+
+        myDataRef.child('chat').on('child_changed', function(snapshot) {
+            var message = snapshot.val();
+            displayChatMessage(message.name, message.text, message.time);
+        });
+
+
         function displayChatMessage(name, text, time) {
 
             $('#messageDiv').append("<br />" + name + ' ： ' + text + time);
@@ -776,10 +783,19 @@
 
 
 		                    if (isNew) {
-    		                    myDataRef.child('chat').push({name: '[log]', text: log, time: time});
-    		                        
-    		                    myDataRef.child('chatNew').child(makeTimeStamp()).set({name: '[log]', text: log, time: time});
 
+                                chatlog = myDataRef.child('chat').push();
+
+                                chatlog.set({name: '[log]', text: log, time: time});
+    		                    
+                                chatNewlog = myDataRef.child('chatNew').child(makeTimeStamp());
+
+    		                    chatNewlog.set({name: '[log]', text: log, time: time});
+
+                            }
+                            else {
+                                chatlog.update({name: '[log]', text: log, time: time});
+                                chatNewlog.update({name: '[log]', text: log, time: time});
                             }
 		
 		                    auto20.model.set({ preview: false });

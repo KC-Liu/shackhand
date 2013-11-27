@@ -376,25 +376,24 @@
 
 
                 var autos = dataSnapshot.val();
-
-               // if (!change)
                 var map = L.map('map', centerZoom);
 
 
                 if (preview) {
-                	autos =[preview];
-//                	preview = false;
+                	autos = [preview];
                 	welcomeWord = false;
                 }
 
                 for (var i = 0; i < autos.length; i++) {
 
-     //               console.log(i);
-                    var hand = autos[i];
-
-                    if (!hand) {
+                    if (!autos[i]) {
                         console.log('略過空格'); continue
                     }
+
+                    var hand;
+
+                    !autos[i][1] ? hand = autos[i] : hand = autos[i][autos[i].length -1]; // check autos[i] 是不是一個陣列
+
                     if (!hand.name) {
                         console.log('略過無名氏'); continue
                     }
@@ -826,6 +825,7 @@ var Router = Backbone.Router.extend({
     "near/:addr" : "near",
     "show/:type" : "show",
     "get/:addr" : "get",
+    "update/:num" : "update",
     ":word" : "maybe"
   },
  
@@ -879,6 +879,27 @@ var Router = Backbone.Router.extend({
             location.hash = '#get/'+(lat+','+lng);
       });
   },
+
+  update: function(num) {
+     if (!confirm("您確定是本人，要修改旗幟嗎？")) return;
+
+     // 把舊資料放進preview去
+        // datasnapshot once
+            // $(input#...).val(hand.name) -> 
+            // $(input#...).val(hand.address) ->
+            //...
+
+     // preview之後，不顯示送出鈕，另顯示一個新的「更新鈕」
+     
+
+     // 把firebase上的Data, 如果是單值，就先變成單元素陣列
+
+     // 把陣列後面加上新元素
+        // var version = array.length
+        // 最後 myDataRef.child('hands').child(num).child(version).update(preview);
+
+  },
+
   maybe: function (word){
 
     if (/^[amfleg]$/.test(word)) {location.hash = '#show/' + encodeURI(word); return}

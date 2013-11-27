@@ -736,14 +736,18 @@
 	            if(command == 'formSubmit') {
 	            	
 	            	var autos;
+                    var isNew;
+
 	            	myDataRef.child('hands').once('value', function(dataSnapshot) {
 	            		autos = dataSnapshot.val();
 	            		
 	            		if (autos[autos.length - 1].name == preview.name) {
 	            			userNum = autos.length -1;
+                            isNew = false;
 		            	}
 		            	else {
 		            		userNum = autos.length;
+                            isNew = true;
 		            	}
 	            	
 
@@ -753,6 +757,7 @@
 		            		if (!preview[keys[i]]) {alert('請輸入'+keys[i]); return};
 		            	};
 	
+
 			        if (preview.note.length < 20) {alert('請輸入完整的自我介紹'); return};
 	
 		                if (!lat) {
@@ -768,10 +773,14 @@
 		
 		                    var time = makeTimeStamp();                
 		                    time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
-		
-		                    myDataRef.child('chat').push({name: '[log]', text: log, time: time});
-		                        
-		                    myDataRef.child('chatNew').child(makeTimeStamp()).set({name: '[log]', text: log, time: time});
+
+
+		                    if (isNew) {
+    		                    myDataRef.child('chat').push({name: '[log]', text: log, time: time});
+    		                        
+    		                    myDataRef.child('chatNew').child(makeTimeStamp()).set({name: '[log]', text: log, time: time});
+
+                            }
 		
 		                    auto20.model.set({ preview: false });
 		                    location.hash = '#'+encodeURI('focus/'+preview.address);	

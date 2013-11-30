@@ -12,27 +12,183 @@
 
 <title>test</title>
 
+<style type="text/css">
+
+body {
+  background: rgba(200,255,255,1);
+}
+
+table {
+  border: 5px ridge;
+  border-collapse: collapse;
+}
+
+tr, td, th { 
+    border: 3px ridge;
+}
+
+td { 
+    width: 24%;
+}
+
+
+input {
+  font-size: 1.2rem;
+}
+
+</style>
+
 </head>
 
 <body>
 
-<p id = 'dum'>
-    dum dum dum
-</p>
-
-<p>
-    dom dom dom
-</p>
+<p><span>^__^</span></p>
 
 
-<p>
-    能量滿滿
-</p>
+<div ng-controller="Ctrl">
 
-<table>
-      <tr><th>row number</th></tr>
-      <tr ng-repeat="i in [0, 1, 2, 3, 4, 5, 6, 7]"><td>{{i}}</td></tr>
-</table>
+  <h1>Hello  {{yourName || 'everyone'}}!</h1>  
+
+      <label>輸入你的姓名，Angular會跟你打招呼</label>  
+      <input type="text" ng-model="yourName">  
+
+      <br/>
+
+      <table>
+
+      <tr>
+        <th><input type="number" ng-model = "s1"></input></th>
+        <th><input type="number" ng-model = "s2"></input></th>
+        <th />
+      </tr>
+
+      <tr><td> {{ s1 }}的因數有 {{ s1 | fact }} </td>
+          <td> {{ s2 }} 的因數有 {{ s2 | fact }} </td>
+          <td>{{s1 | arith}} + {{s2 | arith}} = {{ s1 + s2 | arith}}</td>
+      </tr>
+
+
+      <tr><td> {{ s1 }}的倍數有 {{ s1 | mul }} </td>
+          <td> {{ s2 }} 的倍數有 {{ s2 | mul }} </td>
+          <td>{{s1 | arith}} - {{s2 | arith}} = {{ s1 - s2 | arith}}</td>
+      </tr>
+      
+      <tr><td /><td /><td>{{s1 | arith}} * {{s2 | arith}} = {{ s1 * s2 | arith}}</td></tr>
+      
+      <tr><td /><td /><td>{{s1 | arith}} / {{s2 | arith}} = {{ {a:s1, b:s2} | div:this}}</td>
+      </tr>
+      
+      <tr><td /><td /><td>{{s1 | arith}} <sup> {{s2 | arith}} </sup> = {{ {a:s1, t:s2} | pow }}</td></tr>
+
+
+      <tr><td /><td /><td>{{s2 | arith}} <sup> {{s1 | arith}} </sup> = {{ {a:s2, t:s1} | pow }}</td></tr>
+
+      <tr><td /><td /><td> {{ s1 }}, {{ s2 }} 的最大公因數： {{ {a:s1, b:s2} | gcd }}</td></tr>
+
+      <tr><td /><td /><td> {{ s1 }}, {{ s2 }} 的最小公倍數： {{ {a:s1, b:s2} | lcm }}</td></tr>
+
+
+      </table>
+
+</div>
+
+
+<script type="text/javascript">
+
+var autoApp = angular.module('autoApp', ['autoFilters']);
+
+function Ctrl($scope) {
+  $scope.yourName = 'Bestian';
+  $scope.numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+  $scope.numbers0 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+  $scope.s1 = 7;
+  $scope.s2 = 3;
+}
+
+angular.module('autoFilters', []).filter('arith', function() {
+    return function(input) {
+      return input ? input : 0;
+    };
+  }).filter(('div'), function(){
+    return function(input){
+      var ans = 0;
+      var s1 = input.a;
+      var s2 = input.b;
+      while ((Math.abs(s1) >= Math.abs(s2)) && s2) {
+         console.log(s1 + '/' + s2);
+         if (s1 > 0 ) {
+            s1 -= Math.abs(s2);
+            ans += s2 / Math.abs(s2);
+         }
+         else if (s1 < 0 ) {
+            s1 += Math.abs(s2);
+            ans -= s2 / Math.abs(s2);
+         }         
+      }
+      if (s2 == 0) {
+        if (s1 > 0) return Infinity;
+        if (s1 < 0) return Infinity;
+        if (s1 == 0) return NaN;
+      }
+      else {
+        if (!ans) ans = '';
+        return s1 ? ans + ' ' + s1 + '/' + s2 : ans;
+      }
+  };
+}).filter(('pow'), function(){
+    return function(input){
+       return Math.pow(input.a, input.t);
+  };
+}).filter(('fact'), function(){
+     return function(input){
+        var n = Math.abs(input);
+        var facts = [];
+        for (var i = 1; i <= n; i++) {
+          if (!(n % i)) facts.push(i);        
+
+        };
+        return facts.join();
+  };
+}).filter(('mul'), function(){
+     return function(input){
+        var muls = [];
+        for (var i = -2; i <= 5; i++) {
+           muls.push(i * input);        
+        };
+        return '...'+muls.join()+'...';
+  };
+}).filter(('gcd'), function(){
+     return function(input){
+
+        a = Math.abs(input.a);
+        b = Math.abs(input.b);
+        
+        while (b * a) {          
+          a > b ? a = a % b : b = b % a;
+        }
+
+        return (Math.max(a,b) == 1) ? "1。("+input.a+"和"+input.b+"互質)" :  Math.max(a,b);
+
+  };
+}).filter(('lcm'), function(){
+     return function(input){
+
+        a = Math.abs(input.a);
+        b = Math.abs(input.b);
+        
+        while (b * a) {          
+          a > b ? a = a % b : b = b % a;
+        }
+
+        return input.a * input.b / Math.max(a,b);
+
+  };
+});
+
+
+
+
+</script>
 
 
 
@@ -48,17 +204,14 @@ times = (x, y) -> x * y
 $(document). ready(
     !-> 
         $ \p .fadeOut!fadeIn!
-    #    alert([1 to 100 by 2])) 
-
+      #  alert([1 to 100 by 2])
+         ) 
 
 
 </script>
 
-<script type="text/javascript">
 
-var phonecatApp = angular.module('autoApp', []);
 
-</script>
 
 
 <script src="javascripts/lib/livescript.js"></script>

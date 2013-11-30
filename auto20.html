@@ -180,7 +180,7 @@
 
         <script type="text/javascript">
             $('#warning').hide();
-            setTimeout(function(){$('#warning').show();}, 5000);
+            setTimeout(function(){$('#warning').show();}, 10000);
         </script>
     </div>
 
@@ -470,7 +470,8 @@
                                 var look = seeks[j];
                         		if (look){
              //                      console.log(look);
-                                   flag = flag.replace(look,'<span style = "background-color: rgba(255,255,155,1) ">' + look + '</span>')
+                                   var re = new RegExp(look, 'g');
+                                   flag = flag.replace(re,'<span style = "background-color: rgba(255,255,155,1) ">' + look + '</span>');
     	                    	}
                         	};                        
                         }

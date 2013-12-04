@@ -316,7 +316,7 @@
             $('button#formSubmit').hide();
 
 
-            this.render();
+            if (!location.hash) this.render();
         },
 
         maybeSearch: function(ev) {
@@ -851,13 +851,17 @@ var Router = Backbone.Router.extend({
             location.hash = command + encodeURI(addr);
             $('input#search').val(decodeURIComponent(addr));
 
-            auto20.model.set( {centerZoom : {
+            try {
+                map.setView(new L.LatLng(lat, lng), num);
+            }
+            catch(err) {
+                auto20.model.set( {centerZoom : {
                             center: new L.LatLng(lat, lng),
                             zoom: num },
                             search: '',
-                            welcome: false});
-
-      });
+                            welcome: false });
+            };
+        });
   },
 
   near: function (addr) {

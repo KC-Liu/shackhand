@@ -448,6 +448,7 @@
                         +'<b> <a href = "mailto:bestian@gmail.com?subject=回報名為'+hand.name+'、時間戳記為'+hand.時間戳記+'的資料錯誤&body=網站管理員您好: 我要回報名為'+hand.name+'的資料錯誤，詳請如下：" title="更新資料，或是遇到錯誤與濫用，請按此回報，謝謝!!">  更新資料或是回報錯誤 </a> </b>'
                         +'</div>'
 
+
                     if (seek) {
                         myDataRef.child('seek').child(makeTimeStamp()).set({seek: seek});
 
@@ -465,7 +466,13 @@
                             continue;
                         }
 
-                        if (flag) {
+                        console.log(seek + hand.name);
+	                    if (seek == hand.name) {
+		                    welcomeWord.setContent(flag);
+	                    	welcome = true;
+		                }
+
+                        else if (flag) {
                         	for (var j = 0; j < seeks.length; j++) {
                                 var look = seeks[j];
                         		if (look){
@@ -475,6 +482,7 @@
     	                    	}
                         	};                        
                         }
+
 
                     };
 
@@ -599,7 +607,7 @@
                 };
 
                 for (var i = 0; i < goodMarkers.length; i++) {
-
+                	console.log(goodMarkers[i]);
                     labels.addLayer(goodMarkers[i]);
                 };
 
@@ -653,7 +661,11 @@
 
                 if (!userNum) {
                     userNum = autos.length;
-                    if (welcome) welcomeWord.openOn(map);
+                }
+
+                if (welcome) {
+                	welcomeWord.openOn(map);
+                	welcome = false;
                 }
 
                $( "body").scrollTop( 0 );

@@ -59,10 +59,11 @@
         color: rgba(100,100,100,1);
     }
     
-    #focus {
+    div#focus {
         display: block;
-        position: relative;
-        top: 100px; right: 300px;
+        position: absolute;
+        top: 25px; right: 35%;
+        z-index: 1;
     }
     
 </style>
@@ -181,23 +182,35 @@
         <button id="goBackUp" onclick = "location = 'https://shackhand-autolearn.firebaseio.com/.json?print=pretty&format=export&download=shackhand-autolearn-export.json'">備份.json資料</button>
     </div>
 
+
+    <div id="focus">            <!-- Point:Focus  Status: Test-->
+        <button id="goFocus" class = "ui green button" onclick = "focusOnUser()">我家附近</button>
+    </div>
+
         <script type="text/javascript">
-            function goFocus () {
-            	var userLocation;
-            	if (navigator.geolocation) {
-		      userLocation = navigator.geolocation.getCurrentPosition(showPosition);
-		 }
-		 else {
-		     alert("Geolocation is not supported by this browser.");
-		 }
-            	 location.hash = '#focus/'+userLocation;
-            };
+
+            
+            function focusOnUser() {
+                var userLocation; var good = false;
+              	if (navigator.geolocation) {
+        		    try { navigator.geolocation.getCurrentPosition(focusOn); }
+                    catch(err) { alert(err) }
+                    if (!good) {
+                        alert("未收到您的位置。請檢查您的瀏覽器設定，或改用關鍵字搜詢。");
+                    }
+                }        		
+        		else {
+        		    alert("Geolocation is not supported by this browser.");
+        		}
+                function focusOn(position) {                   
+                    console.log( '#stick/'+ position.coords.latitude + ',' +  position.coords.longitude );
+                    location.hash = '#stick/'+ position.coords.latitude + ',' +  position.coords.longitude;
+                    good = true;
+                }
+             }
         </script>
         
         
-    <div id="focus">            <!-- Point:Backup  Status: Usable lev 1-->
-        <button id="goFocus" onclick = "goFocus()">備份.json資料</button>
-    </div>
 
 
     <div id="map">                          <!-- Point: Main-Map   Status: Usable lev0 -->
@@ -860,6 +873,7 @@ var Router = Backbone.Router.extend({
   routes: {
     "search/:keys" : "search",
     "focus/:addr" : "focus",
+    "stick/:latLng" : "stick",
     "near/:addr" : "near",
     "show/:type" : "show",
     "get/:addr" : "get",
@@ -888,17 +902,30 @@ var Router = Backbone.Router.extend({
             location.hash = command + encodeURI(addr);
             $('input#search').val(decodeURIComponent(addr));
 
-            try {
-                map.setView(new L.LatLng(lat, lng), num);
-            }
-            catch(err) {
-                auto20.model.set( {centerZoom : {
+            auto20.model.set( {centerZoom : {
                             center: new L.LatLng(lat, lng),
                             zoom: num },
                             search: '',
                             welcome: false });
-            };
+
+            try { map.setView(new L.LatLng(lat, lng), num); } catch(err) { };
         });
+  },
+
+  stick: function(latLng) {
+        var lat = latLng.split(',')[0];
+        var lng = latLng.split(',')[1];
+
+        $('input#search').val('');
+        location.hash = '#stick/'+ lat + ',' + lng;
+        
+        auto20.model.set( {centerZoom : {
+                        center: new L.LatLng(lat, lng),
+                        zoom: 11 },
+                        search: '',
+                        welcome: false });
+
+        try { map.setView(new L.LatLng(lat, lng), num); } catch(err) { };
   },
 
   near: function (addr) {
@@ -991,45 +1018,12 @@ var Router = Backbone.Router.extend({
   },
 
 
-   // 測試中的功能
-
-   stick: function(latLng) {
-        var lat = latLng.split(',')[0];
-        var lng = latLng.split(',')[1];
-
-        $('input#search').val('');
-        location.hash = '#stick/'+ lat + ',' + lng;
-
-        lyMap.model.set( {centerZoom : {
-                        center: new L.LatLng(lat, lng),
-                        zoom: 11 } });
-   },
-
 });
  
 var yC = new this.Router;
  
 Backbone.history.start();
-    
-    
-       // 測試中的功能
-function focusOn(position) {
-    console.log( '#stick/'+ position.coords.latitude + ',' +  position.coords.longitude );
-    location.hash = '#stick/'+ position.coords.latitude + ',' +  position.coords.longitude;
-}   
-    
-   // 測試中的功能
-function getLocation()  {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(focusOn);
-    }
-    else {
-        console.log("Geolocation is not supported by this browser.");
-    }
-}
-   // 測試中的功能
-
-// getLocation();
+       
         
 
 </script>

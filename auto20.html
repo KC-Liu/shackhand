@@ -185,9 +185,10 @@
             function goFocus () {
             	var userLocation;
             	if (navigator.geolocation) {
-		    userLocation = navigator.geolocation.getCurrentPosition(showPosition);
+		      userLocation = navigator.geolocation.getCurrentPosition(showPosition);
 		 }
-		 else {alert("Geolocation is not supported by this browser.");}
+		 else {
+		     alert("Geolocation is not supported by this browser.");
 		 }
             	 location.hash = '#focus/'+userLocation;
             };
@@ -978,12 +979,15 @@ var Router = Backbone.Router.extend({
                         return;
                     }
                 };
-*/
                 location.hash = '#search/' + encodeURI(word);
                 return;
             }
 
       });         
+      */
+      
+      location.hash = '#search/' + encodeURI(word);
+      return;
   },
 
 

@@ -58,6 +58,13 @@
     #warning > a{
         color: rgba(100,100,100,1);
     }
+    
+    #focus {
+        display: block;
+        position: relative;
+        top: 100px; right: 300px;
+    }
+    
 </style>
 
 <script src="javascripts/lib/jquery-1.10.2.js"></script>
@@ -123,6 +130,7 @@
         </div>
     </div>
 
+
     <script type="text/javascript">
 
         var myDataRef = new Firebase('https://shackhand-autolearn.firebaseio.com'); 
@@ -170,8 +178,24 @@
   <!--  <div id="news"></div>  -->
 
     <div id="backUp">            <!-- Point:Backup  Status: Usable lev 1-->
- 
         <button id="goBackUp" onclick = "location = 'https://shackhand-autolearn.firebaseio.com/.json?print=pretty&format=export&download=shackhand-autolearn-export.json'">備份.json資料</button>
+    </div>
+
+        <script type="text/javascript">
+            function goFocus () {
+            	var userLocation;
+            	if (navigator.geolocation) {
+		    userLocation = navigator.geolocation.getCurrentPosition(showPosition);
+		 }
+		 else {alert("Geolocation is not supported by this browser.");}
+		 }
+            	 location.hash = '#focus/'+userLocation;
+            };
+        </script>
+        
+        
+    <div id="focus">            <!-- Point:Backup  Status: Usable lev 1-->
+        <button id="goFocus" onclick = "goFocus()">備份.json資料</button>
     </div>
 
 
@@ -923,6 +947,7 @@ var Router = Backbone.Router.extend({
 
     $('input#search').val(word);
 
+/*
     $.getJSON( "http://query.yahooapis.com/v1/public/yql?q=select+%2A+from+geo.placefinder+where+text%3D%22"+ word +"%22+and+locale%3D%22zh_TW%22&format=json", function( data ) {
 
             var obj; try { obj = data.query.results.Result; } catch (e) {
@@ -953,7 +978,7 @@ var Router = Backbone.Router.extend({
                         return;
                     }
                 };
-
+*/
                 location.hash = '#search/' + encodeURI(word);
                 return;
             }

@@ -457,7 +457,12 @@
                         hand.ageMark = ''
                     }
                     else {
-                        hand.ageMark = '(' + hand.age + '歲)';
+                        if ((hand.learner_role.indexOf('家長') > -1 || hand.note.indexOf('孩子') > -1)&& hand.age < 18) {
+                            hand.ageMark = '(孩子' + hand.age + '歲)';
+                        }
+                        else {
+                            hand.ageMark = '(' + hand.age + '歲)';
+                        }
                     }
 
                     hand.connect_me = hand.connect_me.replace(/(\S+@\S+)/,'<a href = "mailto:$1?subject=您好&body='+hand.name+'您好：我在自學2.0上看到您的交友旗幟，我是"> $1 </a>');

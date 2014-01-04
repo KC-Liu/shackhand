@@ -141,8 +141,8 @@
                 if (!name) name = 'guest';
                 var text = $('#messageInput').val();
                 
-                var time = makeTimeStamp();                
-                time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
+                var time = makeTimeStamp().split('午')[0]+'午';                
+           //     time = (' -- 0'+time.split('午')[1].replace(' ', '')).replace('011', '11').replace('012', '12');
 
                 myDataRef.child('chat').push({name: name, text: text, time: time});
                 myDataRef.child('chatNew').child(makeTimeStamp()).set({name: name, text: text, time: time});
@@ -312,7 +312,25 @@
                     search: '',
                     centerZoom: {
                         center: new L.LatLng(23.054299340, 120.24776492196047),
-                        zoom: 7, // 4
+                        zoom: 7,
+                        minZoom: 0,
+                        maxZoom: 16,
+                    },
+                    centerZoom1: {
+                        center: new L.LatLng(23.054299340, 120.24776492196047),
+                        zoom: 6,
+                        minZoom: 0,
+                        maxZoom: 16,
+                    },
+                    centerZoom2: {
+                        center: new L.LatLng(23.054299340, 120.24776492196047),
+                        zoom: 4,
+                        minZoom: 0,
+                        maxZoom: 16,
+                    },
+                    centerZoom3: {
+                        center: new L.LatLng(23.054299340, 120.24776492196047),
+                        zoom: 2,
                         minZoom: 0,
                         maxZoom: 16,
                     },
@@ -339,20 +357,16 @@
 
             _.bindAll(this, 'feedback', 'maybeSearch','changeHands', 'formPerview', 'formSubmit', 'makePrev', 'render');
 
-  //          this.model.bind('change:search', this.changeHands);
-  //          this.model.bind('change:preview', this.changeHands);
             this.model.bind('change:centerZoom', this.changeHands);
 
             this.osmUrl = 'http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
             
-     //       this.osmUrl='http://{s}.tile.cloudmade.com/1dc4012079d54f93b27789a1fc4491e9/997/256/{z}/{x}/{y}.png';
 
             this.cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade';   
 
             this.welcomeWord = L.popup().setLatLng([22.01, 118.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
 
             $('button#formSubmit').hide();
-
 
             if (!location.hash) this.render();
         },
@@ -392,6 +406,9 @@
             var welcomeWord = this.welcomeWord;
 
             var centerZoom = this.model.get('centerZoom');
+            var centerZoom1 = this.model.get('centerZoom1');
+            var centerZoom2 = this.model.get('centerZoom2');
+            var centerZoom3 = this.model.get('centerZoom3');
             var preview = this.model.get('preview');
             var welcome = this.model.get('welcome');
 
@@ -414,7 +431,7 @@
 
 
                 var autos = dataSnapshot.val();
-                var map = L.map('map', centerZoom);
+                var map = L.map('map', centerZoom3);
 
 
                 if (preview) {
@@ -705,16 +722,32 @@
                 if (!userNum) {
                     userNum = autos.length;
                 }
-
-                if (welcome) {
-                	welcomeWord.openOn(map);
-                	welcome = false;
-                }
+                
 
                $( "body").scrollTop( 0 );
 
 
                 console.log("render finished");
+
+                setTimeout(function(){
+                    try { map.setView( centerZoom2.center, centerZoom2.zoom) } catch(err) { console.log(err) };
+
+                }, 500);
+
+                
+                setTimeout(function(){
+                    try { map.setView( centerZoom1.center, centerZoom1.zoom) } catch(err) { console.log(err) };
+
+                }, 1000);
+                setTimeout(function(){
+                    try { map.setView( centerZoom.center, centerZoom.zoom) } catch(err) { console.log(err) };
+
+                    if (welcome) {
+                    welcomeWord.openOn(map);
+                    welcome = false;
+                }
+
+                }, 1500); 
 
             });
 
@@ -913,7 +946,7 @@ var Router = Backbone.Router.extend({
                             search: '',
                             welcome: false });
 
-            try { map.setView(new L.LatLng(lat, lng), num); } catch(err) { };
+            try { map.setView(new L.LatLng(lat, lng), num); } catch(err) { console.log(err) };
         });
   },
 

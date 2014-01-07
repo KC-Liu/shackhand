@@ -1,0 +1,38 @@
+{
+  "author": "bestian",
+  "status": "beta",
+  "name": "shackhand",
+  "description": "shackhand: know eachother on a map",
+  "description_zh": "手屋: 互認地圖",
+  "homepage": "http://bestian.github.io/shackhand/auto20.html",
+  "document": "http://bestian.github.io/shackhand/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bestian/shackhand"
+  },
+  "licenses": [
+    {
+      "type": "CC0"
+    }
+  ],
+  "keywords": [
+    "leafletjs",
+    "backbonejs",
+  ],
+  "audience": [
+    "contributor"
+  ],
+  "products": [
+    "website",
+    "cardgame"
+  ],
+  "projects": [
+    "autolearn2.0"
+  ],
+  "contributors": [
+    "bestian"
+  ],
+  "needs": [
+    "user",
+  ]
+}

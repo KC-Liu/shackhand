@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html ng-app = "listApp">
+
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<meta charset=utf-8 />
+
+<title>自主學習促進會。公益學習資源分享。列印下來即可和朋友分享。</title>
+
+<style id="cardStyles" type="text/css">
+
+/******************************************************************************
+* Styles for playing cards.                                                   *
+******************************************************************************/
+
+
+
+body {
+  background-color: #40a040;
+}
+
+
+#whiteback {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 260mm;
+  height: 1450mm;
+  background-color: #ffffff;
+  z-index: -1;
+}
+
+form {
+  z-index: 101;
+  background: rgba(200, 200, 200, 0.5);
+  width: 20%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  border-radius: 5px;
+  padding: 5px 15px;
+  position: absolute;
+  -webkit-transition: all .3s ease;
+  -moz-transition: all .3s ease;
+  -ms-transition: all .3s ease;
+  -o-transition: all .3s ease;
+  transition: all .3s ease;
+}
+
+
+form:hover {
+  width: 33%;
+
+}
+
+input {
+  font-size: 125%;
+}
+
+#doPrint {
+  font-size: 150%;  
+}
+
+@media print {
+
+  body {
+    background-color: #ffffff;
+  }
+
+  .noPrint, .noPrint *{
+  	display: none;
+  }
+
+}
+
+.qr {
+  width: 20mm;
+  position: relative;
+  top:10mm;
+}
+
+
+</style>
+
+</head>
+
+
+<body ng-controller = "Ctrl">
+
+<div id = "whiteback"></div>
+
+
+
+<form id="frm" class = "noPrint">
+
+  <br/>
+    自訂字級：
+  <input type = "number" ng-model ="size" ng-init = " size = 14 ">
+  <br/>
+    顯示標籤上限：
+  <input type = "number" ng-model ="tagsLimit" ng-init = " tagsLimit = 6">
+  <br/>
+    顯示QR碼:<input type="checkbox" ng-model = "qr" ng-init = "qr = true">
+  <br/>
+    關鍵字搜詢：
+  <input type = "search" ng-model ="key" placeholder = "輸入關鍵字以搜詢資源">
+
+  <hr>
+
+
+      <div id = "custom" class="noPrint"> 
+        
+        <ul>
+
+        <li ng-repeat = "gift in gifts | useKey:key">
+            <input type="checkbox" ng-model = "gift.checked">
+
+            {{gift.title}}      
+            <a href = "{{ gift.url }}" target = "_blank">
+              {{ gift.url }}
+            </a>
+            <br/>
+            {{gift.tags}}      
+
+          <hr>
+        </li>
+
+        </ul>
+
+      </div>
+
+
+    </form>
+
+
+
+<div id = "page" class="print" style="font-size: {{size}}pt"> 
+  
+  <button id = "doPrint" class="noPrint" onclick="window.print()">列印紙本</button>
+
+
+  <ol>
+  <li ng-repeat = "gift in gifts | checked">
+   
+      {{gift.title}}      
+      <a href = "{{ gift.url }}" target = "_blank">
+        {{ gift.url }}
+      </a>
+      <span id = "tags"> {{gift.tags | limitTag:tagsLimit | addQuote }}</span>    
+      
+      <span ng-show = "qr && gift.url">
+
+          <a href = "http://{{gift.url | makeQR}}" target="_blank">
+
+            <img class = "qr" src="http://chart.apis.google.com/chart?chs=200x200&amp;cht=qr&amp;chld=|1&amp;chl=http%3A%2F%2F{{gift.url}}%2F" alt="qrcode_ex" >
+
+          </a>  </span>
+
+
+  </li>
+  </ol>
+
+</div>
+
+
+
+</body>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    console.log(navigator.userAgent);
+  });
+
+  
+  var listApp = new angular.module("listApp", []);
+
+  listApp.filter('makeQR',function(){
+  	return function(str){
+  		return str.replace('https://','').replace('http://','')
+  	}
+  }).filter('makeMoe',function(){
+    return function(x){      
+      return encodeURIComponent(x.replace(/ /g, '　').replace(/[ -~]/g, function(it){ return String.fromCharCode(it.charCodeAt(0) + 0xFEE0); }))
+    }
+  }).filter('makeCharList',function(){
+    return function(str) {
+      var ans = [];
+      for (var i = 0; i < str.length; i++) {
+        ans.push(str.substr(i,1));
+      };
+      return ans;
+    }
+  }).filter('checked',function(){
+    return function(objs) {
+      var list = [];
+        for (var i = 0; i < objs.length; i++) {
+           if (objs[i].checked) list.push(objs[i]);
+         }; 
+      return  list.length ? list : [{title:'請勾選要列印的資源', url:'', tags:'從右側欄中勾選', checked:true}];
+    }
+  }).filter('limitTag',function(){
+    return function(str, lim) {
+      if (lim < 0) lim = 0;
+      var tags = str.split(' ');
+      return tags.slice(0,lim).join(' ');
+    }
+  }).filter('useKey',function(){
+    return function(objs, key) {
+      var list = [];
+        for (var i = 0; i < objs.length; i++) {
+           if (objs[i].title.indexOf(key) > -1
+              || objs[i].url.indexOf(key) > -1 
+              || objs[i].tags.indexOf(key) > -1 ) {
+                list.push(objs[i])
+            };
+         }; 
+      return  list.length ? list : objs;
+    }
+  }).filter('addQuote',function(){
+    return function(str) {      
+      return str ? '('+str+')' : '';
+    }
+  })
+  ;
+
+  function Ctrl ($scope) {
+
+//    $scope.Math = window.Math;
+//    $scope.$ = jQuery;
+
+    
+    $scope.gifts = {};
+
+    $.ajax({
+    type: "GET",
+    url: "learning_resouces.csv",
+    dataType: "text",
+//      success: function(data) {alert(data)}
+        success: function(data) {
+          $scope.gifts = $scope.processData(data);
+          $scope.$digest();
+        }
+     });
+
+    $scope.processData = function(allText) {
+        var ans = [];
+        var allTextLines = allText.split(/\r\n|\n/); 
+        var headers = allTextLines[0].split(',');
+
+        var lines = [];
+
+        for (var i=1; i<allTextLines.length; i++) {
+            var data = allTextLines[i].split(',');
+            if (data.length == headers.length) {
+
+               // var tarr = [];
+               // for (var j=0; j<headers.length; j++) {
+             //       tarr.push(headers[j]+":"+data[j]);
+           //     }
+         //       lines.push(tarr);
+                ans.push({
+                    title: data[0],
+                    url: data[1],
+                    tags: data[2]
+                });
+            }
+        }
+        console.log(ans);
+        return ans;
+    }
+
+  };
+
+
+</script>
+
+
+</html>

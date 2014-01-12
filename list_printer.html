@@ -211,13 +211,23 @@ input {
   }).filter('useKey',function(){
     return function(objs, key) {
       var list = [];
-        for (var i = 0; i < objs.length; i++) {
-           if (objs[i].title.indexOf(key) > -1
+      var min = 0;
+      var max = Infinity;
+      for (var i = 0; i < objs.length; i++) {
+
+          try {
+            min = objs[i].tags.match(/\d+/g)[0];        
+            max = objs[i].tags.match(/\d+/g)[1] ? objs[i].tags.match(/\d+/g)[1] : Infinity;
+             console.log(min+'/'+max);
+          } catch (err){ console.log(err) }
+
+         if (objs[i].title.indexOf(key) > -1
               || objs[i].url.indexOf(key) > -1 
-              || objs[i].tags.indexOf(key) > -1 ) {
-                list.push(objs[i])
-            };
-         }; 
+              || objs[i].tags.indexOf(key) > -1 
+              || (min <= parseInt(key) && parseInt(key) <= max)) {
+            list.push(objs[i]);
+         };
+      }; 
       return  list.length ? list : objs;
     }
   }).filter('addQuote',function(){

@@ -131,7 +131,7 @@ input {
         <li ng-repeat = "gift in gifts | useKey:key">
             	<input type="checkbox" ng-model = "gift.checked">
             	
-   				<input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)" ng-hide = "gift.ord == -1">
+   				<input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">
 
             <br/>
 

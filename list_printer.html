@@ -136,7 +136,7 @@ input {
             <br/>
 
             {{gift.title}}      
-            <a href = "{{ gift.url }}" target = "_blank">
+            <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
               {{ gift.url }}
             </a>
             <br/>
@@ -163,7 +163,7 @@ input {
   <li ng-repeat = "gift in gifts | checked | sortByOrd">
    
       {{gift.title}}
-      <a href = "{{ gift.url }}" target = "_blank">
+      <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
         {{ gift.url }}
       </a>
       <span id = "tags"> {{gift.tags | limitTag:tagsLimit | addQuote }}</span>    

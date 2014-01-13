@@ -17,7 +17,7 @@
   ],
   "keywords": [
     "leafletjs",
-    "backbonejs",
+    "backbonejs"
   ],
   "audience": [
     "contributor"
@@ -33,6 +33,6 @@
     "bestian"
   ],
   "needs": [
-    "user",
+    "user"
   ]
 }

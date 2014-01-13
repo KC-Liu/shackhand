@@ -82,6 +82,10 @@ input {
   top:10mm;
 }
 
+#ord {
+	max-width: 25mm;
+}
+
 
 </style>
 
@@ -103,7 +107,13 @@ input {
     顯示標籤上限：
   <input type = "number" ng-model ="tagsLimit" ng-init = " tagsLimit = 6">
   <br/>
-    顯示QR碼:<input type="checkbox" ng-model = "qr" ng-init = "qr = true">
+    <input type="checkbox" ng-model = "qr" ng-init = "qr = true">顯示QR碼
+  <br/>標號類別
+    <select name = "ol" ng-model = "ol" ng-init = "ol = 'disc'">
+    	<option value="disc">disc</option>
+    	<option ng-repeat = "op in ['circle','square','decimal','lower-roman','upper-roman','lower-alpha','upper-alpha']" value="{{op}}">{{op}}</option>
+    </select>
+
   <br/>
     關鍵字搜詢：
   <input type = "search" ng-model ="key" placeholder = "輸入關鍵字以搜詢資源">
@@ -116,7 +126,11 @@ input {
         <ul>
 
         <li ng-repeat = "gift in gifts | useKey:key">
-            <input type="checkbox" ng-model = "gift.checked">
+            	<input type="checkbox" ng-model = "gift.checked">
+            	
+   				<input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)" ng-hide = "gift.ord == -1">
+
+            <br/>
 
             {{gift.title}}      
             <a href = "{{ gift.url }}" target = "_blank">
@@ -142,10 +156,10 @@ input {
   <button id = "doPrint" class="noPrint" onclick="window.print()">列印紙本</button>
 
 
-  <ol>
-  <li ng-repeat = "gift in gifts | checked">
+  <ol type="{{ol}}">
+  <li ng-repeat = "gift in gifts | checked | sortByOrd">
    
-      {{gift.title}}      
+      {{gift.title}}
       <a href = "{{ gift.url }}" target = "_blank">
         {{ gift.url }}
       </a>
@@ -159,8 +173,8 @@ input {
 
           </a>  </span>
 
-
   </li>
+
   </ol>
 
 </div>
@@ -234,6 +248,10 @@ input {
     return function(str) {      
       return str ? '('+str+')' : '';
     }
+  }).filter('sortByOrd',function(){
+    return function(objs) {      
+      return objs.sort(function(a,b){return a.ord-b.ord});
+    }
   })
   ;
 
@@ -242,7 +260,7 @@ input {
 //    $scope.Math = window.Math;
 //    $scope.$ = jQuery;
 
-    
+    $scope.counter = 0;
     $scope.gifts = {};
 
     $.ajax({
@@ -267,11 +285,6 @@ input {
             var data = allTextLines[i].split(',');
             if (data.length == headers.length) {
 
-               // var tarr = [];
-               // for (var j=0; j<headers.length; j++) {
-             //       tarr.push(headers[j]+":"+data[j]);
-           //     }
-         //       lines.push(tarr);
                 ans.push({
                     title: data[0],
                     url: data[1],

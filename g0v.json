@@ -1,9 +1,9 @@
 {
   "author": "bestian",
   "status": "beta",
-  "name": "shackhand",
+  "name": "手屋:互認地圖",
   "description": "shackhand: know eachother on a map",
-  "description_zh": "手屋: 互認地圖",
+  "description_zh": "手屋:互認地圖",
   "homepage": "http://bestian.github.io/shackhand/auto20.html",
   "document": "http://bestian.github.io/shackhand/",
   "repository": {
@@ -34,5 +34,7 @@
   ],
   "needs": [
     "user",
+    "social network API developer",
+    "mobile APP developer"
   ]
 }

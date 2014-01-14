@@ -1,9 +1,9 @@
 {
   "author": "bestian",
   "status": "beta",
-  "name": "手屋:互認地圖",
+  "name": "自學2.0(互認地圖)",
   "description": "shackhand: know eachother on a map",
-  "description_zh": "手屋:互認地圖",
+  "description_zh": "手屋--互認地圖的第一個實作，以自學家庭、獨立教育工作者和自學團體間，彼此透過地圖的方地互認。免登入免註冊，操作門檻低。",
   "homepage": "http://bestian.github.io/shackhand/auto20.html",
   "document": "http://bestian.github.io/shackhand/",
   "repository": {

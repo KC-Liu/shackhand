@@ -118,8 +118,10 @@ input {
     </select>
 
   <br/>
-    關鍵字搜詢：
-  <input type = "search" ng-model ="key" placeholder = "輸入關鍵字以搜詢資源">
+    包含：
+  <input type = "search" ng-model ="key" placeholder = "輸入關鍵字">
+    不包含：
+  <input type = "search" ng-model ="no" ng-init = "no = '付費'">
 
   <hr>
 
@@ -128,7 +130,7 @@ input {
         
         <ul>
 
-        <li ng-repeat = "gift in gifts | useKey:key">
+        <li ng-repeat = "gift in gifts | useKey:key | noKey:no ">
             	<input type="checkbox" ng-model = "gift.checked">
             	
    				<input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">
@@ -137,7 +139,7 @@ input {
 
             {{gift.title}}      
             <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
-              {{ gift.url }}
+              {{ gift.url | makeQR }}
             </a>
             <br/>
             {{gift.tags}}      
@@ -176,6 +178,10 @@ input {
 
           </a>  </span>
 
+  </li>
+
+  <li ng-hide = "list.length">
+       請勾選要列印的資源，從右側欄中勾選。
   </li>
 
   </ol>
@@ -217,7 +223,7 @@ input {
         for (var i = 0; i < objs.length; i++) {
            if (objs[i].checked) list.push(objs[i]);
          }; 
-      return  list.length ? list : [{title:'請勾選要列印的資源', url:'', tags:'從右側欄中勾選', checked:true}];
+      return list;
     }
   }).filter('limitTag',function(){
     return function(str, lim) {
@@ -227,24 +233,64 @@ input {
     }
   }).filter('useKey',function(){
     return function(objs, key) {
+      var keys=[];
+      try {keys = key.split(' ')} catch(err){console.log(err)};
       var list = [];
-      var min = 0;
-      var max = Infinity;
+      var min = 0, max = Infinity;
+
+
       for (var i = 0; i < objs.length; i++) {
+        
+        var good = true;
 
-          try {
-            min = objs[i].tags.match(/\d+/g)[0];        
-            max = objs[i].tags.match(/\d+/g)[1] ? objs[i].tags.match(/\d+/g)[1] : Infinity;
-             console.log(min+'/'+max);
-          } catch (err){ console.log(err) }
+        for (var j = 0; j < keys.length; j++) {
+            var ke = keys[j];
 
-         if (objs[i].title.indexOf(key) > -1
-              || objs[i].url.indexOf(key) > -1 
-              || objs[i].tags.indexOf(key) > -1 
-              || (min <= parseInt(key) && parseInt(key) <= max)) {
-            list.push(objs[i]);
-         };
-      }; 
+            try {
+              min = objs[i].tags.match(/\d+/g)[0];        
+              max = objs[i].tags.match(/\d+/g)[1] ? objs[i].tags.match(/\d+/g)[1] : Infinity;
+               console.log(min+'/'+max);
+            } catch (err){ console.log(err) }
+
+           if (!((objs[i].title + objs[i].url + objs[i].tags).indexOf(ke) > -1
+                || (min <= parseInt(ke) && parseInt(ke) <= max))) {
+              good = false;
+           };
+        };
+
+        if (good) list.push(objs[i]);
+      };
+      return  list.length ? list : objs;
+    }
+  }).filter('noKey',function(){
+    return function(objs, no) {
+      var nos = [];
+      try {nos = no.split(' ')} catch(err){console.log(err)};
+      var list = [];
+      var min = 0, max = Infinity;
+
+
+      for (var i = 0; i < objs.length; i++) {
+        
+        var good = true;
+
+        for (var j = 0; j < nos.length; j++) {
+            var not = nos[j];
+
+            try {
+              min = objs[i].tags.match(/\d+/g)[0];        
+              max = objs[i].tags.match(/\d+/g)[1] ? objs[i].tags.match(/\d+/g)[1] : Infinity;
+               console.log(min+'/'+max);
+            } catch (err){ console.log(err) }
+
+           if ((objs[i].title + objs[i].url + objs[i].tags).indexOf(not) > -1
+                || (min <= parseInt(not) && parseInt(not) <= max)) {
+              good = false;
+           };
+        };
+
+        if (good) list.push(objs[i]);
+      };
       return  list.length ? list : objs;
     }
   }).filter('addQuote',function(){
@@ -264,18 +310,23 @@ input {
 //    $scope.$ = jQuery;
 
     $scope.counter = 0;
-    $scope.gifts = {};
+    $scope.gifts = [];
+    $scope.lrList = ["learning_resouces.csv", "l_r_paid.csv"]
 
-    $.ajax({
-    type: "GET",
-    url: "learning_resouces.csv",
-    dataType: "text",
-//      success: function(data) {alert(data)}
-        success: function(data) {
-          $scope.gifts = $scope.processData(data);
-          $scope.$digest();
-        }
-     });
+
+    for (var i = 0; i < $scope.lrList.length; i++) {      
+        $.ajax({
+        type: "GET",
+        url: $scope.lrList[i],
+        dataType: "text",
+    //      success: function(data) {alert(data)}
+            success: function(data) {
+              $scope.gifts = $scope.gifts.concat($scope.processData(data));
+              $scope.$digest();
+            }
+         });
+    };
+
 
     $scope.processData = function(allText) {
         var ans = [];

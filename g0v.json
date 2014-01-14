@@ -30,7 +30,8 @@
     "shackhand"
   ],
   "contributors": [
-    "bestian"
+    "bestian",
+    "au"
   ],
   "needs": [
     "user",

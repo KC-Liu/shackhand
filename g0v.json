@@ -17,7 +17,7 @@
   ],
   "keywords": [
     "leafletjs",
-    "backbonejs",
+    "backbonejs"
   ],
   "audience": [
     "contributor"
@@ -35,6 +35,7 @@
   "needs": [
     "user",
     "social network API developer",
-    "mobile APP developer"
+    "mobile APP developer",
+    "user"
   ]
 }

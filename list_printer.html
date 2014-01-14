@@ -166,7 +166,7 @@ input {
    
       {{gift.title}}
       <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
-        {{ gift.url }}
+        {{ gift.url | makeQR  }}
       </a>
       <span id = "tags"> {{gift.tags | limitTag:tagsLimit | addQuote }}</span>    
       
@@ -174,13 +174,13 @@ input {
 
           <a href = "http://{{gift.url | makeQR}}" target="_blank">
 
-            <img class = "qr" src="http://chart.apis.google.com/chart?chs=200x200&amp;cht=qr&amp;chld=|1&amp;chl=http%3A%2F%2F{{gift.url}}%2F" alt="qrcode_ex" >
+            <img class = "qr" src="http://chart.apis.google.com/chart?chs=200x200&amp;cht=qr&amp;chld=|1&amp;chl=http%3A%2F%2F{{gift.url | makeQR}}%2F" alt="qrcode_ex" >
 
           </a>  </span>
 
   </li>
 
-  <li ng-hide = "list.length">
+  <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
        請勾選要列印的資源，從右側欄中勾選。
   </li>
 
@@ -203,7 +203,7 @@ input {
 
   listApp.filter('makeQR',function(){
   	return function(str){
-  		return str.replace('https://','').replace('http://','')
+  		return str.replace('https://','').replace('http://','');
   	}
   }).filter('makeMoe',function(){
     return function(x){      

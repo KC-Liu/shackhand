@@ -197,7 +197,7 @@ ul#sands li {
 
     <select name = "yes" ng-model ="keyLocal">
       <option value = "">--地理位置--</option>
-      <option ng-repeat = "tag in local_taiwan" value = "{{tag}}">{{tag}}</option>
+      <option ng-repeat = "tag in local_taiwan" value = "{{tag}}">{{tag.split('/')[0]}}</option>
     </select>
 
     <select name = "yes" ng-model ="keySpecial">

@@ -146,7 +146,7 @@ ul#sands li {
         
         <ul id = "sands">
 
-        <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:keySelect | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 ">
+        <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 "> <!--  | useKey:keySelect -->
             	<input type="checkbox" ng-model = "gift.checked">
             	
    				
@@ -204,11 +204,11 @@ ul#sands li {
       <option value = "">--特教支持--</option>
       <option ng-repeat = "tag in special_edu" value = "{{tag}}">{{tag}}</option>
     </select>
-
+<!--
     <select name = "yes" ng-model ="keySelect">
       <option value = "">--所有標籤--</option>
       <option ng-repeat = "tag in tags" value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
-    </select>
+    </select> -->
     
     <select name = "yesAge" type = "number" ng-model ="yesAge">
       <option value = "">--年齡--</option>
@@ -331,7 +331,7 @@ ul#sands li {
                 var ke = akeys[k];
 
                 try {
-                  min = objs[i].tags.match(/\d+/g)[0];        
+                  min = objs[i].tags.match(/\d+[~\+]/g)[0].replace(/[~\+]/,'');        
                   max = objs[i].tags.match(/\d+/g)[1] ? objs[i].tags.match(/\d+/g)[1] : Infinity;
       //             console.log(min+'/'+max);
                 } catch (err){ }

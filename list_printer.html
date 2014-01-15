@@ -4,6 +4,7 @@
 
 <head>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
 <meta charset=utf-8 />
 
@@ -37,7 +38,7 @@ body {
   z-index: 99;
 }
 
-form {
+form#frm {
   z-index: 1;
   background: rgba(200, 200, 200, 0.5);
  /* width: 20%; */
@@ -56,7 +57,7 @@ form {
 }
 
 
-form:hover {
+form#frm:hover {
     background: rgba(200, 200, 200, 1);
 
 }
@@ -111,11 +112,17 @@ input {
   font-size: 70%;
 }
 
-ul li {
+ul#sands {
+  list-style-type: none;
+}
+ul#sands li {
   text-align: right;
 }
 
 </style>
+
+
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
 
 </head>
 
@@ -137,7 +144,7 @@ ul li {
 
       <div id = "custom" class="noPrint"> 
         
-        <ul>
+        <ul id = "sands">
 
         <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:keySelect | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 ">
             	<input type="checkbox" ng-model = "gift.checked">
@@ -185,7 +192,8 @@ ul li {
 
   <hr>
     <span>包含：</span>
-  <input type = "search" ng-model ="key" placeholder = "輸入關鍵字">
+
+  <input id="tags" auto-complete ui-items="pureTags" type = "search" ng-model ="key" placeholder = "輸入關鍵字">
 
     <select name = "yes" ng-model ="keyLocal">
       <option value = "">--地理位置--</option>
@@ -262,8 +270,9 @@ ul li {
 
 <script type="text/javascript">
 
+
   $(document).ready(function(){
-    console.log(navigator.userAgent);
+   // console.log(navigator.userAgent);
   });
 
   
@@ -305,7 +314,7 @@ ul li {
       if (!key) return objs;
 
       var keys=[];
-      try {keys = key.split(' ')} catch(err){console.log(err)};
+      try {keys = key.split(' ')} catch(err){ };
       var list = [], others = [];
       var min = 0, max = Infinity;
     
@@ -324,7 +333,7 @@ ul li {
                 try {
                   min = objs[i].tags.match(/\d+/g)[0];        
                   max = objs[i].tags.match(/\d+/g)[1] ? objs[i].tags.match(/\d+/g)[1] : Infinity;
-                   console.log(min+'/'+max);
+      //             console.log(min+'/'+max);
                 } catch (err){ }
 
                 if (min <= parseInt(ke) && parseInt(ke) <= max) {
@@ -385,8 +394,26 @@ ul li {
     return function(objs) {      
       return objs.sort(function(a,b){return a.ord-b.ord});
     }
-  })
-  ;
+  }).directive('autoComplete', function($timeout) {                
+                  return {
+                      replace: true,
+                      link: function(scope, iElement, iAttrs) {
+                        scope.$watch(iAttrs.uiItems, function(newValue, oldValue) {
+                            if (newValue) {
+                          //      console.log("I see a data change!" + newValue);
+                                iElement.autocomplete({
+                                    source: scope[iAttrs.uiItems],
+                                    select: function() {
+                                        $timeout(function() {
+                                          iElement.trigger('input');
+                                        }, 0);
+                                    }
+                                });
+                            }
+                        }, true);                      
+                      }
+                  };
+              });
 
   function Ctrl ($scope) {
 
@@ -398,41 +425,45 @@ ul li {
     $scope.lrList = ["learning_resouces.csv", "l_r_paid.csv"];
     $scope.metaList = ["local_taiwan", "special_edu"];
     $scope.tags =[];  // $scope.tags = [{t: '數學', n: 3}, {t: '科學', n: 6}];
+    $scope.pureTags =['數學','科學'];
     $scope.ageIndex = [0,0,0,0,1,1,3,4,5,6,7,5,0,0,0];
     $scope.ages = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,25,30,40,50,60,70,80,90,'無限'];
 
     $scope.local_taiwan = []; 
     $scope.special_edu = []; 
 
+    $scope.names = ["john", "bill", "charlie", "robert", "alban", "oscar", "marie", "celine", "brad", "drew", "rebecca", "michel", "francis", "jean", "paul", "pierre", "nicolas", "alfred", "gerard", "louis", "albert", "edouard", "benoit", "guillaume", "nicolas", "joseph"];
+
     $.ajax({
-    type: "GET",    url: 'local_taiwan.txt',    dataType: "text",
+    type: "GET",    url: 'data/local_taiwan.txt',    dataType: "text",
         success: function(data) {
           $scope.readTxt(data,'local_taiwan');
           $scope.$digest();
 
-          console.log($scope.local_taiwan);
+ //        console.log($scope.local_taiwan);
         }
     });
 
     $.ajax({
-        type: "GET",     url: 'special_edu.txt',   dataType: "text",
+        type: "GET",     url: 'data/special_edu.txt',   dataType: "text",
             success: function(data) {
               $scope.readTxt(data,'special_edu');
               $scope.$digest();
 
-              console.log($scope.special_edu);
+  //            console.log($scope.special_edu);
             }
     });
 
     for (var i = 0; i < $scope.lrList.length; i++) {      
         $.ajax({
         type: "GET",
-        url: $scope.lrList[i],
+        url: 'data/'+$scope.lrList[i],
         dataType: "text",
             success: function(data) {
               $scope.gifts = $scope.gifts.concat($scope.processData(data));
               $scope.tags = $scope.processTags(data, $scope.tags);
-              
+              $scope.pureTags = $scope.tags.map(function(obj){return obj.t});
+
         /*      var newIndex = $scope.processAges(data);
 
               for (var i = 0; i < $scope.ageIndex.length; i++) {
@@ -441,9 +472,42 @@ ul li {
                 */
               
               $scope.$digest();
+
             }
          });
     };
+
+    $.ajax({
+        type: "GET",     url: 'json/shackhand-autolearn-export.json',   dataType: "json",
+            success: function(data) {
+              console.log(data.hands);
+              for (var i = 0; i < data.hands.length; i++) {
+
+                if (!data.hands[i]) continue;
+
+                var newTags = (data.hands[i].learner_habit+','+data.hands[i].share+','+data.hands[i].address).split(/[,.、]\s?/);
+                
+                $scope.gifts.push({
+                  title: data.hands[i].name,
+                  url: 'http://bestian.github.io/shackhand/auto20#'+data.hands[i].name,
+                  tags: newTags.join(' ')
+                });
+
+
+                for (var j = 0; j < newTags.length; j++) {
+                  if ($scope.pureTags.indexOf(newTags[j]) == -1) $scope.pureTags.push(newTags[j]);
+
+                  if (!$scope.tags[newTags[j]]) $scope.tags[newTags[j]] = 0;
+                  $scope.tags[newTags[j]] += 1;
+                };
+
+              };
+          //    $scope.readTxt(data,'special_edu');
+              $scope.$digest();
+
+  //            console.log($scope.special_edu);
+            }
+    });
 
 
     $scope.readTxt = function(allText, name) {
@@ -459,7 +523,7 @@ ul li {
               }
           }
 
-        console.log(ans);
+   //     console.log(ans);
         $scope[name] =  ans;
     }
 
@@ -504,7 +568,7 @@ ul li {
 
                 var tags = data[2].split(' ');
 
-                 console.log(tags.join());
+     //            console.log(tags.join());
 
                 for (var j = 0; j < tags.length; j++) {
                     if (!(ansRow[tags[j]])) ansRow[tags[j]] = 0;

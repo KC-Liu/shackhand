@@ -113,6 +113,9 @@ input {
   font-size: 70%;
 }
 
+ul#sands {
+  list-style-type: none;
+}
 ul#sands li {
   text-align: right;
 }
@@ -433,7 +436,7 @@ ul#sands li {
     $scope.names = ["john", "bill", "charlie", "robert", "alban", "oscar", "marie", "celine", "brad", "drew", "rebecca", "michel", "francis", "jean", "paul", "pierre", "nicolas", "alfred", "gerard", "louis", "albert", "edouard", "benoit", "guillaume", "nicolas", "joseph"];
 
     $.ajax({
-    type: "GET",    url: 'local_taiwan.txt',    dataType: "text",
+    type: "GET",    url: 'data/local_taiwan.txt',    dataType: "text",
         success: function(data) {
           $scope.readTxt(data,'local_taiwan');
           $scope.$digest();
@@ -443,7 +446,7 @@ ul#sands li {
     });
 
     $.ajax({
-        type: "GET",     url: 'special_edu.txt',   dataType: "text",
+        type: "GET",     url: 'data/special_edu.txt',   dataType: "text",
             success: function(data) {
               $scope.readTxt(data,'special_edu');
               $scope.$digest();
@@ -455,7 +458,7 @@ ul#sands li {
     for (var i = 0; i < $scope.lrList.length; i++) {      
         $.ajax({
         type: "GET",
-        url: $scope.lrList[i],
+        url: 'data/'+$scope.lrList[i],
         dataType: "text",
             success: function(data) {
               $scope.gifts = $scope.gifts.concat($scope.processData(data));
@@ -474,6 +477,38 @@ ul#sands li {
             }
          });
     };
+
+    $.ajax({
+        type: "GET",     url: 'json/shackhand-autolearn-export.json',   dataType: "json",
+            success: function(data) {
+              console.log(data.hands);
+              for (var i = 0; i < data.hands.length; i++) {
+
+                if (!data.hands[i]) continue;
+
+                var newTags = (data.hands[i].learner_habit+','+data.hands[i].share+','+data.hands[i].address).split(/[,.、]\s?/);
+                
+                $scope.gifts.push({
+                  title: data.hands[i].name,
+                  url: 'http://bestian.github.io/shackhand/auto20#'+data.hands[i].name,
+                  tags: newTags.join(' ')
+                });
+
+
+                for (var j = 0; j < newTags.length; j++) {
+                  if ($scope.pureTags.indexOf(newTags[j]) == -1) $scope.pureTags.push(newTags[j]);
+
+                  if (!$scope.tags[newTags[j]]) $scope.tags[newTags[j]] = 0;
+                  $scope.tags[newTags[j]] += 1;
+                };
+
+              };
+          //    $scope.readTxt(data,'special_edu');
+              $scope.$digest();
+
+  //            console.log($scope.special_edu);
+            }
+    });
 
 
     $scope.readTxt = function(allText, name) {

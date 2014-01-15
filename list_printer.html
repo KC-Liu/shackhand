@@ -22,7 +22,7 @@ body {
 }
 
 
-#whiteback, #page {
+#page {
   display: block;
   position: absolute;
   top: 0;
@@ -33,11 +33,16 @@ body {
   z-index: -1;
 }
 
+#page:hover {
+  z-index: 99;
+}
+
 form {
-  z-index: 101;
+  z-index: 1;
   background: rgba(200, 200, 200, 0.5);
  /* width: 20%; */
-  height: 297mm;
+  height: 297mm;  
+  width: 50%;
   top: 0;
   right: 0;
   border-radius: 5px;
@@ -51,13 +56,14 @@ form {
 }
 
 
-form, form:hover {
-  width: 33%;
+form:hover {
+    background: rgba(200, 200, 200, 1);
 
 }
 
 input {
-  font-size: 125%;
+  font-size: 120%;
+  color: rgba(0,0,0,0.7);
 }
 
 #doPrint {
@@ -88,9 +94,8 @@ input {
 }
 
 .qr {
+  display: inline-block;
   width: 20mm;
-  position: relative;
-  top:10mm;
 }
 
 #ord, .num {
@@ -100,6 +105,14 @@ input {
 #header {
   display: inline-block;
   height: 150px;
+}
+
+.small {
+  font-size: 70%;
+}
+
+ul li {
+  text-align: right;
 }
 
 </style>
@@ -129,16 +142,16 @@ input {
         <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:keySelect | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 ">
             	<input type="checkbox" ng-model = "gift.checked">
             	
-   				<input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">
-
-            <br/>
-
+   				
             {{gift.title}}      
+            <span class = "small">
             <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
               {{ gift.url | makeQR }}
             </a>
+
             <br/>
-            {{gift.tags}}      
+            {{gift.tags}}  <input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">    
+            </span>
 
           <hr>
         </li>
@@ -163,10 +176,9 @@ input {
   <input type = "number" class = "num"  ng-model ="tagsLimit" ng-init = " tagsLimit = 6">
   <br/>
     <input type="checkbox" ng-model = "qr" ng-init = "qr = true">
-    <span>顯示QR碼</span>
-  
+    <span>顯示QR碼&nbsp;&nbsp;&nbsp;&nbsp;</span>
     <span>標號類別</span>
-    <select name = "ol" ng-model = "ol">
+    <select name = "ol" ng-model = "ol" ng-init = "ol = 'cjk-ideographic'">
       <option value="cjk-ideographic">cjk-ideographic</option>
       <option ng-repeat = "op in ['circle','square','disk','decimal','lower-roman','upper-roman','lower-alpha','upper-alpha','lower-greek']" value="{{op}}">{{op}}</option>
     </select>
@@ -192,7 +204,7 @@ input {
     
     <select name = "yesAge" type = "number" ng-model ="yesAge">
       <option value = "">--年齡--</option>
-      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{age}}歲</option>
+      <option ng-repeat = "age in ages" value = "{{age}}">{{age}}歲</option>
     </select>
   
   <hr>  
@@ -206,8 +218,10 @@ input {
 
     <select name = "noAge" type = "number" ng-model ="noAge">
       <option value = "">--年齡--</option>
-      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{age}}歲</option>
+      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{ age}}歲</option>
     </select>
+    <hr>
+
     </div>
  
     <div id = "main">
@@ -220,7 +234,6 @@ input {
               {{ gift.url | makeQR  }}
             </a>
 
-            <br/>
             <span id = "tags"> {{gift.tags | limitTag:tagsLimit | addQuote }}</span>    
             
             <span ng-show = "qr && gift.url">
@@ -386,6 +399,7 @@ input {
     $scope.metaList = ["local_taiwan", "special_edu"];
     $scope.tags =[];  // $scope.tags = [{t: '數學', n: 3}, {t: '科學', n: 6}];
     $scope.ageIndex = [0,0,0,0,1,1,3,4,5,6,7,5,0,0,0];
+    $scope.ages = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,25,30,40,50,60,70,80,90,'無限'];
 
     $scope.local_taiwan = []; 
     $scope.special_edu = []; 

@@ -22,7 +22,7 @@ body {
 }
 
 
-#whiteback {
+#whiteback, #page {
   display: block;
   position: absolute;
   top: 0;
@@ -83,7 +83,7 @@ input {
   top:10mm;
 }
 
-#ord {
+#ord, .num {
 	max-width: 25mm;
 }
 
@@ -95,9 +95,12 @@ input {
 
 <body ng-controller = "Ctrl">
 
+<!--
 <div id = "whiteback">
   <hr style="position:absolute; bottom: 0mm; width:100%; "> 
 </div>
+
+-->
 
 
 
@@ -105,32 +108,52 @@ input {
 
   <br/>
     自訂字級：
-  <input type = "number" ng-model ="size" ng-init = " size = 14 ">
-  <br/>
+  <input type = "number" class = "num" ng-model ="size" ng-init = " size = 14 ">
     顯示標籤上限：
-  <input type = "number" ng-model ="tagsLimit" ng-init = " tagsLimit = 6">
+  <input type = "number" class = "num"  ng-model ="tagsLimit" ng-init = " tagsLimit = 6">
   <br/>
     <input type="checkbox" ng-model = "qr" ng-init = "qr = true">顯示QR碼
   <br/>標號類別
-    <select name = "ol" ng-model = "ol" ng-init = "ol = 'cjk-ideographic';">
+    <select name = "ol" ng-model = "ol">
     	<option value="cjk-ideographic">cjk-ideographic</option>
-    	<option ng-repeat = "op in ['circle','square','disk','decimal','lower-roman','upper-roman','lower-alpha','upper-alpha','lower-greek']" value="{{op}}">{{op}}</option>
+      <option ng-repeat = "op in ['circle','square','disk','decimal','lower-roman','upper-roman','lower-alpha','upper-alpha','lower-greek']" value="{{op}}">{{op}}</option>
     </select>
 
   <br/>
     包含：
   <input type = "search" ng-model ="key" placeholder = "輸入關鍵字">
+    <select name = "yes" ng-model ="keySelect">
+      <option value = "">--標籤--</option>
+      <option ng-repeat = "tag in tags" value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
+    </select>
+    
+    <select name = "yesAge" type = "number" ng-model ="yesAge">
+      <option value = "">--年齡--</option>
+      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{age}}歲</option>
+    </select>
+
+  <br/>
     不包含：
   <input type = "search" ng-model ="no" ng-init = "no = '付費'">
 
-  <hr>
+    <select name = "no" ng-model ="noSelect">      
+      <option value = "">--標籤--</option>
+      <option ng-repeat = "tag in tags" value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
+    </select>
 
+
+    <select name = "noAge" type = "number" ng-model ="noAge">
+      <option value = "">--年齡--</option>
+      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{age}}歲</option>
+    </select>
+
+  <hr>
 
       <div id = "custom" class="noPrint"> 
         
         <ul>
 
-        <li ng-repeat = "gift in gifts | useKey:key | noKey:no ">
+        <li ng-repeat = "gift in gifts | useKey:key | useKey:keySelect | useKey:yesAge | noKey:no | noKey:noSelect | noKey:noAge ">
             	<input type="checkbox" ng-model = "gift.checked">
             	
    				<input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">
@@ -233,6 +256,9 @@ input {
     }
   }).filter('useKey',function(){
     return function(objs, key) {
+
+      if (!key) return objs;
+
       var keys=[];
       try {keys = key.split(' ')} catch(err){console.log(err)};
       var list = [];
@@ -250,9 +276,12 @@ input {
               min = objs[i].tags.match(/\d+/g)[0];        
               max = objs[i].tags.match(/\d+/g)[1] ? objs[i].tags.match(/\d+/g)[1] : Infinity;
                console.log(min+'/'+max);
-            } catch (err){ console.log(err) }
+            } catch (err){ }
 
-           if (!((objs[i].title + objs[i].url + objs[i].tags).indexOf(ke) > -1
+           if (!(
+                ( parseInt(ke) != ke
+                  && (objs[i].title + objs[i].url + objs[i].tags).indexOf(ke) > -1
+                ) 
                 || (min <= parseInt(ke) && parseInt(ke) <= max))) {
               good = false;
            };
@@ -260,10 +289,14 @@ input {
 
         if (good) list.push(objs[i]);
       };
-      return  list.length ? list : objs;
+      return list;
+  //    return  list.length ? list : objs;
     }
   }).filter('noKey',function(){
     return function(objs, no) {
+
+      if (!no) return objs;
+
       var nos = [];
       try {nos = no.split(' ')} catch(err){console.log(err)};
       var list = [];
@@ -291,7 +324,7 @@ input {
 
         if (good) list.push(objs[i]);
       };
-      return  list.length ? list : objs;
+      return list;
     }
   }).filter('addQuote',function(){
     return function(str) {      
@@ -311,8 +344,11 @@ input {
 
     $scope.counter = 0;
     $scope.gifts = [];
-    $scope.lrList = ["learning_resouces.csv", "l_r_paid.csv"]
+    $scope.lrList = ["learning_resouces.csv", "l_r_paid.csv"];
+//    $scope.tags = [{t: '數學', n: 3}, {t: '科學', n: 6}];
+    $scope.tags =[];
 
+    $scope.ageIndex = [0,0,0,0,1,1,3,4,5,6,7,5,0,0,0];
 
     for (var i = 0; i < $scope.lrList.length; i++) {      
         $.ajax({
@@ -322,10 +358,22 @@ input {
     //      success: function(data) {alert(data)}
             success: function(data) {
               $scope.gifts = $scope.gifts.concat($scope.processData(data));
+              $scope.tags = $scope.processTags(data, $scope.tags);
+              
+        /*      var newIndex = $scope.processAges(data);
+
+              for (var i = 0; i < $scope.ageIndex.length; i++) {
+                $scope.ageIndex[i] += newIndex[i]
+              };
+                */
+              
               $scope.$digest();
             }
          });
+
     };
+
+
 
 
     $scope.processData = function(allText) {
@@ -348,6 +396,48 @@ input {
         }
         console.log(ans);
         return ans;
+    }
+
+    $scope.processTags = function(allText, oldTags) {
+        var ansRow = new Object;
+        var ans = [];
+
+        if (oldTags) {
+          for (var i = 0; i < oldTags.length; i++) {
+              if (!ansRow[oldTags[i].t]) ansRow[oldTags[i].t] = 0;
+              ansRow[oldTags[i].t] += oldTags[i].n;
+          };
+        }
+
+        var allTextLines = allText.split(/\r\n|\n/); 
+        var headers = allTextLines[0].split(',');
+
+        var lines = [];
+
+        for (var i=1; i<allTextLines.length; i++) {
+            var data = allTextLines[i].split(',');
+
+            if (data.length == headers.length) {
+
+                var tags = data[2].split(' ');
+
+                 console.log(tags.join());
+
+                for (var j = 0; j < tags.length; j++) {
+                    if (!(ansRow[tags[j]])) ansRow[tags[j]] = 0;
+                    ansRow[tags[j]] += 1;
+
+                };                
+            }
+        }
+
+        for (var i = 0; i < Object.keys(ansRow).length; i++) {
+           ans[i] = {t: Object.keys(ansRow)[i],
+                     n: ansRow[Object.keys(ansRow)[i]]};
+        };
+
+        return ans;
+
     }
 
   };

@@ -485,7 +485,7 @@ ul#sands li {
 
                 if (!data.hands[i]) continue;
 
-                var newTags = (data.hands[i].learner_habit+','+data.hands[i].share+','+data.hands[i].address).split(/[,.、\/]\s?/);
+                var newTags = (data.hands[i].learner_habit+','+data.hands[i].share+','+data.hands[i].address).split(/[,.、\/;]\s?/);
                 
                 $scope.gifts.push({
                   title: data.hands[i].name,

@@ -75,6 +75,16 @@ input {
   	display: none;
   }
 
+  #header {
+    height: 0px;
+    display: none;
+  }
+
+  #page #main {
+    position: absolute;
+    top: 0px;
+  }  
+
 }
 
 .qr {
@@ -87,6 +97,10 @@ input {
 	max-width: 25mm;
 }
 
+#header {
+  display: inline-block;
+  height: 150px;
+}
 
 </style>
 
@@ -106,54 +120,13 @@ input {
 
 <form id="frm" class = "noPrint">
 
-  <br/>
-    自訂字級：
-  <input type = "number" class = "num" ng-model ="size" ng-init = " size = 14 ">
-    顯示標籤上限：
-  <input type = "number" class = "num"  ng-model ="tagsLimit" ng-init = " tagsLimit = 6">
-  <br/>
-    <input type="checkbox" ng-model = "qr" ng-init = "qr = true">顯示QR碼
-  <br/>標號類別
-    <select name = "ol" ng-model = "ol">
-    	<option value="cjk-ideographic">cjk-ideographic</option>
-      <option ng-repeat = "op in ['circle','square','disk','decimal','lower-roman','upper-roman','lower-alpha','upper-alpha','lower-greek']" value="{{op}}">{{op}}</option>
-    </select>
-
-  <br/>
-    包含：
-  <input type = "search" ng-model ="key" placeholder = "輸入關鍵字">
-    <select name = "yes" ng-model ="keySelect">
-      <option value = "">--標籤--</option>
-      <option ng-repeat = "tag in tags" value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
-    </select>
-    
-    <select name = "yesAge" type = "number" ng-model ="yesAge">
-      <option value = "">--年齡--</option>
-      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{age}}歲</option>
-    </select>
-
-  <br/>
-    不包含：
-  <input type = "search" ng-model ="no" ng-init = "no = '付費'">
-
-    <select name = "no" ng-model ="noSelect">      
-      <option value = "">--標籤--</option>
-      <option ng-repeat = "tag in tags" value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
-    </select>
-
-
-    <select name = "noAge" type = "number" ng-model ="noAge">
-      <option value = "">--年齡--</option>
-      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{age}}歲</option>
-    </select>
-
   <hr>
 
       <div id = "custom" class="noPrint"> 
         
         <ul>
 
-        <li ng-repeat = "gift in gifts | useKey:key | useKey:keySelect | useKey:yesAge | noKey:no | noKey:noSelect | noKey:noAge ">
+        <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:keySelect | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 ">
             	<input type="checkbox" ng-model = "gift.checked">
             	
    				<input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">
@@ -174,40 +147,99 @@ input {
 
       </div>
 
-
     </form>
+
 
 
 
 <div id = "page" class="print" style="font-size: {{size}}pt"> 
   
-  <button id = "doPrint" class="noPrint" onclick="window.print()">列印紙本</button>
+    <div id = "header" class="noPrint">
+      <button id = "doPrint" class="noPrint" onclick="window.print()">列印紙本</button>
 
+      <span>自訂字級：</span>
+  <input type = "number" class = "num" ng-model ="size" ng-init = " size = 14 ">
+    <span>顯示標籤上限：</span>
+  <input type = "number" class = "num"  ng-model ="tagsLimit" ng-init = " tagsLimit = 6">
+  <br/>
+    <input type="checkbox" ng-model = "qr" ng-init = "qr = true">
+    <span>顯示QR碼</span>
+  
+    <span>標號類別</span>
+    <select name = "ol" ng-model = "ol">
+      <option value="cjk-ideographic">cjk-ideographic</option>
+      <option ng-repeat = "op in ['circle','square','disk','decimal','lower-roman','upper-roman','lower-alpha','upper-alpha','lower-greek']" value="{{op}}">{{op}}</option>
+    </select>
 
-  <ol style="list-style-type: {{ol}}">
-  <li ng-repeat = "gift in gifts | checked | sortByOrd">
-   
-      {{gift.title}}
-      <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
-        {{ gift.url | makeQR  }}
-      </a>
-      <span id = "tags"> {{gift.tags | limitTag:tagsLimit | addQuote }}</span>    
-      
-      <span ng-show = "qr && gift.url">
+  <hr>
+    <span>包含：</span>
+  <input type = "search" ng-model ="key" placeholder = "輸入關鍵字">
 
-          <a href = "http://{{gift.url | makeQR}}" target="_blank">
+    <select name = "yes" ng-model ="keyLocal">
+      <option value = "">--地理位置--</option>
+      <option ng-repeat = "tag in local_taiwan" value = "{{tag}}">{{tag}}</option>
+    </select>
 
-            <img class = "qr" src="http://chart.apis.google.com/chart?chs=200x200&amp;cht=qr&amp;chld=|1&amp;chl=http%3A%2F%2F{{gift.url | makeQR}}%2F" alt="qrcode_ex" >
+    <select name = "yes" ng-model ="keySpecial">
+      <option value = "">--特教支持--</option>
+      <option ng-repeat = "tag in special_edu" value = "{{tag}}">{{tag}}</option>
+    </select>
 
-          </a>  </span>
+    <select name = "yes" ng-model ="keySelect">
+      <option value = "">--所有標籤--</option>
+      <option ng-repeat = "tag in tags" value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
+    </select>
+    
+    <select name = "yesAge" type = "number" ng-model ="yesAge">
+      <option value = "">--年齡--</option>
+      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{age}}歲</option>
+    </select>
+  
+  <hr>  
+    <span>不包含：</span>
+  <input type = "search" ng-model ="no" ng-init = "no = '付費'">
 
-  </li>
+    <select name = "no" ng-model ="noSelect">      
+      <option value = "">--所有標籤--</option>
+      <option ng-repeat = "tag in tags" value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
+    </select>
 
-  <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
-       請勾選要列印的資源，從右側欄中勾選。
-  </li>
+    <select name = "noAge" type = "number" ng-model ="noAge">
+      <option value = "">--年齡--</option>
+      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{age}}歲</option>
+    </select>
+    </div>
+ 
+    <div id = "main">
 
-  </ol>
+      <ol style="list-style-type: {{ol}}">
+        <li ng-repeat = "gift in gifts | checked | sortByOrd">
+         
+            {{gift.title}}
+            <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
+              {{ gift.url | makeQR  }}
+            </a>
+
+            <br/>
+            <span id = "tags"> {{gift.tags | limitTag:tagsLimit | addQuote }}</span>    
+            
+            <span ng-show = "qr && gift.url">
+
+                <a href = "http://{{gift.url | makeQR}}" target="_blank">
+
+                  <img class = "qr" src="http://chart.apis.google.com/chart?chs=200x200&amp;cht=qr&amp;chld=|1&amp;chl=http%3A%2F%2F{{gift.url | makeQR}}%2F" alt="qrcode_ex" >
+
+                </a>  </span>
+
+        </li>
+
+        <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
+             請勾選要列印的資源，從右側欄中勾選。
+        </li>
+
+      </ol>
+
+    </div>
 
 </div>
 
@@ -255,44 +287,50 @@ input {
       return tags.slice(0,lim).join(' ');
     }
   }).filter('useKey',function(){
-    return function(objs, key) {
+    return function(objs, key, inv) {
 
       if (!key) return objs;
 
       var keys=[];
       try {keys = key.split(' ')} catch(err){console.log(err)};
-      var list = [];
+      var list = [], others = [];
       var min = 0, max = Infinity;
-
-
+    
       for (var i = 0; i < objs.length; i++) {
-        
-        var good = true;
 
-        for (var j = 0; j < keys.length; j++) {
-            var ke = keys[j];
+          var good = true;
+              
+          for (var j = 0; j < keys.length; j++) {
+              var thisGood = false;
+              var akey = keys[j];
+              var akeys = akey.split('/');
 
-            try {
-              min = objs[i].tags.match(/\d+/g)[0];        
-              max = objs[i].tags.match(/\d+/g)[1] ? objs[i].tags.match(/\d+/g)[1] : Infinity;
-               console.log(min+'/'+max);
-            } catch (err){ }
+              for (var k = 0; k < akeys.length; k++) {
+                var ke = akeys[k];
 
-           if (!(
-                ( parseInt(ke) != ke
-                  && (objs[i].title + objs[i].url + objs[i].tags).indexOf(ke) > -1
-                ) 
-                || (min <= parseInt(ke) && parseInt(ke) <= max))) {
-              good = false;
-           };
-        };
+                try {
+                  min = objs[i].tags.match(/\d+/g)[0];        
+                  max = objs[i].tags.match(/\d+/g)[1] ? objs[i].tags.match(/\d+/g)[1] : Infinity;
+                   console.log(min+'/'+max);
+                } catch (err){ }
 
-        if (good) list.push(objs[i]);
+                if (min <= parseInt(ke) && parseInt(ke) <= max) {
+                  thisGood = true;
+                }
+                if ( parseInt(ke) != ke && (objs[i].title + objs[i].url + objs[i].tags).indexOf(ke) > -1) thisGood = true;
+                }              
+
+              if (!thisGood) good = false;
+             
+          };
+
+          if (good) { list.push(objs[i]) } else { others.push(objs[i]) };
       };
-      return list;
-  //    return  list.length ? list : objs;
+
+      
+      return inv ? others : list;
     }
-  }).filter('noKey',function(){
+  })/*.filter('noKey',function(){
     return function(objs, no) {
 
       if (!no) return objs;
@@ -326,7 +364,7 @@ input {
       };
       return list;
     }
-  }).filter('addQuote',function(){
+  })*/.filter('addQuote',function(){
     return function(str) {      
       return str ? '('+str+')' : '';
     }
@@ -345,17 +383,38 @@ input {
     $scope.counter = 0;
     $scope.gifts = [];
     $scope.lrList = ["learning_resouces.csv", "l_r_paid.csv"];
-//    $scope.tags = [{t: '數學', n: 3}, {t: '科學', n: 6}];
-    $scope.tags =[];
-
+    $scope.metaList = ["local_taiwan", "special_edu"];
+    $scope.tags =[];  // $scope.tags = [{t: '數學', n: 3}, {t: '科學', n: 6}];
     $scope.ageIndex = [0,0,0,0,1,1,3,4,5,6,7,5,0,0,0];
+
+    $scope.local_taiwan = []; 
+    $scope.special_edu = []; 
+
+    $.ajax({
+    type: "GET",    url: 'local_taiwan.txt',    dataType: "text",
+        success: function(data) {
+          $scope.readTxt(data,'local_taiwan');
+          $scope.$digest();
+
+          console.log($scope.local_taiwan);
+        }
+    });
+
+    $.ajax({
+        type: "GET",     url: 'special_edu.txt',   dataType: "text",
+            success: function(data) {
+              $scope.readTxt(data,'special_edu');
+              $scope.$digest();
+
+              console.log($scope.special_edu);
+            }
+    });
 
     for (var i = 0; i < $scope.lrList.length; i++) {      
         $.ajax({
         type: "GET",
         url: $scope.lrList[i],
         dataType: "text",
-    //      success: function(data) {alert(data)}
             success: function(data) {
               $scope.gifts = $scope.gifts.concat($scope.processData(data));
               $scope.tags = $scope.processTags(data, $scope.tags);
@@ -370,18 +429,30 @@ input {
               $scope.$digest();
             }
          });
-
     };
 
 
+    $scope.readTxt = function(allText, name) {
+          var ans = [];
+          var allTextLines = allText.split(/\r\n|\n/); 
 
+          for (var i=0; i<allTextLines.length; i++) {
+              if (allTextLines[i].split('/')[1]) {
+                ans.push(allTextLines[i].replace(/\s/g, ''));
+              }
+              else if (allTextLines[i].substr(0,1) == '【' ) {
+                ans.push(allTextLines[i].split('【')[1].split('】')[0]);
+              }
+          }
+
+        console.log(ans);
+        $scope[name] =  ans;
+    }
 
     $scope.processData = function(allText) {
         var ans = [];
         var allTextLines = allText.split(/\r\n|\n/); 
         var headers = allTextLines[0].split(',');
-
-        var lines = [];
 
         for (var i=1; i<allTextLines.length; i++) {
             var data = allTextLines[i].split(',');
@@ -394,7 +465,7 @@ input {
                 });
             }
         }
-        console.log(ans);
+   //     console.log(ans);
         return ans;
     }
 
@@ -411,8 +482,6 @@ input {
 
         var allTextLines = allText.split(/\r\n|\n/); 
         var headers = allTextLines[0].split(',');
-
-        var lines = [];
 
         for (var i=1; i<allTextLines.length; i++) {
             var data = allTextLines[i].split(',');

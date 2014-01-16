@@ -143,16 +143,19 @@ ul#sands li {
 
 
 <form id="frm" class = "noPrint">
+
+
   <div id = "all" >
     <span ng-show = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked" >
-      <input id = "forceNo" type="radio" checked ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:false ; $('#forceNo').attr('checked', true);"> 取消全部
+      
+      <input id = "forceNo" type="checkbox" checked ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:false ; $('#forceNo').prop('checked', true);"> 取消全部
     </span>
 
     <span ng-hide = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked">
-      <input id = "forceYes" type="radio" ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:true; $('#forceYes').attr('checked', false);" > 選取全部
+      <input id = "forceYes" type="checkbox" ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:true; $('#forceYes').prop('checked', false);" > 選取全部
      </span>
-  </div>
 
+  </div>
   <hr>
 
       <div id = "custom" class="noPrint"> 
@@ -443,7 +446,7 @@ ul#sands li {
           if (!(objs[i].checked)) ans = false;
         };
 
-        console.log(ans);
+   //     console.log(ans);
         return ans;
     }
   }).filter('forceChecked',function(){
@@ -540,7 +543,7 @@ ul#sands li {
     $.ajax({
         type: "GET",     url: 'json/shackhand-autolearn-export.json',   dataType: "json",
             success: function(data) {
-              console.log(data.hands);
+     //         console.log(data.hands);
               for (var i = 0; i < data.hands.length; i++) {
 
                 if (!data.hands[i]) continue;

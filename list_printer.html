@@ -253,7 +253,7 @@ ul#sands li {
       <ol style="list-style-type: {{ol}}">
         <li ng-repeat = "gift in gifts | checked | sortByOrd">
          
-            <input type="checkbox" ng-model = "gift.checked">
+            <input class = "noPrint" type="checkbox" ng-model = "gift.checked">
             <input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">  
 
             {{gift.title}}

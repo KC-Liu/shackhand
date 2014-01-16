@@ -100,7 +100,7 @@ input {
 }
 
 #ord, .num {
-	max-width: 25mm;
+	max-width: 15mm;
 }
 
 #header {
@@ -117,6 +117,10 @@ ul#sands {
 }
 ul#sands li {
   text-align: right;
+}
+
+#all {
+  text-align: center;
 }
 
 </style>
@@ -139,6 +143,15 @@ ul#sands li {
 
 
 <form id="frm" class = "noPrint">
+  <div id = "all" >
+    <span ng-show = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked" >
+      <input id = "forceNo" type="radio" checked ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:false ; $('#forceNo').attr('checked', true);"> 取消全部
+    </span>
+
+    <span ng-hide = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked">
+      <input id = "forceYes" type="radio" ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:true; $('#forceYes').attr('checked', false);" > 選取全部
+     </span>
+  </div>
 
   <hr>
 
@@ -146,7 +159,7 @@ ul#sands li {
         
         <ul id = "sands">
 
-        <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal "> <!--  | useKey:keySelect -->
+            <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal "> <!--  | useKey:keySelect -->
             	<input type="checkbox" ng-model = "gift.checked">
             	
    				
@@ -226,7 +239,7 @@ ul#sands li {
 
     <select name = "noAge" type = "number" ng-model ="noAge">
       <option value = "">--年齡--</option>
-      <option ng-repeat = "age in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]" value = "{{age}}">{{ age}}歲</option>
+      <option ng-repeat = "age in ages" value = "{{age}}">{{ age}}歲</option>
     </select>
     <hr>
 
@@ -237,6 +250,9 @@ ul#sands li {
       <ol style="list-style-type: {{ol}}">
         <li ng-repeat = "gift in gifts | checked | sortByOrd">
          
+            <input type="checkbox" ng-model = "gift.checked">
+            <input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">  
+
             {{gift.title}}
             <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
               {{ gift.url | makeQR  }}
@@ -409,15 +425,34 @@ ul#sands li {
   }).filter('sortByLocal',function(){
     return function(objs,locals) {
       if (!locals) return objs;
-      var prio = locals.split('/');
-      var aVal = 0, bVal = 0;      
+      var prio = locals.split('/');    
       return objs.sort(function(a,b){
+        var aVal = a.ord, bVal = b.ord;  
         for (var i = 0; i < prio.length; i++) {
-          if ((a.title + a.url + a.tags).indexOf(prio[i]) > -1) aVal += prio.length - i;
-          if ((b.title + b.url + b.tags).indexOf(prio[i]) > -1) bVal += prio.length - i;
+          if ((a.title + a.url + a.tags).indexOf(prio[i]) > -1) aVal -= (prio.length - i) * 100;
+          if ((b.title + b.url + b.tags).indexOf(prio[i]) > -1) bVal -= (prio.length - i) * 100;
         };
-        return bVal - aVal;
+        return aVal - bVal;
       });
+    }
+  }).filter('allChecked',function(){
+    return function(objs) {
+        var ans = true;
+        for (var i = 0; i < objs.length; i++) {
+
+          if (!(objs[i].checked)) ans = false;
+        };
+
+        console.log(ans);
+        return ans;
+    }
+  }).filter('forceChecked',function(){
+    return function(objs,bool) {
+        for (var i = 0; i < objs.length; i++) {
+
+          objs[i].checked = bool;
+        };
+        
     }
   }).directive('autoComplete', function($timeout) {                
                   return {
@@ -443,7 +478,7 @@ ul#sands li {
   function Ctrl ($scope) {
 
 //    $scope.Math = window.Math;
-//    $scope.$ = jQuery;
+    $scope.$ = jQuery;
 
     $scope.counter = 0;
     $scope.gifts = [];

@@ -146,7 +146,7 @@ ul#sands li {
         
         <ul id = "sands">
 
-        <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 "> <!--  | useKey:keySelect -->
+        <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal "> <!--  | useKey:keySelect -->
             	<input type="checkbox" ng-model = "gift.checked">
             	
    				
@@ -255,7 +255,19 @@ ul#sands li {
         </li>
 
         <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
-             請勾選要列印的資源，從右側欄中勾選。
+             以勾選和關鍵字，找到要列印的資源。
+        </li>
+
+        <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
+             從右側欄中，將方框打勾，將支持與資源加入中央的白紙。
+        </li>
+
+        <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
+             改變右側欄中的順序排號，即可重新排序。
+        </li>
+
+        <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
+             按列印鍵，分享你的支持與祝福。
         </li>
 
       </ol>
@@ -393,6 +405,19 @@ ul#sands li {
   }).filter('sortByOrd',function(){
     return function(objs) {      
       return objs.sort(function(a,b){return a.ord-b.ord});
+    }
+  }).filter('sortByLocal',function(){
+    return function(objs,locals) {
+      if (!locals) return objs;
+      var prio = locals.split('/');
+      var aVal = 0, bVal = 0;      
+      return objs.sort(function(a,b){
+        for (var i = 0; i < prio.length; i++) {
+          if ((a.title + a.url + a.tags).indexOf(prio[i]) > -1) aVal += prio.length - i;
+          if ((b.title + b.url + b.tags).indexOf(prio[i]) > -1) bVal += prio.length - i;
+        };
+        return bVal - aVal;
+      });
     }
   }).directive('autoComplete', function($timeout) {                
                   return {

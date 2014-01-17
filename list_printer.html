@@ -123,6 +123,10 @@ ul#sands li {
   text-align: center;
 }
 
+input#tags {
+	width: 45mm;
+}
+
 </style>
 
 
@@ -146,12 +150,12 @@ ul#sands li {
 
 
   <div id = "all" >
-    <span ng-show = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked" >
+    <span ng-show = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked" >
       
-      <input id = "forceNo" type="checkbox" checked ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:false ; $('#forceNo').prop('checked', true);"> 取消全部
+      <input id = "forceNo" type="checkbox" checked ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:false ; $('#forceNo').prop('checked', true);"> 取消全部
     </span>
 
-    <span ng-hide = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked">
+    <span ng-hide = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked">
       <input id = "forceYes" type="checkbox" ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:true; $('#forceYes').prop('checked', false);" > 選取全部
      </span>
 
@@ -162,7 +166,7 @@ ul#sands li {
         
         <ul id = "sands">
 
-            <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal "> <!--  | useKey:keySelect -->
+            <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal "> <!--  | useKey:keySelect -->
             	<input type="checkbox" ng-model = "gift.checked">
             	
    				
@@ -230,14 +234,19 @@ ul#sands li {
       <option value = "">--年齡--</option>
       <option ng-repeat = "age in ages" value = "{{age}}">{{age}}歲</option>
     </select>
+
+    <select name = "yes" ng-model ="keySelect">      
+      <option value = "">--所有標籤--</option>
+      <option ng-repeat = "tag in tags | notNullTag | orderBy:'n':true " value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
+    </select>
   
   <hr>  
     <span>不包含：</span>
-  <input type = "search" auto-complete ui-items="pureTags" ng-model ="no" ng-init = "no = '付費'">
+  <input id = "tags" type = "search" auto-complete ui-items="pureTags" ng-model ="no" ng-init = "no = '付費'">
 
     <select name = "no" ng-model ="noSelect">      
       <option value = "">--所有標籤--</option>
-      <option ng-repeat = "tag in tags" value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
+      <option ng-repeat = "tag in tags | notNullTag | orderBy:'n':true " value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
     </select>
 
     <select name = "noAge" type = "number" ng-model ="noAge">
@@ -251,7 +260,7 @@ ul#sands li {
     <div id = "main">
 
       <ol style="list-style-type: {{ol}}">
-        <li ng-repeat = "gift in gifts | checked | sortByOrd">
+        <li ng-repeat = "gift in gifts | checked | orderBy:'ord'">
          
             <input class = "noPrint" type="checkbox" ng-model = "gift.checked">
             <input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">  
@@ -273,19 +282,19 @@ ul#sands li {
 
         </li>
 
-        <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
+        <li ng-hide = "(gifts | checked | orderBy:'ord').length > 0">
              以勾選和關鍵字，找到要列印的資源。
         </li>
 
-        <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
+        <li ng-hide = "(gifts | checked | orderBy:'ord').length > 0">
              從右側欄中，將方框打勾，將支持與資源加入中央的白紙。
         </li>
 
-        <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
+        <li ng-hide = "(gifts | checked | orderBy:'ord').length > 0">
              改變右側欄中的順序排號，即可重新排序。
         </li>
 
-        <li ng-hide = "(gifts | checked | sortByOrd).length > 0">
+        <li ng-hide = "(gifts | checked | orderBy:'ord').length > 0">
              按列印鍵，分享你的支持與祝福。
         </li>
 
@@ -332,6 +341,10 @@ ul#sands li {
            if (objs[i].checked) list.push(objs[i]);
          }; 
       return list;
+    }
+  }).filter('notNullTag',function(){
+    return function(objs) {
+      return objs.filter(function(obj){ return obj.n });
     }
   }).filter('limitTag',function(){
     return function(str, lim) {
@@ -420,10 +433,6 @@ ul#sands li {
   })*/.filter('addQuote',function(){
     return function(str) {      
       return str ? '('+str+')' : '';
-    }
-  }).filter('sortByOrd',function(){
-    return function(objs) {      
-      return objs.sort(function(a,b){return a.ord-b.ord});
     }
   }).filter('sortByLocal',function(){
     return function(objs,locals) {

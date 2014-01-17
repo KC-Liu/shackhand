@@ -213,7 +213,7 @@ input#tags {
   <hr>
     <span>包含：</span>
 
-  <input id="tags" auto-complete ui-items="pureTags" type = "search" ng-model ="key" placeholder = "輸入關鍵字">
+  <input id="tags" auto-complete ui-items="tags" type = "search" ng-model ="key" placeholder = "輸入關鍵字">
 
     <select name = "yes" ng-model ="keyLocal">
       <option value = "">--地理位置--</option>
@@ -224,17 +224,13 @@ input#tags {
       <option value = "">--特教支持--</option>
       <option ng-repeat = "tag in special_edu" value = "{{tag}}">{{tag}}</option>
     </select>
-<!--
-    <select name = "yes" ng-model ="keySelect">
-      <option value = "">--所有標籤--</option>
-      <option ng-repeat = "tag in tags" value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
-    </select> -->
     
     <select name = "yesAge" type = "number" ng-model ="yesAge">
       <option value = "">--年齡--</option>
       <option ng-repeat = "age in ages" value = "{{age}}">{{age}}歲</option>
     </select>
 
+    <br/>
     <select name = "yes" ng-model ="keySelect">      
       <option value = "">--所有標籤--</option>
       <option ng-repeat = "tag in tags | notNullTag | orderBy:'n':true " value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
@@ -242,7 +238,7 @@ input#tags {
   
   <hr>  
     <span>不包含：</span>
-  <input id = "tags" type = "search" auto-complete ui-items="pureTags" ng-model ="no" ng-init = "no = '付費'">
+  <input id = "tags" type = "search" auto-complete ui-items="tags" ng-model ="no" ng-init = "no = '付費'">
 
     <select name = "no" ng-model ="noSelect">      
       <option value = "">--所有標籤--</option>
@@ -344,7 +340,8 @@ input#tags {
     }
   }).filter('notNullTag',function(){
     return function(objs) {
-      return objs.filter(function(obj){ return obj.n });
+//      console.log(objs.filter(function(o){ return o.t == '字典'})   )
+      return objs.filter(function(o){ return o.n && o.t });
     }
   }).filter('limitTag',function(){
     return function(str, lim) {
@@ -472,9 +469,10 @@ input#tags {
                       link: function(scope, iElement, iAttrs) {
                         scope.$watch(iAttrs.uiItems, function(newValue, oldValue) {
                             if (newValue) {
-                          //      console.log("I see a data change!" + newValue);
+              //              	console.log(scope['tags'].map(function(o){return o.t }) );
+                  //              console.log("I see a data change!" + newValue);
                                 iElement.autocomplete({
-                                    source: scope[iAttrs.uiItems],
+                                    source: (scope[iAttrs.uiItems].map(function(o){return o.t || '' }) ),
                                     select: function() {
                                         $timeout(function() {
                                           iElement.trigger('input');
@@ -494,7 +492,7 @@ input#tags {
 
     $scope.counter = 0;
     $scope.gifts = [];
-    $scope.lrList = ["learning_resouces.csv", "l_r_paid.csv"];
+    $scope.lrList = ["learning_resouces.csv"]; // "l_r_paid.csv"
     $scope.metaList = ["local_taiwan", "special_edu"];
     $scope.tags =[];  // $scope.tags = [{t: '數學', n: 3}, {t: '科學', n: 6}];
     $scope.pureTags =['數學','科學'];
@@ -533,54 +531,89 @@ input#tags {
         dataType: "text",
             success: function(data) {
               $scope.gifts = $scope.gifts.concat($scope.processData(data));
-              $scope.tags = $scope.processTags(data, $scope.tags);
-              $scope.pureTags = $scope.tags.map(function(obj){return obj.t});
-
-        /*      var newIndex = $scope.processAges(data);
-
-              for (var i = 0; i < $scope.ageIndex.length; i++) {
-                $scope.ageIndex[i] += newIndex[i]
-              };
-                */
+              $scope.tags = $scope.processTags(data, $scope.tags);        	
               
               $scope.$digest();
 
+	              $.ajax({
+			        type: "GET",     url: 'json/shackhand-autolearn-export.json',   dataType: "json",
+			            success: function(data) {
+			     //         console.log(data.hands);
+
+			// console.log($scope.tags.filter(function(o){ return o.t == '字典'} ));
+
+  		             	  var newtagObjs = [];
+
+			              for (var i = 0; i < data.hands.length; i++) {
+
+			                if (!data.hands[i]) continue;
+
+			                var newTags = (data.hands[i].learner_habit.split(/\s/).join()+','+data.hands[i].share.split(/\s/).join()+','+data.hands[i].address).split(/[,，.、\/;]\s?/);
+
+			                
+			                $scope.gifts.push({
+			                  title: data.hands[i].name,
+			                  url: 'http://bestian.github.io/shackhand/auto20#'+data.hands[i].name,
+			                  tags: newTags.join(' ')
+			                });
+			             
+			                for (var j = 0; j < newTags.length; j++) {
+			                  if (typeof (newtagObjs[newTags[j]]) == 'undefined') {
+			                  	newtagObjs[newTags[j]] = 0;
+			                  }
+			           
+			                  newtagObjs[newTags[j]] += 1;
+			                };
+
+			                var goodObjs = [];
+
+			                for (var j = 0; j < Object.keys(newtagObjs).length; j++) {
+			                		var k = Object.keys(newtagObjs)[j];
+			                	goodObjs.push({
+				                	t: k,
+				                	n: newtagObjs[k]
+				                });
+			                };
+			            }
+
+			            console.log(goodObjs);
+
+						$scope.tags = $scope.tags.concat(goodObjs); 
+
+						// 合而為一
+
+						var usedkeys = [];
+						var usedObjs = [];
+
+						for (var i = 0; i < $scope.tags.length; i++) {
+							if ($.inArray($scope.tags[i].t, usedkeys) > -1) {
+								usedObjs[$scope.tags[i].t] += $scope.tags[i].n;
+							}
+							else {
+								usedkeys.push($scope.tags[i].t);
+								usedObjs[$scope.tags[i].t] = $scope.tags[i].n;
+							}	
+						};
+
+						$scope.tags = [];
+
+						for (var i = 0; i < usedkeys.length; i++) {
+							$scope.tags.push({
+								t: usedkeys[i],
+								n: usedObjs[usedkeys[i]]
+							});
+						};
+
+
+			            $scope.$digest();
+			        }            
+			    });
             }
          });
     };
 
-    $.ajax({
-        type: "GET",     url: 'json/shackhand-autolearn-export.json',   dataType: "json",
-            success: function(data) {
-     //         console.log(data.hands);
-              for (var i = 0; i < data.hands.length; i++) {
 
-                if (!data.hands[i]) continue;
-
-                var newTags = (data.hands[i].learner_habit.split(/\s/).join()+','+data.hands[i].share.split(/\s/).join()+','+data.hands[i].address).split(/[,，.、\/;]\s?/);
-
-                
-                $scope.gifts.push({
-                  title: data.hands[i].name,
-                  url: 'http://bestian.github.io/shackhand/auto20#'+data.hands[i].name,
-                  tags: newTags.join(' ')
-                });
-
-
-                for (var j = 0; j < newTags.length; j++) {
-                  if ($scope.pureTags.indexOf(newTags[j]) == -1) $scope.pureTags.push(newTags[j]);
-
-                  if (!$scope.tags[newTags[j]]) $scope.tags[newTags[j]] = 0;
-                  $scope.tags[newTags[j]] += 1;
-                };
-
-              };
-          //    $scope.readTxt(data,'special_edu');
-              $scope.$digest();
-
-  //            console.log($scope.special_edu);
-            }
-    });
+    
 
 
     $scope.readTxt = function(allText, name) {
@@ -595,8 +628,6 @@ input#tags {
                 ans.push(allTextLines[i].split('【')[1].split('】')[0]);
               }
           }
-
-   //     console.log(ans);
         $scope[name] =  ans;
     }
 
@@ -656,6 +687,7 @@ input#tags {
                      n: ansRow[Object.keys(ansRow)[i]]};
         };
 
+   //     console.log(ans.filter(function(o){ return o.t == '字典'} ));
         return ans;
 
     }

@@ -49,7 +49,7 @@ input {
 }
 
 #doPrint {
-  font-size: 150%;  
+  font-size: 150%;
 }
 
 @media print {
@@ -71,6 +71,7 @@ input {
   #page #main {
     position: absolute;
     top: 0px;
+
   }  
 
 }

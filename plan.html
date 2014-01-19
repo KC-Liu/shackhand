@@ -1,4 +1,11 @@
 
+
+<!-- backbround image colored bots -->
+
+<!-- li icons before -->
+
+
+
 <!DOCTYPE html>
 <html ng-app = "editApp">
 
@@ -31,13 +38,23 @@
   height: 30px;
   background-color: #cc9;
   text-align: center;
-  overflow: hidden;
+  overflow: auto;
 }
 
 #headInfos *{
   max-height: 28px;
 
 }
+
+#headInfos #login,#logout,#create,#delete {
+  display: inline-block;
+  border: green 1px ridge;
+  background-color: #afa;
+  cursor: pointer;
+  border-radius: 5px 0 5px 0;
+}
+
+
 
 #headPlans{
   display: block;
@@ -66,13 +83,9 @@
 }
 
 
-
-#headInfos #login,#logout,#create,#delete {
+span#status {
   display: inline-block;
-  border: green 1px ridge;
-  background-color: #afa;
-  cursor: pointer;
-  border-radius: 5px 0 5px 0;
+  color: #999;
 }
 
 
@@ -116,6 +129,12 @@
   width: 33%;
 }
 
+#main {
+  position: absolute;
+  top: 55px;
+  left: 200px;
+}
+
 
 </style>
 
@@ -141,6 +160,9 @@
   <a id = 'create' ng-click = 'create' ng-hide = 'logged'>創建帳號</a>
   <a id = 'delete' ng-click = 'create' ng-show = 'logged'>刪除帳號</a>
 
+  <span id = 'status' ng-show = 'logged'>可編輯</span>
+  <span id = 'status' ng-hide = 'logged'>只可瀏覽</span>
+
 </div>
 
 
@@ -151,6 +173,10 @@
       {{n}} 
     </a>
   </span>
+
+  <span id = 'status' ng-show = 'updated'>所有更動已儲存</span>
+  <span id = 'status' ng-hide = 'updated'>自動儲存中...</span>
+  <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
 
 </div>
 
@@ -175,7 +201,20 @@
 
 
 <div id = 'main'>
-  {{name}}
+
+
+  <textarea rows= '42' cols = '52' ng-model = 'text'></textarea>
+
+  <div id = 'action'>
+
+    {{name}}要：
+    <a>雲端儲存</a>
+    <a ng-click = "copyToClipboard(text) ">存下副本</a>
+    <a>清空</a>
+    雲端儲存的資料，將會用於協助其他計劃自學的人。
+    如您不願分享，請在編輯完成後存下副本，再清空雲端資料。
+  </div>
+
 </div>
 
 
@@ -190,9 +229,10 @@
   var editApp = new angular.module('editApp',["firebase"]);
 
   var Ctrl = function ($scope, $firebase) {
+    
+
 
     $scope.name = '您';
- //   $scope.password = 'asdasads';
 
     $scope.$watch('name', function(newValue, oldValue) {    // chage firebase ref when name changed
 
@@ -201,6 +241,11 @@
         $scope.root = $firebase(ref); 
 
     });
+
+
+    $scope.copyToClipboard = function(text) {
+      window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
+    }
 
 
   }

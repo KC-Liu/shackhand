@@ -12,7 +12,7 @@
 <head>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script src="javascripts/lib/angular.min.js"></script>
 
 <script src='https://cdn.firebase.com/v0/firebase.js'></script>
 <script src='https://cdn.firebase.com/libs/angularfire/0.5.0/angularfire.min.js'></script>
@@ -142,8 +142,19 @@ span#status {
   left: 200px;
   width: 210mm;
   height: 297mm;
+  padding: 10px;
 }
 
+tr {
+  min-height: 20px;
+}
+th,td {
+   min-width: 20px;
+}
+
+a#x, #x {
+  cursor: not-allowed; 
+}
 
 </style>
 
@@ -178,15 +189,11 @@ span#status {
 
 <div id = 'headPlans' class = 'noPrint'>
 
-  <span ng-repeat = 'n in [1,2,3,4,5,6,7,8,9,10,11,12]' >
+  <span ng-repeat = 'n in [0,1,2,3,4,5,6,7,8,9,10,11]' >
     <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n'>
-      {{n}} 
+      {{n+1}}
     </a>
   </span>
-
-  <span id = 'status' ng-show = 'updated'>所有更動已儲存</span>
-  <span id = 'status' ng-hide = 'updated'>自動儲存中...</span>
-  <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
 
 </div>
 
@@ -196,7 +203,7 @@ span#status {
 <div id = 'leftPages' class = 'noPrint'>
 
   <ol>
-    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','學習目標與時程','學習空間與支持','學習資源','希望的協助','附件']" class = "{{$parent.pageNow == k && 'focus'}}" ng-click = '$parent.pageNow = k'> {{name}}的{{ k }} </li>
+    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','學期進度表','學習空間與支持','學習資源','希望的協助','附件']" class = "{{$parent.pageNow == k && 'focus'}}" ng-click = '$parent.pageNow = k'> {{name}}的{{ k }} </li>
   </ol>
 
 </div>
@@ -208,7 +215,7 @@ span#status {
 
 {{pageNow}}
 <ul>
-	<li ng-repeat = "sup in supports | has:pageNow"> {{sup}}
+	<li ng-repeat = "sup in supports | has:pageNow"> <a href = "{{sup.split(' ')[1] }}" target="_blank"> {{sup.split(' ')[0]}}</a>
 </ul>
 
 </div>
@@ -217,13 +224,56 @@ span#status {
 
 <div id = 'main'>
 
+  <span id = 'status' ng-show = 'updated'>所有更動已儲存</span>
+  <span id = 'status' ng-hide = 'updated'>自動儲存中...</span>
+  <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
+
   <div id ='page1' ng-show = "pageNow == '自傳'">
-	  <textarea rows= '22' cols = '52' ng-model = 'data["自傳"]'></textarea>
+	  <textarea rows= '22' cols = '52' ng-model = 'data.t[planNow]["自傳"]'></textarea>
   </div>
 
-  <div id ='page1' ng-show = "pageNow == '學習風格'">
-	  <textarea rows= '22' cols = '52' ng-model = 'data["學習風格"]'></textarea>
+  <div id ='page2' ng-show = "pageNow == '學習風格'">
+	  <textarea rows= '22' cols = '52' ng-model = 'data.t[planNow]["學習風格"]'></textarea>
   </div>
+
+
+  <div id ='page3' ng-show = "pageNow == '學習主題與領域'">
+
+  <input ng-model = "addTopic" ng-keydown = "adTPC($event)" placeholder = "寫上您的學習主題，再按Enter鍵"/>
+
+<!--  <a ng-click= "adTPC($event)">增加主題</a> -->
+
+  <span ng-repeat = "t in data.t[planNow]['主題']"> <a id = "x" ng-click = "data.t[planNow]['主題'] = removeElem(data.t[planNow]['主題'], t)">{{t}}</a></span>
+
+  <br>
+  <span id = "x" onclick = "$(this).fadeOut()">
+    <ul>
+    <li>您的學主題可以自訂好幾項，範圍不限。
+    <li>例如修車、養昆蟲、寫程式、打籃球、繪畫...都可以。
+    <li>先想自己要做什麼，再去和課綱上的七大領域，對照打勾，看看是不是都有。
+    <li>如果一個主題和許多領域都有關，可以打好幾個勾。</ul> </span>
+
+  <hr>
+
+    <table>
+     <tr>
+      <th>
+      <span id = "status" ng-show = "count(data.t[planNow].correlation, sevenFields, data.t[planNow]['主題']) > 0">還有{{count(data.t[planNow].correlation, sevenFields, data.t[planNow]['主題'])}}個領域</span>
+
+      <span id = "status" ng-hide= "count(data.t[planNow].correlation, sevenFields, data.t[planNow]['主題']) > 0">都對到了!!</span>
+      </th>
+
+      <th ng-repeat = "t in data.t[planNow]['主題']"> {{t}}</th>
+     </tr>
+     <tr ng-repeat = "a in sevenFields">
+      <th>{{a}}</th>
+        <td ng-repeat = "t in data.t[planNow]['主題']">
+        <input type = "checkbox" ng-model ="data.t[planNow].correlation[a+t]" /> 
+        <span class = "clipOnly"> {{ data.t[planNow].correlation[a+t] && "V" || ''}} </span>
+     </tr>
+    </table>
+  </div>
+
 
   <div id = 'action'>
   	目前頁面是：{{pageNow}}
@@ -260,15 +310,36 @@ span#status {
   	$scope.confirm = window.confirm;
   	$scope.$ = jQuery;
     $scope.name = '您';
-    $scope.planNow = 1;
+    $scope.planNow = 0;
     $scope.pageNow = '自傳';
+    $scope.sevenFields = ['語文-國文','語文-鄉土語文','語文-英文','健康與體育','社會','數學','自然與科技','藝術與人文','綜合活動'];
 
-    $scope.data = {
-    	自傳:'',
-    	學習風格:'',
-    }
+    $scope.data = {};
+    $scope.data.t = [
+    {},   //0
+    {},
+    {},
+    {},
+    {},   //4
+    {},
+    {},
+    {},
+    {},  
+    {},  //9
+    {},
+    {},  //11
+    ];
 
-    $scope.supports = ['咳哈自傳', '咳哈哈自傳', '學習風格咳哈' ]
+    for (var i = 0; i < $scope.data.t.length; i++) {
+      $scope.data.t[i].correlation = {};
+      $scope.data.t[i]['主題'] = ['生活自理','運動'];
+    };
+
+    $scope.supports = [
+    '咳哈自傳', 
+    '咳哈哈自傳', 
+    '學習風格自我測試 http://bestian.github.io/freemath/%E5%B7%A5%E5%85%B7%E8%BB%9F%E9%AB%94/styleTester.html',
+    '七大領域的教學理念(學習主題與領域) http://163.24.138.110/jses/other/%E4%B8%83%E5%A4%A7%E9%A0%98%E5%9F%9F%E7%9A%84%E6%95%99%E5%AD%B8%E7%90%86%E5%BF%B5.html' ];
 
     $scope.$watch('name', function(newValue, oldValue) {    // chage firebase ref when name changed
 
@@ -279,9 +350,36 @@ span#status {
     });
 
     $scope.deleteData = function (pageNow) {
-	    if (confirm('確認刪除?這動作無法復原')) $scope.data[pageNow] = '';
-	}
+	    if (confirm('確認刪除?這動作無法復原')) $scope.data.t[pageNow] = '';
+	  }
 
+    $scope.removeElem = function(list, elem) {
+       return list.filter(function(str){ return str.indexOf(elem) == -1})
+    }
+
+    $scope.adTPC = function(ev){
+      if ((ev.keyCode && ev.keyCode != 13) || !$scope.addTopic) return;
+      $scope.data.t[$scope.planNow]['主題'].push($scope.addTopic);
+      $scope.addTopic = '';
+    }
+
+    $scope.count = function(table, set1, set2) {
+      var ans = set1.length;
+
+      function satis(elem) {
+        var a = false;
+        for (var i = 0; i < set2.length; i++) {
+          if (table[elem+set2[i]]) a = true;
+        };
+        return a;
+
+      }
+      for (var i = 0; i < set1.length; i++) {
+        if (satis(set1[i])) ans -= 1;
+      };
+
+      return ans;
+    }
 
   
 

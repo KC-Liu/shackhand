@@ -52,6 +52,14 @@ input {
   font-size: 150%;
 }
 
+.clipOnly {
+  color: rgba(0,0,0,0.01);
+}
+
+.printOnly, .printOnly {
+  display: none;
+}
+
 @media print {
 
   body {
@@ -61,6 +69,11 @@ input {
 
   .noPrint, .noPrint *{
     display: none;
+  }
+
+  .printOnly, .printOnly *{
+    display: inline;
+    visibility: visible;
   }
 
   #header {

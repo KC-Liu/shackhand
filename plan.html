@@ -39,6 +39,7 @@
   background-color: #cc9;
   text-align: center;
   overflow: auto;
+  border: green 1px ridge;
 }
 
 #headInfos *{
@@ -46,7 +47,7 @@
 
 }
 
-#headInfos #login,#logout,#create,#delete {
+#headInfos #login,#logout,#create,#delete,#main a {
   display: inline-block;
   border: green 1px ridge;
   background-color: #afa;
@@ -59,11 +60,11 @@
 #headPlans{
   display: block;
   position: absolute;
-  top: 30px;
+  top: 31px;
   left: 200px;
   width: 50%;
   min-height: 20px;
-  background-color: #fff;
+  background-color: rgba(255,255,255,0.2);
   text-align: center;
   border-radius: 0 0 10px 10px ;
   padding-top: 5px;
@@ -79,6 +80,7 @@
 
 
 #headPlans a.focus {
+  border: 3px black solid;
   border-bottom: none;
 }
 
@@ -93,7 +95,7 @@ span#status {
   display: block;
   position: absolute;
   left: 0px;
-  top: 30px;
+  top: 31px;
   width: 200px;
   min-height: 100%;
   background-color: #cc9;
@@ -111,6 +113,7 @@ span#status {
 }
 
 #leftPages li:hover, #leftPages li.focus {
+  border: 3px black solid;
   background-color: #fff; 
   border-right: none;
 }
@@ -123,16 +126,22 @@ span#status {
   width: 100px;
   min-height: 100%;
   background-color: #cc9;
+  border: 1px black solid;
+  border-radius: 10px 0 10px 0;
 }
 
 #rightSupports:hover {
   width: 33%;
+  z-index: 99;
+  cursor: help;
 }
 
 #main {
   position: absolute;
   top: 55px;
   left: 200px;
+  width: 210mm;
+  height: 297mm;
 }
 
 
@@ -161,7 +170,8 @@ span#status {
   <a id = 'delete' ng-click = 'create' ng-show = 'logged'>刪除帳號</a>
 
   <span id = 'status' ng-show = 'logged'>可編輯</span>
-  <span id = 'status' ng-hide = 'logged'>只可瀏覽</span>
+  <span id = 'status' ng-show = 'name == "您"'>沙盒</span>
+  <span id = 'status' ng-hide = 'logged || name == "您"'>只可瀏覽</span>
 
 </div>
 
@@ -169,7 +179,7 @@ span#status {
 <div id = 'headPlans' class = 'noPrint'>
 
   <span ng-repeat = 'n in [1,2,3,4,5,6,7,8,9,10,11,12]' >
-    <a onclick = '$("a").removeClass("focus"); $(this).addClass("focus");' ng-click = 'planNow = n'>
+    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n'>
       {{n}} 
     </a>
   </span>
@@ -186,7 +196,7 @@ span#status {
 <div id = 'leftPages' class = 'noPrint'>
 
   <ol>
-    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','學習目標與時程','學習空間與支持','學習資源','希望的協助','附件']" onclick = '$("li").removeClass("focus"); $(this).addClass("focus");' ng-click = 'pageNow = k'> {{name}}的{{ k }} </li>
+    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','學習目標與時程','學習空間與支持','學習資源','希望的協助','附件']" class = "{{$parent.pageNow == k && 'focus'}}" ng-click = '$parent.pageNow = k'> {{name}}的{{ k }} </li>
   </ol>
 
 </div>
@@ -195,24 +205,35 @@ span#status {
 
 
 <div id = 'rightSupports' class = 'noPrint'>
-</div>
 
+{{pageNow}}
+<ul>
+	<li ng-repeat = "sup in supports | has:pageNow"> {{sup}}
+</ul>
+
+</div>
 
 
 
 <div id = 'main'>
 
+  <div id ='page1' ng-show = "pageNow == '自傳'">
+	  <textarea rows= '22' cols = '52' ng-model = 'data["自傳"]'></textarea>
+  </div>
 
-  <textarea rows= '42' cols = '52' ng-model = 'text'></textarea>
+  <div id ='page1' ng-show = "pageNow == '學習風格'">
+	  <textarea rows= '22' cols = '52' ng-model = 'data["學習風格"]'></textarea>
+  </div>
 
   <div id = 'action'>
+  	目前頁面是：{{pageNow}}
 
     {{name}}要：
-    <a>雲端儲存</a>
-    <a ng-click = "copyToClipboard(text) ">存下副本</a>
-    <a>清空</a>
-    雲端儲存的資料，將會用於協助其他計劃自學的人。
-    如您不願分享，請在編輯完成後存下副本，再清空雲端資料。
+    <a id = 'save'>雲端儲存</a>
+    <a id = 'delete' ng-click = "deleteData(pageNow)">清空</a>
+    <br/>
+    *雲端儲存的資料，將會用於協助其他計劃自學的人。
+    如您不願分享，請在編輯完成後，剪貼存下副本，再清空雲端資料。
   </div>
 
 </div>
@@ -227,12 +248,27 @@ span#status {
 
 
   var editApp = new angular.module('editApp',["firebase"]);
+  editApp.filter('has',function(){
+  	return function(list, x){
+  		console.log(x);
+  		return list.filter(function(str){return str.indexOf(x) > -1})
+  	}
+  })
 
   var Ctrl = function ($scope, $firebase) {
-    
 
-
+  	$scope.confirm = window.confirm;
+  	$scope.$ = jQuery;
     $scope.name = '您';
+    $scope.planNow = 1;
+    $scope.pageNow = '自傳';
+
+    $scope.data = {
+    	自傳:'',
+    	學習風格:'',
+    }
+
+    $scope.supports = ['咳哈自傳', '咳哈哈自傳', '學習風格咳哈' ]
 
     $scope.$watch('name', function(newValue, oldValue) {    // chage firebase ref when name changed
 
@@ -242,10 +278,12 @@ span#status {
 
     });
 
+    $scope.deleteData = function (pageNow) {
+	    if (confirm('確認刪除?這動作無法復原')) $scope.data[pageNow] = '';
+	}
 
-    $scope.copyToClipboard = function(text) {
-      window.prompt("Copy to clipboard: Ctrl+C, Enter", text);
-    }
+
+  
 
 
   }

@@ -1,0 +1,111 @@
+
+body {
+  background-color: #cfc;
+}
+
+
+#page {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 210mm;
+  height: 297mm;
+  background-color: #ffffff;
+  z-index: -1;
+}
+
+#page:hover {
+  z-index: 99;
+}
+
+form#frm {
+  z-index: 1;
+  background: rgba(200, 200, 200, 0.5);
+ /* width: 20%; */
+  height: 297mm;  
+  width: 50%;
+  top: 0;
+  right: 0;
+  border-radius: 5px;
+  padding: 5px 15px;
+  position: absolute;
+  -webkit-transition: all .3s ease;
+  -moz-transition: all .3s ease;
+  -ms-transition: all .3s ease;
+  -o-transition: all .3s ease;
+  transition: all .3s ease;
+}
+
+
+form#frm:hover {
+    background: rgba(200, 200, 200, 1);
+
+}
+
+input {
+  font-size: 120%;
+  color: rgba(0,0,0,0.7);
+}
+
+#doPrint {
+  font-size: 150%;  
+}
+
+@media print {
+
+  body {
+    background-color: #ffffff;
+    width: 210mm;
+  }
+
+  .noPrint, .noPrint *{
+    display: none;
+  }
+
+  #header {
+    height: 0px;
+    display: none;
+  }
+
+  #page #main {
+    position: absolute;
+    top: 0px;
+  }  
+
+}
+
+.qr {
+  display: inline-block;
+  width: 20mm;
+}
+
+#ord, .num {
+  max-width: 15mm;
+}
+
+#header {
+  display: inline-block;
+  height: 150px;
+}
+
+.small {
+  font-size: 70%;
+}
+
+ul#sands {
+  list-style-type: none;
+}
+ul#sands li {
+  text-align: right;
+}
+
+#all {
+  text-align: center;
+}
+
+input#tags {
+  width: 45mm;
+}
+
+</style>

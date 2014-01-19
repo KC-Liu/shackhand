@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html ng-app = "editApp">
+
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+
+<script src='https://cdn.firebase.com/v0/firebase.js'></script>
+<script src='https://cdn.firebase.com/libs/angularfire/0.5.0/angularfire.min.js'></script>
+
+
+<meta charset=utf-8 />
+
+<title>自學計畫編輯器。可列印和存檔。</title>
+
+
+<link rel="stylesheet" href="stylesheets/editor.css" />
+
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
+
+
+<style>
+
+#headInfos {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 30px;
+  background-color: #cc9;
+  text-align: center;
+  overflow: hidden;
+}
+
+#headInfos *{
+  max-height: 28px;
+
+}
+
+#headPlans{
+  display: block;
+  position: absolute;
+  top: 30px;
+  left: 200px;
+  width: 50%;
+  min-height: 20px;
+  background-color: #fff;
+  text-align: center;
+  border-radius: 0 0 10px 10px ;
+  padding-top: 5px;
+}
+
+#headPlans a{
+  display: inline-block;
+  border: 1px black solid;
+  min-width: 30px;
+  margin-left: 15px;
+  border-radius: 10px 10px 0 0;
+}
+
+
+#headPlans a.focus {
+  border-bottom: none;
+}
+
+
+
+#headInfos #login,#logout,#create,#delete {
+  display: inline-block;
+  border: green 1px ridge;
+  background-color: #afa;
+  cursor: pointer;
+  border-radius: 5px 0 5px 0;
+}
+
+
+#leftPages {
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: 30px;
+  width: 200px;
+  min-height: 100%;
+  background-color: #cc9;
+  padding-right: 3px;
+}
+
+
+#leftPages li{
+  margin-top: 30px;
+  display: block;
+  border: 1px black solid;
+  border-radius: 10px 0 10px 0;
+  padding: 2px;
+  cursor: pointer;
+}
+
+#leftPages li:hover, #leftPages li.focus {
+  background-color: #fff; 
+  border-right: none;
+}
+
+#rightSupports {
+  display: block;
+  position: absolute;
+  top: 30px;
+  right: 0px;
+  width: 100px;
+  min-height: 100%;
+  background-color: #cc9;
+}
+
+#rightSupports:hover {
+  width: 33%;
+}
+
+
+</style>
+
+</head>
+
+
+
+
+<body ng-controller = "Ctrl">
+
+
+
+<div id = 'headInfos' class = 'noPrint'>
+
+  使用者名稱(ID)：
+  <input ng-model = 'name' />
+  密碼(Password)：<input type = 'password' ng-model = 'password' />
+  
+  <a id = 'login' ng-click = 'login' ng-hide = 'logged'>登入(Login)</a>
+  <a id = 'logout' ng-click = 'logout' ng-show = 'logged'>登出(Logout)</a>
+
+
+  <a id = 'create' ng-click = 'create' ng-hide = 'logged'>創建帳號</a>
+  <a id = 'delete' ng-click = 'create' ng-show = 'logged'>刪除帳號</a>
+
+</div>
+
+
+<div id = 'headPlans' class = 'noPrint'>
+
+  <span ng-repeat = 'n in [1,2,3,4,5,6,7,8,9,10,11,12]' >
+    <a onclick = '$("a").removeClass("focus"); $(this).addClass("focus");' ng-click = 'planNow = n'>
+      {{n}} 
+    </a>
+  </span>
+
+</div>
+
+
+
+
+<div id = 'leftPages' class = 'noPrint'>
+
+  <ol>
+    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','學習目標與時程','學習空間與支持','學習資源','希望的協助','附件']" onclick = '$("li").removeClass("focus"); $(this).addClass("focus");' ng-click = 'pageNow = k'> {{name}}的{{ k }} </li>
+  </ol>
+
+</div>
+
+
+
+
+<div id = 'rightSupports' class = 'noPrint'>
+</div>
+
+
+
+
+<div id = 'main'>
+  {{name}}
+</div>
+
+
+
+
+</body>
+
+
+<script type="text/javascript">
+
+
+  var editApp = new angular.module('editApp',["firebase"]);
+
+  var Ctrl = function ($scope, $firebase) {
+
+    $scope.name = '您';
+ //   $scope.password = 'asdasads';
+
+    $scope.$watch('name', function(newValue, oldValue) {    // chage firebase ref when name changed
+
+        console.log("I see a data change!" + newValue);
+        var ref = new Firebase('https://skywater.firebaseio.com/shackhand/plans/' + newValue); 
+        $scope.root = $firebase(ref); 
+
+    });
+
+
+  }
+
+
+</script>
+
+
+</html>

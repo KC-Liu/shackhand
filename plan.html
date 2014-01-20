@@ -103,7 +103,7 @@ span#status {
 }
 
 
-#leftPages li{
+#leftPages li, #rightSupports li{
   margin-top: 30px;
   display: block;
   border: 1px black solid;
@@ -112,7 +112,7 @@ span#status {
   cursor: pointer;
 }
 
-#leftPages li:hover, #leftPages li.focus {
+#leftPages li:hover, #leftPages li.focus, #rightSupports li:hover {
   border: 3px black solid;
   background-color: #fff; 
   border-right: none;
@@ -128,6 +128,7 @@ span#status {
   background-color: #cc9;
   border: 1px black solid;
   border-radius: 10px 0 10px 0;
+  padding: 5px;
 }
 
 #rightSupports:hover {
@@ -164,6 +165,11 @@ a#x, #x {
 
 
 <body ng-controller = "Ctrl">
+
+  <audio id ="easy" controls autoplay>
+    <source src="voice/easy.mp3" type="audio/mpeg">
+    <source src="voice/easy.ogg" type="audio/ogg">
+  </audio>
 
 
 
@@ -213,9 +219,11 @@ a#x, #x {
 
 <div id = 'rightSupports' class = 'noPrint'>
 
-{{pageNow}}
+<h3>{{pageNow}}</h3>
+<br/>參考資源：
+  <hr>
 <ul>
-	<li ng-repeat = "sup in supports | has:pageNow"> <a href = "{{sup.split(' ')[1] }}" target="_blank"> {{sup.split(' ')[0]}}</a>
+	<li ng-repeat = "sup in supports | has:pageNow | invis:pageNow "> <a href = "{{sup.split(' ')[1] }}" target="_blank"> {{sup.split(' ')[0]}}</a>
 </ul>
 
 </div>
@@ -239,39 +247,54 @@ a#x, #x {
 
   <div id ='page3' ng-show = "pageNow == '學習主題與領域'">
 
-  <input ng-model = "addTopic" ng-keydown = "adTPC($event)" placeholder = "寫上您的學習主題，再按Enter鍵"/>
+    <audio id ="topic" controls>
+            <source src="voice/topic.mp3" type="audio/mpeg">
+            <source src="voice/topic.ogg" type="audio/ogg">
+    </audio>
+
+
+    <input ng-model = "addTopic" ng-keydown = "adTPC($event)" placeholder = "寫上主題，再按Enter鍵"/>
 
 <!--  <a ng-click= "adTPC($event)">增加主題</a> -->
 
-  <span ng-repeat = "t in data.t[planNow]['主題']"> <a id = "x" ng-click = "data.t[planNow]['主題'] = removeElem(data.t[planNow]['主題'], t)">{{t}}</a></span>
+      <span ng-repeat = "t in data.t[planNow]['主題']"> <a id = "x" ng-click = "data.t[planNow]['主題'] = removeElem(data.t[planNow]['主題'], t)">{{t}}</a></span>
 
-  <br>
-  <span id = "x" onclick = "$(this).fadeOut()">
-    <ul>
-    <li>您的學主題可以自訂好幾項，範圍不限。
-    <li>例如修車、養昆蟲、寫程式、打籃球、繪畫...都可以。
-    <li>先想自己要做什麼，再去和課綱上的七大領域，對照打勾，看看是不是都有。
-    <li>如果一個主題和許多領域都有關，可以打好幾個勾。</ul> </span>
+      <br>
+          
+      <span id = "x" onclick = "$(this).fadeOut()" onmouseover = "$('#topic').trigger('play')">
+        <ul>
+          <li>您的學習主題可以自訂好幾項，範圍不限。
+          <li>例如修車、養昆蟲、寫程式、打籃球、繪畫...都可以。
+          <li>先想自己要做什麼，再去和課綱上的七大領域，對照打勾，看看是不是都有。
+          <li>如果同一個主題，和許多領域都有關，可以在一行中，打好幾個勾。</ul> </span>
 
-  <hr>
+      <hr>
 
-    <table>
-     <tr>
-      <th>
-      <span id = "status" ng-show = "count(data.t[planNow].correlation, sevenFields, data.t[planNow]['主題']) > 0">還有{{count(data.t[planNow].correlation, sevenFields, data.t[planNow]['主題'])}}個領域</span>
+        <table>
+           <tr>
+            <th>
+            <span id = "status" ng-show = "count(data.t[planNow].correlation, sevenFields, data.t[planNow]['主題']) > 0">還有{{count(data.t[planNow].correlation, sevenFields, data.t[planNow]['主題'])}}個領域</span>
 
-      <span id = "status" ng-hide= "count(data.t[planNow].correlation, sevenFields, data.t[planNow]['主題']) > 0">都對到了!!</span>
-      </th>
+            <span id = "status" ng-hide= "count(data.t[planNow].correlation, sevenFields, data.t[planNow]['主題']) > 0">都對到了!!</span>
+            </th>
 
-      <th ng-repeat = "t in data.t[planNow]['主題']"> {{t}}</th>
-     </tr>
-     <tr ng-repeat = "a in sevenFields">
-      <th>{{a}}</th>
-        <td ng-repeat = "t in data.t[planNow]['主題']">
-        <input type = "checkbox" ng-model ="data.t[planNow].correlation[a+t]" /> 
-        <span class = "clipOnly"> {{ data.t[planNow].correlation[a+t] && "V" || ''}} </span>
-     </tr>
-    </table>
+            <th ng-repeat = "t in data.t[planNow]['主題']"> {{t}}</th>
+           </tr>
+           <tr ng-repeat = "a in sevenFields">
+            <th>{{a}}</th>
+              <td ng-repeat = "t in data.t[planNow]['主題']">
+              <input type = "checkbox" ng-model ="data.t[planNow].correlation[a+t]" /> 
+              <span class = "clipOnly"> {{ data.t[planNow].correlation[a+t] && "V" || ''}} </span>
+           </tr>
+        </table>
+  </div>
+
+
+  <div id ='page4' ng-show = "pageNow == '一週節奏'">
+
+    你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
+    不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。政府的政策是，所有公立大學都開放旁聽。
+
   </div>
 
 
@@ -300,10 +323,15 @@ a#x, #x {
   var editApp = new angular.module('editApp',["firebase"]);
   editApp.filter('has',function(){
   	return function(list, x){
-  		console.log(x);
+//  		console.log(x);
   		return list.filter(function(str){return str.indexOf(x) > -1})
   	}
-  })
+  }).filter('invis',function(){
+    return function(list, x){
+//      console.log(x);
+      return list.map(function(str){return str.replace(x+',', '')});
+    }
+  });
 
   var Ctrl = function ($scope, $firebase) {
 
@@ -336,10 +364,12 @@ a#x, #x {
     };
 
     $scope.supports = [
-    '咳哈自傳', 
-    '咳哈哈自傳', 
-    '學習風格自我測試 http://bestian.github.io/freemath/%E5%B7%A5%E5%85%B7%E8%BB%9F%E9%AB%94/styleTester.html',
-    '七大領域的教學理念(學習主題與領域) http://163.24.138.110/jses/other/%E4%B8%83%E5%A4%A7%E9%A0%98%E5%9F%9F%E7%9A%84%E6%95%99%E5%AD%B8%E7%90%86%E5%BF%B5.html' ];
+    '學習風格自我測試(自傳,5分鐘_自我探索) http://bestian.github.io/freemath/%E5%B7%A5%E5%85%B7%E8%BB%9F%E9%AB%94/styleTester.html',
+    '七大領域的教學理念(學習主題與領域,3分鐘_瀏覽概要) http://163.24.138.110/jses/other/%E4%B8%83%E5%A4%A7%E9%A0%98%E5%9F%9F%E7%9A%84%E6%95%99%E5%AD%B8%E7%90%86%E5%BF%B5.html',
+    '如何訂學習計畫_上(學習主題與領域,10分鐘_影音講座) http://www.youtube.com/watch?v=SUoT5P8_UOI',
+    '如何成為未來職場需要的自由人才_上(學習主題與領域,10分鐘_影音講座) http://www.youtube.com/watch?v=ZPzqw3x05-g',
+    '丙級技術師證照線上複習(學習主題與領域,3分鐘_瀏覽概要) http://onlinetest.slhs.tp.edu.tw/test2/main/review_setup.asp?examid=testr',
+    '乙級技術師證照線上複習(學習主題與領域,3分鐘_瀏覽概要) http://onlinetest2.slhs.tp.edu.tw'];
 
     $scope.$watch('name', function(newValue, oldValue) {    // chage firebase ref when name changed
 

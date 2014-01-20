@@ -115,6 +115,11 @@
 
 <body>
 
+    <audio controls autoplay>
+      <source src= "voice/auto20_welcome.mp3" type = "audio/mpeg">
+      <source src= "voice/auto20_welcome.ogg" type = "audio/mpeg">
+    </audio>
+
     <div id="searchDiv">            <!-- Point:Search  Status: Usable lev 1-->
         <div id="searchbox">
             <input id="search" type="text" data-ng-modle = "seekFriend" placeholder="輸入關鍵字再按「Go!」找朋友">
@@ -308,7 +313,7 @@
     AutoModel = Backbone.Model.extend({
             defaults: {
                     preview: false,
-                    welcome: true,
+                    welcome: false,
                     search: '',
                     centerZoom: {
                         center: new L.LatLng(23.054299340, 120.24776492196047),
@@ -364,7 +369,7 @@
 
             this.cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade';   
 
-            this.welcomeWord = L.popup().setLatLng([22.01, 118.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>");
+            this.welcomeWord = L.popup().setLatLng([22.01, 118.26]).setContent("<div id = 'welcome' style = 'font-size:2rem'><p>歡迎使用「自學2.0」地圖式互助通訊錄！！</p><p>自學的路不孤單，相信您一定很快能找到志同道合的朋友與共學夥伴👼</p></div>"); 
 
             $('button#formSubmit').hide();
 

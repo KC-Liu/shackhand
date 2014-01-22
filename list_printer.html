@@ -380,7 +380,7 @@
 
     $scope.counter = 0;
     $scope.gifts = [];
-    $scope.lrList = ["learning_resouces.csv"]; // "l_r_paid.csv"
+    $scope.lrList = ["https://ethercalc.org/1v3161t7tu.csv"]; // "data/learning_resouces.csv""
     $scope.metaList = ["local_taiwan", "special_edu"];
     $scope.tags =[];  // $scope.tags = [{t: '數學', n: 3}, {t: '科學', n: 6}];
     $scope.pureTags =['數學','科學'];
@@ -415,7 +415,7 @@
     for (var i = 0; i < $scope.lrList.length; i++) {      
         $.ajax({
         type: "GET",
-        url: 'data/'+$scope.lrList[i],
+        url: $scope.lrList[i],
         dataType: "text",
             success: function(data) {
               $scope.gifts = $scope.gifts.concat($scope.processData(data));

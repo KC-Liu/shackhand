@@ -174,6 +174,22 @@ img.shadow {
   position:relative; left:-24px;
 }
 
+#popup-content {
+  display: block;
+  background: #fff;
+  position: fixed;
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  z-index: 98;
+}
+
+#popup-content * {
+  position: relative;
+  z-index: 99;
+}
+
 </style>
 
 </head>
@@ -260,9 +276,9 @@ img.shadow {
 <br/>參考資源：
   <hr>
 <ul>
-	<li ng-repeat = "sup in supports | has:pageNow | invis:pageNow " ng-click = "op(sup.split(' ')[1])">
+	<li ng-repeat = "sup in supports | has:pageNow | invis:pageNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.pop = true; $parent.popURL = sup.split(' ')[1]">
 
-    <img src="img/leaf-green.png" />
+    <img src="img/leaf-green.png"  />
       <img src="img/leaf-shadow.png" class="shadow"/>
 
       <br/>
@@ -368,6 +384,20 @@ img.shadow {
 
 
 
+<div id='popup-content' popup='popURL' ng-show = "pop" ng-mouseout = "pop = false">
+
+
+  <iframe id ="myframe" width = "100%" height = "100%">
+
+  </iframe>
+
+</div>
+
+
+
+
+
+
 </body>
 
 
@@ -386,12 +416,37 @@ img.shadow {
 //      console.log(x);
       return list.map(function(str){return str.replace(x+',', '').replace('all,', '')});
     }
-  });
+  })
+.directive('popup', function() {
+  var p = {
+      link : function(scope, iElement, iAttrs){
+           //code to wrap the div (iElement) with a abs pos div (parentDiv)
+          // code to add a mask layer div behind 
+          // if the parent is already there, then skip adding it again.
+         //use jquery ui to make it dragable etc.
+          scope.$watch(iAttrs.popup, function(newVal, oldVal){
+               if(newVal){
+       //            $(iElement).show();
+                   console.log(newVal);
+                   $('#myframe').attr('src', newVal);
+                 } 
+              else{
+         //        $(iElement).hide();
+                }
+          });
+      }
+
+
+   }
+  return p;
+});;
 
   var Ctrl = function ($scope, $firebase) {
 
   	$scope.confirm = window.confirm;
+    $scope.console = window.console;
   	$scope.$ = jQuery;
+    $scope.popURL = 'http://law.chen-wernik.net';
     $scope.name = '您';
     $scope.planNow = 0;
     $scope.pageNow = '自傳';
@@ -418,13 +473,18 @@ img.shadow {
     };
 
     $scope.supports = [
-    '各縣市自學申請表(all,_正式申請用的表格是這份喔!) http://law.chen-wernik.net',
-    '學習風格自我測試(自傳_5分鐘_自我探索) http://bestian.github.io/freemath/%E5%B7%A5%E5%85%B7%E8%BB%9F%E9%AB%94/styleTester.html',
+    '全球化與自主學習(自傳,13分鐘_講座) http://www.youtube.com/embed/Mi7qkTyqimE',
+    '各縣市自學申請表(附件,_正式申請用的表格是這份喔!) http://law.chen-wernik.net',
+    '學習風格自我測試(學習風格,5分鐘_自我探索) http://bestian.github.io/freemath/%E5%B7%A5%E5%85%B7%E8%BB%9F%E9%AB%94/styleTester.html',
     '七大領域的教學理念(學習主題與領域,3分鐘_瀏覽概要) http://163.24.138.110/jses/other/%E4%B8%83%E5%A4%A7%E9%A0%98%E5%9F%9F%E7%9A%84%E6%95%99%E5%AD%B8%E7%90%86%E5%BF%B5.html',
-    '如何訂學習計畫_上(學習主題與領域,10分鐘_影音講座) http://www.youtube.com/watch?v=SUoT5P8_UOI',
-    '如何成為未來職場需要的自由人才_上(學習主題與領域,10分鐘_影音講座) http://www.youtube.com/watch?v=ZPzqw3x05-g',
+    '如何訂學習計畫_上(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/SUoT5P8_UOI',
+    '如何訂學習計畫_中(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/2jF8Hu6aTCU',
+    '如何訂學習計畫_下(學習主題與領域,10分鐘_講座) http:www.youtube.com/embed/yeWB3BhQ7lg',
+    '如何成為未來職場需要的自由人才_上(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/ZPzqw3x05-g',
+    '如何成為未來職場需要的自由人才_中(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/Yc-fHn5aevo',
+    '如何成為未來職場需要的自由人才_中(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/IqQTLQH-S_M',
     '丙級技術師證照線上複習(學習主題與領域,3分鐘_瀏覽概要) http://onlinetest.slhs.tp.edu.tw/test2/main/review_setup.asp?examid=testr',
-//    '乙級技術師證照線上複習(學習主題與領域,3分鐘_瀏覽概要) http://onlinetest2.slhs.tp.edu.tw'
+    '乙級技術師證照線上複習(學習主題與領域,3分鐘_瀏覽概要) http://onlinetest2.slhs.tp.edu.tw'
 
     ];
 
@@ -483,13 +543,10 @@ img.shadow {
       window.open(url);
     }
 
-  
 
-
-  }
+  };
 
 
 </script>
-
 
 </html>

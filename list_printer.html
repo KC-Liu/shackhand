@@ -15,18 +15,33 @@
 
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
 
+<style type="text/css">
+
+#popup-content {
+  display: block;
+  background: #fff;
+  position: fixed;
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  z-index: 98;
+}
+
+#popup-content * {
+  position: relative;
+  z-index: 99;
+}
+
+
+</style>
+
 
 </head>
 
 
 <body ng-controller = "Ctrl">
 
-<!--
-<div id = "whiteback">
-  <hr style="position:absolute; bottom: 0mm; width:100%; "> 
-</div>
-
--->
 
 
 
@@ -46,7 +61,10 @@
   </div>
   <hr>
 
-      <div id = "custom" class="noPrint"> 
+
+  <div id = "rightCustom" class="noPrint"> 
+
+        <span ng-hide = "gifts">資料讀取中...</span>
         
         <ul id = "sands">
 
@@ -56,7 +74,7 @@
    				
             {{gift.title}}      
             <span class = "small">
-            <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
+            <a href = "http://{{ gift.url | makeQR }}" target = "_blank" ng-mouseover = "$parent.pop = true; $parent.popURL = (gift.url | maybeHTTP)">
               {{ gift.url | makeQR }}
             </a>
 
@@ -97,7 +115,7 @@
   <hr>
     <span>包含：</span>
 
-  <input id="tags" auto-complete ui-items="tags" type = "search" ng-model ="key" placeholder = "輸入關鍵字">
+  <input id="tags" auto-complete ui-items="tags" type = "search" ng-model ="key" placeholder = "輸入關鍵字" >
 
     <select name = "yes" ng-model ="keyLocal">
       <option value = "">--地理位置--</option>
@@ -141,7 +159,7 @@
 
     <br/>    <br/>
 
-    <div id = "main">
+  <div id = "main">
 
       <ol style="list-style-type: {{ol}}">
         <li ng-repeat = "gift in gifts | checked | orderBy:'ord'">
@@ -188,6 +206,14 @@
 
 </div>
 
+<div id='popup-content' popup='popURL' ng-show = "pop" ng-mouseout = "pop = false">
+
+
+  <iframe id ="myframe" width = "100%" height = "100%">
+  </iframe>
+
+</div>
+
 
 
 </body>
@@ -206,6 +232,11 @@
   	return function(str){
   		return str.replace('https://','').replace('http://','');
   	}
+  }).filter('maybeHTTP',function(){
+    return function(str){
+      if (str.substr(0,4) != 'http') str = 'http://' + str;
+      return str;
+    }
   }).filter('makeMoe',function(){
     return function(x){      
       return encodeURIComponent(x.replace(/ /g, '　').replace(/[ -~]/g, function(it){ return String.fromCharCode(it.charCodeAt(0) + 0xFEE0); }))
@@ -371,12 +402,41 @@
                         }, true);                      
                       }
                   };
-              });
+  }).directive('popup', function() {
+    var p = {
+        link : function(scope, iElement, iAttrs){
+             //code to wrap the div (iElement) with a abs pos div (parentDiv)
+            // code to add a mask layer div behind 
+            // if the parent is already there, then skip adding it again.
+           //use jquery ui to make it dragable etc.
+            scope.$watch(iAttrs.popup, function(newVal, oldVal){
+                 if(newVal){
+         //            $(iElement).show();
+                     console.log(newVal);
+
+                     var fThis = myframe.contentWindow;
+
+                     $('#myframe').attr('src', newVal);
+                     
+
+                   } 
+                else{
+           //        $(iElement).hide();
+                  }
+            });
+        }
+
+
+     }
+    return p;
+  });
 
   function Ctrl ($scope) {
 
 //    $scope.Math = window.Math;
     $scope.$ = jQuery;
+
+    $scope.key = decodeURI(location.hash).replace('#','');
 
     $scope.counter = 0;
     $scope.gifts = [];
@@ -499,9 +559,6 @@
             }
          });
     };
-
-
-    
 
 
     $scope.readTxt = function(allText, name) {

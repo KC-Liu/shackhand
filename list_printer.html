@@ -588,7 +588,7 @@
                 ans.push({
                     title: data[0],
                     url: data[1],
-                    tags: data[2]
+                    tags: data[2].replace(/"/g, '')
                 });
             }
         }

@@ -519,35 +519,7 @@ img.shadow {
 
     ];
 
-    $scope.$watch('name', function(newValue, oldValue) {    // chage firebase ref when name changed
-        console.log("I see a data change!" + newValue);
 
-        var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI(newValue));
-
-        $scope.base = $firebase(ref);
-
-    /*    $scope.base.$on("loaded", function() {
-          console.log("Initial data received!");
-          console.log($scope.base);
-          if (typeof ($scope.base.data) != "undifined") {
-            $scope.overwrite();
-          }
-        }); */
-
-        $scope.base.$on("change", function() {
-          console.log("A remote change was applied locally!");
-
-        $scope.overwrite();
-//          if (confirm("遠端資料已更新^_^")) {
-//            $scope.overwrite();
-//          }
-        });
-       
-    });
-
-    $scope.$watch('name', function(newValue, oldValue) {
-      $scope.updated = false;
-    });
 
     $scope.deleteData = function (pageNow) {
 	    if (confirm('確認刪除?這動作無法復原')) $scope.root.data.t[pageNow] = '';
@@ -631,10 +603,9 @@ img.shadow {
       }
 
       var d = new Date;
-      console.log(d.toLocaleString());
+  //    console.log(d.toLocaleString());
 
-
-      console.log($scope.base);
+ //     console.log($scope.base);
 
       $scope.root.data.time = d.toLocaleString();
 
@@ -642,39 +613,74 @@ img.shadow {
 
       $scope.updated = true;
 
-   //   $scope.root.$save();
-      // $set($scope.data);
-
-//      alert("已成功儲存。");
-
     }
 
-    $scope.overwrite = function() {
-      setTimeout( function() {
-        //      $scope.root.data = $scope.base.data;
-        //        for (var i = 0; i < $scope.root.data.t.length; i++) {
-         //       $scope.root.data.t[i].correlation = $scope.root.data.t[i].correlation || {};
-         //     };
-              console.log($scope.root.data) ;
-        //      $scope.$digest();
 
-              $scope.updated = true;
+    $scope.id = function(o) {
+      var m = {};
+      for (i=0; i < Object.keys(o).length; i++) {
+          var k = Object.keys(o)[i];
+        m[k] = o[k];
+      } 
+      console.log("A"); 
+      console.log(m);
+      return m;
+    }
 
-              $scope.bind3w();
+      $scope.$watch('name', function(newValue, oldValue) {    // chage firebase ref when name changed
+        console.log("I see a data change!" + newValue);
 
-            }  , 500 );
+        $scope.updated = false;
+
+        var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI(newValue));
+
+        $scope.base = $firebase(ref);
+
+        $scope.base.$on("change", function() {
+          console.log("A remote change was applied locally!");
+
+          setTimeout( function() {   
+            $scope.overwrite();
+          }, 500);
+
+          setTimeout( function() {
+              if (!$scope.binding) {
+                $scope.bind3w();
+              } else {
+                alert("Binded");
+              }
+          }  , 1000 );
+
+        });
+       
+    });
+
+
+    $scope.overwrite = function() {  
+        if ($scope.root.data != $scope.id($scope.base.data) ) $scope.root.data = $scope.id($scope.base.data);
+        console.log("B"); 
+        console.log($scope.root) ;   
     }
 
     $scope.bind3w = function() {
 
-              console.log($scope.base);
-       
+              console.log("C"); 
+              console.log($scope.base);       
+              
 
-              $scope.base.$bind($scope, "root");
-      //        $scope.root = {};
+              $scope.$watch("root", function(oldValue,newValue) {
+                        alert("root data synced !");
+                       //   console.log($scope.base);
+                          $scope.base.$set(newValue);
+                      });
 
 
+              $scope.binding = true;
               $scope.updated = true;
+
+       //       $scope.base.$bind($scope, "root");
+
+
     }
 
   };

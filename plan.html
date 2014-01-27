@@ -680,8 +680,10 @@ img.shadow {
             //          });
               
               setInterval(function(){
-                  $scope.base.$set($scope.root);
-                  console.log("pushed");
+                  setTimeout ( function () {
+                    $scope.base.$set($scope.root);
+                    console.log("pushed");
+                  }, Math.random() * 10);
               }, 100);
 
               $scope.binding = true;

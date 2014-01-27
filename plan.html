@@ -647,7 +647,7 @@ img.shadow {
               if (!$scope.binding) {
                 $scope.bind3w();
               } else {
-                alert("Binded");
+                console.log("Binded");
               }
           }  , 1000 );
 
@@ -657,7 +657,12 @@ img.shadow {
 
 
     $scope.overwrite = function() {  
-        if ($scope.root.data != $scope.id($scope.base.data) ) $scope.root.data = $scope.id($scope.base.data);
+        if (JSON.stringify($scope.base.data) != JSON.stringify($scope.root.data)) {
+          $scope.root.data = $scope.id($scope.base.data);
+        } else {
+          console.log("same!");
+        }
+
         console.log("B"); 
         console.log($scope.root) ;   
     }
@@ -668,12 +673,16 @@ img.shadow {
               console.log($scope.base);       
               
 
-              $scope.$watch("root", function(oldValue,newValue) {
-                        alert("root data synced !");
+          //    $scope.$watch("root", function(oldValue,newValue) {
+           //             alert("root data synced !");
                        //   console.log($scope.base);
-                          $scope.base.$set(newValue);
-                      });
-
+             //             $scope.base.$set(newValue);
+            //          });
+              
+              setInterval(function(){
+                  $scope.base.$set($scope.root);
+                  console.log("pushed");
+              }, 100);
 
               $scope.binding = true;
               $scope.updated = true;

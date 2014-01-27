@@ -315,7 +315,22 @@ img.shadow {
   </div>
 
   <div id ='page2' ng-show = "pageNow == '學習風格'">
-	  <textarea rows= '22' cols = '52' ng-model = 'root.data.t[planNow]["學習風格"]'></textarea>
+
+    <table>
+      <tr>
+        <td>
+      	  <textarea rows= '22' cols = '32' ng-model = 'root.data.t[planNow]["學習風格"]'> </textarea>
+        </td>
+        <td>
+          學習風格自我測試
+          <div > {{root.data.t[planNow].styleTester1}} </div>
+
+          學習階段自我測試
+          <div > {{root.data.t[planNow].styleTester2}} </div>
+        </td>
+      </tr>
+    </table>
+
   </div>
 
 

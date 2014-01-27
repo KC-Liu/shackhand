@@ -190,6 +190,10 @@ img.shadow {
   z-index: 99;
 }
 
+textarea {
+  font-size: 16pt;
+}
+
 </style>
 
 </head>
@@ -199,7 +203,7 @@ img.shadow {
 
 <body ng-controller = "Ctrl">
 
-  <audio id ="easy" controls autoplay>
+  <audio id ="easy" controls autoplay class = 'noPrint'>
     <source src="voice/easy.mp3" type="audio/mpeg">
     <source src="voice/easy.ogg" type="audio/ogg">
   </audio>
@@ -247,7 +251,7 @@ img.shadow {
     <span id = 'init4' ng-init = ""></span>
 
 
-    <a class = "{{$parent.planNow == n && 'focus'}}" ng-mouseover = '$parent.planNow = n; quite();'>
+    <a class = "{{$parent.planNow == n && 'focus'}}" ng-mouseover = 'cfrmPlan(n); quite();'>
       {{n+1}}
     </a>
 
@@ -520,6 +524,12 @@ img.shadow {
     ];
 
 
+    $scope.cfrmPlan = function(p) {
+        if ($scope.planNow - p == 0) return;
+        if (confirm("確定要切換到第"+(p+1)+"份學習計劃嗎?")) {
+          $scope.planNow = p;
+        }
+    }
 
     $scope.deleteData = function (pageNow) {
 	    if (confirm('確認刪除?這動作無法復原')) $scope.root.data.t[pageNow] = '';
@@ -639,9 +649,7 @@ img.shadow {
         $scope.base.$on("change", function() {
           console.log("A remote change was applied locally!");
 
-          setTimeout( function() {   
-            $scope.overwrite();
-          }, 500);
+          $scope.overwrite();
 
           setTimeout( function() {
               if (!$scope.binding) {

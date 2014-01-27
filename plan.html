@@ -238,7 +238,10 @@ img.shadow {
     <span id = 'init2' ng-init = ""></span>
 
 
-    <span id = 'init3' ng-init = "root.data.t[n]['主題'] = ['生活自理','運動','閱讀','寫作','參訪']"></span>
+    <span id = 'init3' ng-init = "
+    root.data.t[n]['主題'] = ['生活自理','運動','閱讀','寫作','參訪'];
+    root.data.t[n].correlation = {'健康與體育運動': true}">
+  </span>
 
 
     <span id = 'init4' ng-init = ""></span>
@@ -477,9 +480,9 @@ img.shadow {
       自傳: '小幫手：先照著你想到的去寫你的成長故事以及自我介紹\n\n再對應到申請書的「個性描述」「平時興趣」「健康狀況」「學習態度」「家庭成員」「家庭成員」「人際互動」「特殊表現」「其他方面」'
     };
 
-    $scope.root = {};
-            $scope.root.data = {};
-            $scope.root.data.t = [
+           $scope.root = {};
+           $scope.root.data = {};
+           $scope.root.data.t = [
             {},   //0
             {},
             {},
@@ -497,7 +500,8 @@ img.shadow {
               $scope.root.data.t[i].correlation = $scope.root.data.t[i].correlation || {};
             };
 
- //   $scope.buffer = {};
+            $scope.len =  $scope.root.data.t.length;
+
 
     $scope.supports = [
     '全球化與自主學習(自傳,13分鐘_講座) http://www.youtube.com/embed/Mi7qkTyqimE',
@@ -524,23 +528,19 @@ img.shadow {
 
     /*    $scope.base.$on("loaded", function() {
           console.log("Initial data received!");
-
-
-            console.log($scope.base);
-
+          console.log($scope.base);
           if (typeof ($scope.base.data) != "undifined") {
-
             $scope.overwrite();
-
           }
         }); */
 
         $scope.base.$on("change", function() {
           console.log("A remote change was applied locally!");
 
-          if (confirm("遠端資料已更新^_^")) {
-            $scope.overwrite();
-          }
+        $scope.overwrite();
+//          if (confirm("遠端資料已更新^_^")) {
+//            $scope.overwrite();
+//          }
         });
        
     });
@@ -651,17 +651,30 @@ img.shadow {
 
     $scope.overwrite = function() {
       setTimeout( function() {
-              $scope.root.data = $scope.base.data;
-                for (var i = 0; i < $scope.root.data.t.length; i++) {
-                $scope.root.data.t[i].correlation = $scope.root.data.t[i].correlation || {};
-              };
+        //      $scope.root.data = $scope.base.data;
+        //        for (var i = 0; i < $scope.root.data.t.length; i++) {
+         //       $scope.root.data.t[i].correlation = $scope.root.data.t[i].correlation || {};
+         //     };
               console.log($scope.root.data) ;
-              $scope.$digest();
+        //      $scope.$digest();
 
               $scope.updated = true;
 
+              $scope.bind3w();
 
             }  , 500 );
+    }
+
+    $scope.bind3w = function() {
+
+              console.log($scope.base);
+       
+
+              $scope.base.$bind($scope, "root");
+      //        $scope.root = {};
+
+
+              $scope.updated = true;
     }
 
   };

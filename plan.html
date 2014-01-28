@@ -194,6 +194,27 @@ textarea {
   font-size: 16pt;
 }
 
+
+#timeline.draw {
+  display: inline-block;
+  width: 760px;
+  height: 120px;
+  position: relative;
+  top: 10px;
+  left: 5px;
+}
+
+.px {
+  display: block;
+  position: absolute;
+  z-index: 51;
+  background-color: #999;
+  width: 10px;
+  height: 10px;
+  cursor: sw-resize;
+  border-radius: 5px;
+}
+
 </style>
 
 </head>
@@ -213,7 +234,7 @@ textarea {
 <div id = 'headInfos' class = 'noPrint'>
 
   使用者名稱(ID)：
-  <input ng-model = 'name' />
+  <input ng-model = 'name'  ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)"/>
  <!-- 密碼(Password)：<input type = 'password' ng-model = 'password' /> -->
   
   <a id = 'unlock' ng-click = 'unlock' ng-hide = 'logged'>解鎖</a>
@@ -242,16 +263,14 @@ textarea {
     <span id = 'init2' ng-init = ""></span>
 
 
-    <span id = 'init3' ng-init = "
-    root.data.t[n]['主題'] = ['生活自理','運動','閱讀','寫作','參訪'];
-    root.data.t[n].correlation = {'健康與體育運動': true}">
+    <span id = 'init3' ng-init = "">
   </span>
 
 
     <span id = 'init4' ng-init = ""></span>
 
 
-    <a class = "{{$parent.planNow == n && 'focus'}}" ng-mouseover = 'cfrmPlan(n); quite();'>
+    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = 'planNow = p; quite();'>
       {{n+1}}
     </a>
 
@@ -308,7 +327,37 @@ textarea {
 
   <div id ='page1' ng-show = "pageNow == '自傳'">
 
-    學習的Timeline
+    <div id = "timeline" class = "draw noSelect">
+
+      <div ng-repeat = "y in ys">
+
+        <div ng-repeat = "x in xs" class = "px" style = "
+
+          top : {{y*10}}px; left : {{x*10}}px;
+
+          background-color: {{
+           (root.data.t[planNow].timeline[y][x] && 'rgb(' + (50 + x*3) + ',' + (255 - y *10 - x*3) + ',50)' ) || '#cfc' }} ;
+
+        " ng-mouseover = "draw($event,y,x,planNow,colorNow)"
+
+          ng-click = "resetDraw(planNow)"
+
+        >
+          
+          &nbsp;
+
+        </div>
+
+      </div>
+
+      <div style = "position:absolute; top:102px;left:60px"> 幼年 </div>
+      <div style = "position:absolute; top:102px;left:180px"> 小學 </div>
+      <div style = "position:absolute; top:102px;left:420px"> 國中 </div>
+      <div style = "position:absolute; top:102px;left:520px"> 高職/高中 </div>
+      <div style = "position:absolute; top:102px;left:660px"> 社會/大學 </div>
+    </div>
+
+
     <hr>
 	  <textarea rows= '22' cols = '52' ng-model = "root.data.t[planNow]['自傳']"  
 
@@ -339,6 +388,7 @@ textarea {
     </table>
 
   </div>
+
 
 
   <div id ='page3' ng-show = "pageNow == '學習主題與領域'">
@@ -411,8 +461,6 @@ textarea {
 </div>
 
 
-
-
 <div id='popup-content' popup='popURL' ng-show = "pop" ng-mouseout = "pop = false">
 
   <iframe id ="myframe" width = "100%" height = "100%">
@@ -430,6 +478,12 @@ textarea {
 
 
 <script type="text/javascript">
+
+$(document).ready(function(){
+  
+  $('.noSelect').disableSelection();
+
+});
 
 
 
@@ -469,6 +523,38 @@ textarea {
   return p;
 });
 
+  initData = new Object;
+  initData.t = new Array;
+      for (var i = 0; i < 12; i++) {
+
+         initData.t[i] = new Object;
+
+         initData.t[i]['自傳'] = '小幫手：先照著你想到的去寫你的成長故事以及自我介紹\n\n再對應到申請書的「個性描述」「平時興趣」「健康狀況」「學習態度」「家庭成員」「家庭成員」「人際互動」「特殊表現」「其他方面」';
+        
+        initData.t[i].correlation = {
+            '健康與體育運動' : true,
+            '綜合活動生活自理' : true
+        };
+        
+        initData.t[i]['主題'] = ['生活自理','運動','閱讀','寫作','參訪'];
+
+        initData.t[i].timeline = [
+          [true],
+          [true],
+          [true],
+          [true],
+          [true],
+          [true],
+          [true],
+          [true],
+          [true],
+          [true],
+        ];
+
+      };
+
+  console.log(initData);
+
   var Ctrl = function ($scope, $firebase) {
 
   	$scope.confirm = window.confirm;
@@ -480,32 +566,21 @@ textarea {
     $scope.pageNow = '自傳';
     $scope.sevenFields = ['語文-國文','語文-鄉土語文','語文-英文','健康與體育','社會','數學','自然與科技','藝術與人文','綜合活動'];
 
-    $scope.hint = {
-      自傳: '小幫手：先照著你想到的去寫你的成長故事以及自我介紹\n\n再對應到申請書的「個性描述」「平時興趣」「健康狀況」「學習態度」「家庭成員」「家庭成員」「人際互動」「特殊表現」「其他方面」'
-    };
+      $scope.clone = function(o) {
+   
+        var m = $.extend(true, {}, o);
+ //       console.log("Cloning this"); 
+   //     console.log(m);
+     //   console.log("well done"); 
 
-           $scope.root = {};
-           $scope.root.data = {};
-           $scope.root.data.t = [
-            {},   //0
-            {},
-            {},
-            {},
-            {},   //4
-            {},
-            {},
-            {},
-            {},  
-            {},  //9
-            {},
-            {},  //11
-            ];
-            for (var i = 0; i < $scope.root.data.t.length; i++) {
-              $scope.root.data.t[i].correlation = $scope.root.data.t[i].correlation || {};
-            };
+        return m;
+      }
 
-            $scope.len =  $scope.root.data.t.length;
+      $scope.hint = $scope.clone(initData.t[0]);
 
+      $scope.root = {};
+      $scope.root.data = $scope.clone(initData);
+      
 
     $scope.supports = [
     '全球化與自主學習(自傳,13分鐘_講座) http://www.youtube.com/embed/Mi7qkTyqimE',
@@ -523,13 +598,58 @@ textarea {
 
     ];
 
+    $scope.resetDraw = function (planNow) {
+      for (var i = 0; i < 10; i++) {
+        $scope.root.data.t[planNow].timeline[i][0] = true;
 
-    $scope.cfrmPlan = function(p) {
-        if ($scope.planNow - p == 0) return;
-        if (confirm("確定要切換到第"+(p+1)+"份學習計劃嗎?")) {
-          $scope.planNow = p;
-        }
+        for (var j = 1; j < 72; j++) {
+          $scope.root.data.t[planNow].timeline[i][j] = false;
+        };
+      };
+
+      $scope.root.data.t[planNow].timeline[8][12] = true;
+      $scope.root.data.t[planNow].timeline[9][12] = true;
+
+      $scope.root.data.t[planNow].timeline[8][36] = true;
+      $scope.root.data.t[planNow].timeline[9][36] = true;
+
+      $scope.root.data.t[planNow].timeline[8][48] = true;
+      $scope.root.data.t[planNow].timeline[9][48] = true;
+
+      $scope.root.data.t[planNow].timeline[8][60] = true;
+      $scope.root.data.t[planNow].timeline[9][60] = true;
+
+
     }
+
+    $scope.draw = function (ev,y,x,planNow, colorNow) {
+   //   console.log($scope.root.data.t[planNow]);
+
+      if (!$scope.root.data.t[planNow].timeline[y]) $scope.root.data.t[planNow].timeline[y] = [true];
+
+      var depth = ((x % 6) && 10) || 8;
+
+      for (var i = 0; i < depth; i++) {      
+        $scope.root.data.t[planNow].timeline[i][x] = colorNow;        
+      } 
+
+
+      $scope.root.data.t[planNow].timeline[y][x] = !colorNow;
+
+ 
+    }
+
+    $scope.range = function (n) {
+      var ar = [];
+      for (var k = 0; k < n; k++) {
+          ar[k] = k;
+      }
+      return ar;
+    }
+
+    $scope.ys = $scope.range(10);
+    $scope.xs = $scope.range(72);
+
 
     $scope.deleteData = function (pageNow) {
 	    if (confirm('確認刪除?這動作無法復原')) $scope.root.data.t[pageNow] = '';
@@ -586,6 +706,8 @@ textarea {
 
     $scope.save = function () {
 
+      /*
+
       function createPassword() {
         var p1, p2;
         while (!p1 || p1 != p2) {
@@ -608,102 +730,124 @@ textarea {
 
         } else {
           var newPass = createPassword();
-          $scope.root.$child(password).$set(newPass);
+          $scope.base.$child(password).$set(newPass);
         }
-      }
+      }  */
 
       var d = new Date;
   //    console.log(d.toLocaleString());
-
  //     console.log($scope.base);
 
       $scope.root.data.time = d.toLocaleString();
-
-      $scope.base.$set($scope.root);
-
-      $scope.updated = true;
+//      $scope.base.$set($scope.root);
+ //     $scope.updated = true;
 
     }
 
+    //NAME CHANGE
 
-    $scope.id = function(o) {
-      var m = {};
-      for (i=0; i < Object.keys(o).length; i++) {
-          var k = Object.keys(o)[i];
-        m[k] = o[k];
-      } 
-      console.log("A"); 
-      console.log(m);
-      return m;
-    }
+      $scope.mayBeChName = function(ev, n){
+     //   alert("aaa");
+        if (ev.keyCode != 13 || !$scope.name) return;
+        $scope.chName(n);
+      }
 
-      $scope.$watch('name', function(newValue, oldValue) {    // chage firebase ref when name changed
+      $scope.chName = function(newValue) {  
+
         console.log("I see a data change!" + newValue);
 
         $scope.updated = false;
 
         var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI(newValue));
 
+        try {
+          $scope.base.$bind($scope, "root").then(function(unbind) {
+            unbind();          // No changes have been made to the remote data.
+          });
+
+          $scope.binding = false;
+          console.log("unbinded");
+
+        } catch (err) {
+          console.log(err);
+        }
+
         $scope.base = $firebase(ref);
+        console.log($scope.base);
 
-        $scope.base.$on("change", function() {
-          console.log("A remote change was applied locally!");
+        $scope.base.$on("loaded", function() {
 
-          $scope.overwrite();
+          console.log("File Loaded!!");
+
+          if (!$scope.binding) $scope.overwrite();
 
           setTimeout( function() {
+
               if (!$scope.binding) {
                 $scope.bind3w();
               } else {
-                console.log("Binded");
+                console.log("Already Binded");
               }
           }  , 1000 );
 
         });
+
+
+        $scope.base.$on("change", function() {
+          
+          if (!$scope.binding) {
+            console.log("A remote change was applied locally!");
+            $scope.overwrite();
+
+          }
+
+        });
        
-    });
+    }
 
 
     $scope.overwrite = function() {  
+
         if (JSON.stringify($scope.base.data) != JSON.stringify($scope.root.data)) {
-          $scope.root.data = $scope.id($scope.base.data);
+          $scope.root.data = $scope.clone($scope.base.data);
         } else {
           console.log("same!");
         }
 
-        console.log("B"); 
-        console.log($scope.root) ;   
+        console.log("Overwriting"); 
+        console.log($scope.root) ;
+
     }
 
     $scope.bind3w = function() {
 
-              console.log("C"); 
-              console.log($scope.base);       
-              
-
-          //    $scope.$watch("root", function(oldValue,newValue) {
-           //             alert("root data synced !");
-                       //   console.log($scope.base);
-             //             $scope.base.$set(newValue);
-            //          });
-              
-              setInterval(function(){
-                  setTimeout ( function () {
-                    $scope.base.$set($scope.root);
-                    console.log("pushed");
-                  }, Math.random() * 10);
-              }, 100);
-
+              console.log("Begin Binding"); 
+              console.log($scope.base);  
+              console.log($scope.root);      
+                    
               $scope.binding = true;
               $scope.updated = true;
 
-       //       $scope.base.$bind($scope, "root");
+            
 
+              $scope.base.$bind($scope, "root");
 
-    }
+              if (typeof($scope.root.data.t) == "undefined") {
+
+                  console.log("Initializing");
+
+                  $scope.base.$child("data").$set(initData);   // B
+
+                  $scope.root = new Object;
+                  $scope.root.data = $scope.clone(initData);   // M
+
+                  console.log($scope.root);
+                  console.log($scope.base);
+              }
+
+     }
 
   };
-
 
 </script>
 

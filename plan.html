@@ -525,20 +525,20 @@ $(document).ready(function(){
 
   initData = new Object;
   initData.t = new Array;
-      for (var i = 0; i < 12; i++) {
+      for (var inn = 0; inn < 12; inn++) {
 
-         initData.t[i] = new Object;
+         initData.t[inn] = new Object;
 
-         initData.t[i]['自傳'] = '小幫手：先照著你想到的去寫你的成長故事以及自我介紹\n\n再對應到申請書的「個性描述」「平時興趣」「健康狀況」「學習態度」「家庭成員」「家庭成員」「人際互動」「特殊表現」「其他方面」';
+         initData.t[inn]['自傳'] = '小幫手：先照著你想到的去寫你的成長故事以及自我介紹\n\n再對應到申請書的「個性描述」「平時興趣」「健康狀況」「學習態度」「家庭成員」「家庭成員」「人際互動」「特殊表現」「其他方面」';
         
-        initData.t[i].correlation = {
+        initData.t[inn].correlation = {
             '健康與體育運動' : true,
             '綜合活動生活自理' : true
         };
         
-        initData.t[i]['主題'] = ['生活自理','運動','閱讀','寫作','參訪'];
+        initData.t[inn]['主題'] = ['生活自理','運動','閱讀','寫作','參訪'];
 
-        initData.t[i].timeline = [
+        initData.t[inn].timeline = [
           [true],
           [true],
           [true],
@@ -551,6 +551,27 @@ $(document).ready(function(){
           [true],
         ];
 
+         for (var i = 0; i < 10; i++) {
+  //          $scope.root.data.t[planNow].timeline[i][0] = true;
+
+            for (var j = 1; j < 72; j++) {
+              initData.t[inn].timeline[i][j] = false;
+            };
+          };
+
+          initData.t[inn].timeline[8][12] = true;
+          initData.t[inn].timeline[9][12] = true;
+
+          initData.t[inn].timeline[8][36] = true;
+          initData.t[inn].timeline[9][36] = true;
+
+          initData.t[inn].timeline[8][48] = true;
+          initData.t[inn].timeline[9][48] = true;
+
+          initData.t[inn].timeline[8][60] = true;
+          initData.t[inn].timeline[9][60] = true;
+
+
       };
 
   console.log(initData);
@@ -562,6 +583,9 @@ $(document).ready(function(){
   	$scope.$ = jQuery;
     $scope.popURL = '';
     $scope.name = '您';
+
+    if(location.hash) {$scope.name = decodeURI(location.hash.replace('#','')) }
+
     $scope.planNow = 0;
     $scope.pageNow = '自傳';
     $scope.sevenFields = ['語文-國文','語文-鄉土語文','語文-英文','健康與體育','社會','數學','自然與科技','藝術與人文','綜合活動'];
@@ -599,6 +623,9 @@ $(document).ready(function(){
     ];
 
     $scope.resetDraw = function (planNow) {
+      $scope.root.data.t[planNow].timeline = initData.t[0].timeline;
+/*
+
       for (var i = 0; i < 10; i++) {
         $scope.root.data.t[planNow].timeline[i][0] = true;
 
@@ -617,8 +644,7 @@ $(document).ready(function(){
       $scope.root.data.t[planNow].timeline[9][48] = true;
 
       $scope.root.data.t[planNow].timeline[8][60] = true;
-      $scope.root.data.t[planNow].timeline[9][60] = true;
-
+      $scope.root.data.t[planNow].timeline[9][60] = true; */
 
     }
 
@@ -749,7 +775,13 @@ $(document).ready(function(){
       $scope.mayBeChName = function(ev, n){
      //   alert("aaa");
         if (ev.keyCode != 13 || !$scope.name) return;
-        $scope.chName(n);
+
+        location.hash = "#"+encodeURI(n);
+        location.reload();
+
+//        $scope.chName(n);
+
+
       }
 
       $scope.chName = function(newValue) {  
@@ -761,11 +793,13 @@ $(document).ready(function(){
         var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI(newValue));
 
         try {
+
+          $scope.binding = false;
+
           $scope.base.$bind($scope, "root").then(function(unbind) {
             unbind();          // No changes have been made to the remote data.
           });
 
-          $scope.binding = false;
           console.log("unbinded");
 
         } catch (err) {
@@ -774,6 +808,8 @@ $(document).ready(function(){
 
         $scope.base = $firebase(ref);
         console.log($scope.base);
+
+        //
 
         $scope.base.$on("loaded", function() {
 
@@ -791,6 +827,8 @@ $(document).ready(function(){
           }  , 1000 );
 
         });
+
+        //
 
 
         $scope.base.$on("change", function() {

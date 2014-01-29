@@ -20,7 +20,7 @@
 
 <meta charset=utf-8 />
 
-<title>自學計畫編輯器。可列印和存檔。</title>
+<title>計畫小幫手--協力完成自學計畫</title>
 
 
 <link rel="stylesheet" href="stylesheets/editor.css" />
@@ -89,7 +89,7 @@
 
 span#status {
   display: inline-block;
-  color: #eee;
+  color: #999;
 }
 
 
@@ -222,7 +222,7 @@ textarea {
 
 
 
-<body ng-controller = "Ctrl">
+<body ng-controller = "Ctrl" ng-keydown = "maybeSave($event)">
 
   <audio id ="easy" controls autoplay class = 'noPrint'>
     <source src="voice/easy.mp3" type="audio/mpeg">
@@ -237,19 +237,19 @@ textarea {
   <input ng-model = 'name'  ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)"/>
  <!-- 密碼(Password)：<input type = 'password' ng-model = 'password' /> -->
   
-  <a id = 'unlock' ng-click = 'unlock' ng-hide = 'logged'>解鎖</a>
-  <a id = 'lock' ng-click = 'lock' ng-show = 'logged'>上鎖</a>
+  <a id = 'unlock' ng-click = 'lock = false' ng-show = 'lock && name != "您"'>已上鎖</a>
+  <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && name != "您"'>已解鎖</a>
 
 <!--
   <a id = 'create' ng-click = 'create' ng-hide = 'logged'>創建帳號</a>
   <a id = 'delete' ng-click = 'create' ng-show = 'logged'>刪除帳號</a>
 -->
 
-  <span id = 'status' ng-show = 'logged'>可編輯</span>
-  <span id = 'status' ng-show = 'name == "您"'>沙盒</span>
-  <span id = 'status' ng-hide = 'logged || name == "您"'>只可瀏覽</span>
+  <span id = 'status' ng-show = 'name == "您"'>沙盒。可直接儲存</span>
+  <span id = 'status' ng-show = '!lock && name != "您"'>可直接儲存</span>
+  <span id = 'status' ng-show = 'lock && name != "您"'>輸入密碼才可儲存</span>
 
-  <span id = 'lastTime'>上次編輯時間: {{root.data.time}} </span>
+  <span id = 'lastTime'>上次存檔時間: {{root.data.time}} </span>
 
 </div>
 
@@ -270,7 +270,7 @@ textarea {
     <span id = 'init4' ng-init = ""></span>
 
 
-    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = 'planNow = p; quite();'>
+    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();'>
       {{n+1}}
     </a>
 
@@ -319,10 +319,10 @@ textarea {
 
 
 
-<div id = 'main'>
+<div id = 'main' >
 
   <span id = 'status' ng-show = 'updated'>所有更動已儲存</span>
-  <span id = 'status' ng-hide = 'updated'>等待儲存...</span>
+  <span id = 'status' ng-hide = 'updated'>等待儲存...按Ctrl+S儲存</span>
   <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
 
   <div id ='page1' ng-show = "pageNow == '自傳'">
@@ -340,7 +340,7 @@ textarea {
 
         " ng-mouseover = "draw($event,y,x,planNow,colorNow)"
 
-          ng-click = "resetDraw(planNow)"
+          ng-dblclick = "resetDraw(planNow)"
 
         >
           
@@ -583,6 +583,7 @@ $(document).ready(function(){
   	$scope.$ = jQuery;
     $scope.popURL = '';
     $scope.name = '您';
+    $scope.lock = true;
 
     if(location.hash) {$scope.name = decodeURI(location.hash.replace('#','')) }
 
@@ -624,7 +625,9 @@ $(document).ready(function(){
 
     $scope.resetDraw = function (planNow) {
       $scope.root.data.t[planNow].timeline = initData.t[0].timeline;
-/*
+      $scope.updated = false
+
+      /*
 
       for (var i = 0; i < 10; i++) {
         $scope.root.data.t[planNow].timeline[i][0] = true;
@@ -651,6 +654,8 @@ $(document).ready(function(){
     $scope.draw = function (ev,y,x,planNow, colorNow) {
    //   console.log($scope.root.data.t[planNow]);
 
+      if (!colorNow) colorNow = false;
+
       if (!$scope.root.data.t[planNow].timeline[y]) $scope.root.data.t[planNow].timeline[y] = [true];
 
       var depth = ((x % 6) && 10) || 8;
@@ -659,10 +664,8 @@ $(document).ready(function(){
         $scope.root.data.t[planNow].timeline[i][x] = colorNow;        
       } 
 
-
       $scope.root.data.t[planNow].timeline[y][x] = !colorNow;
-
- 
+      $scope.updated = false; 
     }
 
     $scope.range = function (n) {
@@ -678,7 +681,9 @@ $(document).ready(function(){
 
 
     $scope.deleteData = function (pageNow) {
-	    if (confirm('確認刪除?這動作無法復原')) $scope.root.data.t[pageNow] = '';
+	    if (confirm('確認刪除第'+(pageNow+1)+'頁嗎?這動作將在存檔後成效')) {
+        $scope.root.data.t[pageNow] = initData.t[0];
+      }
 	  }
 
     $scope.removeElem = function(list, elem) {
@@ -730,50 +735,82 @@ $(document).ready(function(){
       window.open(url);
     }
 
-    $scope.save = function () {
 
-      /*
+    $scope.maybeSave = function (event) {
 
-      function createPassword() {
-        var p1, p2;
-        while (!p1 || p1 != p2) {
-          p1 = prompt("請輸入密碼");
-          p2 = prompt("請再輸入一次密碼以確認");
-
-          if (p1 != p2) { alert("兩次密碼不同，請重新設定") } else { break }
+        if (event.ctrlKey || event.metaKey) {
+            switch (String.fromCharCode(event.which).toLowerCase()) {
+              case 's':
+                  event.preventDefault();
+                  console.log('ctrl-s');
+                  $scope.save();
+          //        $scope.updated = true;
+                  return;
+                  break;      
+            }
         }
-        alert("已成功設定密碼為"+p1+"請確實記下您的密碼，之後無法再查詢。");
-        return p1 && p2;
+
+        $scope.updated = false;
+    }
+
+    $scope.createPassword = function(name) {
+      var p1, p2;
+
+      while (!p1 || p1 != p2) {
+        p1 = prompt("歡迎" + name + "!!請設定一組密碼");
+        p2 = prompt("請再輸入一次密碼以確認");
+
+        if (!p1  || !p2) {
+          alert("已取消")
+          return;
+        }
+
+        if (p1 != p2) { alert("兩次密碼不同，請重新設定") } else { break }
       }
 
+      alert("已成功設定密碼為"+p1+"!!\n請確實記下您的密碼，之後無法再查詢。");
+      return p1 && p2;
+    }
+
+    $scope.save = function () {
+
       if ($scope.name != '您')  {
-        if ($scope.root.password) {
-          var trypass = prompt("請輸入密碼以儲存變更");
+
+
+        if ($scope.root.password && $scope.lock) {
+
+          var trypass = prompt("請輸入密碼以儲存變更" + $scope.root.password);
+
           if (trypass != $scope.root.password) {
             alert("密碼不符");
             return;
           }
 
-        } else {
-          var newPass = createPassword();
-          $scope.base.$child(password).$set(newPass);
-        }
-      }  */
+          } else {
+            var newPass = $scope.createPassword($scope.name);
+            if (newPass) {
+              $scope.root.password = newPass;
+    //          $scope.base.$child("password").$set(newPass);
+            } else {
+              return;
+            }
+          }
+      }
 
       var d = new Date;
-  //    console.log(d.toLocaleString());
- //     console.log($scope.base);
+      console.log(d.toLocaleString());
+      console.log($scope.root);
 
       $scope.root.data.time = d.toLocaleString();
-//      $scope.base.$set($scope.root);
- //     $scope.updated = true;
+      $scope.base.$set($scope.root);
+      $scope.updated = true;
+      $scope.lock = false;
 
     }
 
     //NAME CHANGE
-
       $scope.mayBeChName = function(ev, n){
-     //   alert("aaa");
+
         if (ev.keyCode != 13 || !$scope.name) return;
 
         location.hash = "#"+encodeURI(n);
@@ -792,19 +829,19 @@ $(document).ready(function(){
 
         var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI(newValue));
 
-        try {
+      //  try {
 
-          $scope.binding = false;
+      //    $scope.binding = false;
 
-          $scope.base.$bind($scope, "root").then(function(unbind) {
-            unbind();          // No changes have been made to the remote data.
-          });
+      //    $scope.base.$bind($scope, "root").then(function(unbind) {
+      //      unbind();          // No changes have been made to the remote data.
+      //    });
 
-          console.log("unbinded");
+      //    console.log("unbinded");
 
-        } catch (err) {
-          console.log(err);
-        }
+      //  } catch (err) {
+      //    console.log(err);
+      //  }
 
         $scope.base = $firebase(ref);
         console.log($scope.base);
@@ -838,6 +875,9 @@ $(document).ready(function(){
             $scope.overwrite();
 
           }
+          else {
+            console.log("binding");
+          }
 
         });
        
@@ -846,13 +886,24 @@ $(document).ready(function(){
 
     $scope.overwrite = function() {  
 
-        if (JSON.stringify($scope.base.data) != JSON.stringify($scope.root.data)) {
-          $scope.root.data = $scope.clone($scope.base.data);
-        } else {
-          console.log("same!");
+        console.log("Overwriting"); 
+      
+        $scope.root.data = $scope.clone($scope.base.data);
+
+        try {
+          $scope.root.password = $scope.base.password + "";
+
+          if (!$scope.root.password.replace("undefined",'').replace("false",'')) {
+              $scope.root.password = false;
+          } else {
+
+          }
+
+        } catch (err) {
+          console.log(err);
         }
 
-        console.log("Overwriting"); 
+
         console.log($scope.root) ;
 
     }
@@ -863,25 +914,38 @@ $(document).ready(function(){
               console.log($scope.base);  
               console.log($scope.root);      
                     
-              $scope.binding = true;
-              $scope.updated = true;
-
-            
-
-              $scope.base.$bind($scope, "root");
+      //        $scope.binding = true;
+      //        $scope.updated = true;
 
               if (typeof($scope.root.data.t) == "undefined") {
 
-                  console.log("Initializing");
+                    console.log("Initializing");
 
-                  $scope.base.$child("data").$set(initData);   // B
+                    $scope.base.$child("data").$set(initData);   // B
 
-                  $scope.root = new Object;
-                  $scope.root.data = $scope.clone(initData);   // M
+                    $scope.root = new Object;
+                    $scope.root.data = $scope.clone(initData);   // M
 
-                  console.log($scope.root);
-                  console.log($scope.base);
-              }
+                    console.log($scope.root);
+                    console.log($scope.base);
+                }
+            
+
+         //     $scope.base.$bind($scope, "root");   Problem: TOO LEG!!
+              
+   /*
+              setInterval(function(){
+                  
+                  setTimeout(function(){
+
+                    console.log($scope.root);
+
+            //        $scope.base.$set($scope.root);
+
+                  }, 10 + Math.floor(Math.random()*10));
+
+              }, 1000);  */
+
 
      }
 

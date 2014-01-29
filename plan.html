@@ -215,6 +215,7 @@ textarea {
   border-radius: 5px;
 }
 
+
 </style>
 
 </head>
@@ -285,7 +286,7 @@ textarea {
 <div id = 'leftPages' class = 'noPrint'>
 
   <ul>
-    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','學期進度表','學習空間與支持','學習資源','希望的協助','附件']" class = "{{$parent.pageNow == k && 'focus'}}" ng-mouseover = '$parent.pageNow = k;quite()'> 
+    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','學期進度表','學習空間與支持','學習資源','希望的協助','附件']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
 
       <img src="img/leaf-yellow.png" />
       <img src="img/leaf-shadow.png" class="shadow"/> 
@@ -301,11 +302,11 @@ textarea {
 
 <div id = 'rightSupports' class = 'noPrint'>
 
-<h3>{{pageNow}}</h3>
+<h3>{{pgNow}}</h3>
 <br/>參考資源：
   <hr>
 <ul>
-	<li ng-repeat = "sup in supports | has:pageNow | invis:pageNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.pop = true; $parent.popURL = sup.split(' ')[1]">
+	<li ng-repeat = "sup in supports | has:pgNow | invis:pgNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.pop = true; $parent.popURL = sup.split(' ')[1]">
 
     <img src="img/leaf-green.png"  />
       <img src="img/leaf-shadow.png" class="shadow"/>
@@ -325,7 +326,7 @@ textarea {
   <span id = 'status' ng-hide = 'updated'>等待儲存...按Ctrl+S儲存</span>
   <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
 
-  <div id ='page1' ng-show = "pageNow == '自傳'">
+  <div id ='page1' ng-show = "pgNow == '自傳'">
 
     <div id = "timeline" class = "draw noSelect">
 
@@ -370,7 +371,7 @@ textarea {
     </textarea>
   </div>
 
-  <div id ='page2' ng-show = "pageNow == '學習風格'">
+  <div id ='page2' ng-show = "pgNow == '學習風格'">
 
     <table>
       <tr>
@@ -391,7 +392,7 @@ textarea {
 
 
 
-  <div id ='page3' ng-show = "pageNow == '學習主題與領域'">
+  <div id ='page3' ng-show = "pgNow == '學習主題與領域'">
 
     <audio id ="topic" controls>
             <source src="voice/topic.mp3" type="audio/mpeg">
@@ -429,14 +430,46 @@ textarea {
            <tr ng-repeat = "a in sevenFields">
             <th>{{a}}</th>
               <td ng-repeat = "t in root.data.t[planNow]['主題']">
-              <input type = "checkbox" ng-model ="root.data.t[planNow].correlation[a+t]" /> 
+              	<input type = "checkbox" ng-model ="root.data.t[planNow].correlation[a+t]" /> 
               <span class = "clipOnly"> {{ root.data.t[planNow].correlation[a+t] && "V" || ''}} </span>
            </tr>
         </table>
   </div>
 
 
-  <div id ='page4' ng-show = "pageNow == '一週節奏'">
+  <div id ='page4' ng-show = "pgNow == '一週節奏'">
+
+   <table>
+  		<tr>
+  			<th></th>
+  			<th ng-repeat = "d in ['日','一','二','三','四','五','六']">{{d}}</th>
+  		</tr>
+
+  		<tr ng-repeat = "j in ['清晨','早餐','早上','午餐','下午','晚餐','晚上','深夜']">
+
+  			<th>
+  				{{j}}
+  			</th>
+
+  			<td ng-repeat = "d in ['日','一','二','三','四','五','六']">
+
+  				<select ng-model = "root.data.t[planNow].schedule[d+j]" ng-init = "root.data.t[planNow].schedule[d+j] = '彈性' ">
+  					<option ng-repeat = "tp in root.data.t[planNow]['主題']" value="{{tp}}">{{tp}}</option>
+  					<option value="彈性">彈性</option>
+  				</select>
+
+
+  				<select ng-show = "j == '早上' || j == '下午'"
+  					ng-model = "root.data.t[planNow].schedule[d+j+'b']" ng-init = "root.data.t[planNow].schedule[d+j+'b'] = '彈性' ">
+  					<option ng-repeat = "tp in root.data.t[planNow]['主題']" value="{{tp}}">{{tp}}</option>
+  					<option value="彈性">彈性</option>
+  				</select>
+
+
+  			</td> 			
+  		</tr>
+  		
+  	</table>
 
     你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
     不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。政府的政策是，所有公立大學都開放旁聽。
@@ -444,18 +477,88 @@ textarea {
   </div>
 
 
+  <div id ='page5' ng-show = "pgNow == '學期進度表'">
+
+   <select ng-model = "timeT" ng-init = "timeT = 'm'">
+	   	<option value="m">月進度</option>
+	   	<option value="y">年進度</option>
+<!--	    <option value="w">週進度</option> -->
+   </select>
+
+   <input type="number" ng-model = "root.data.t[planNow].shift" ng-init = "root.data.t[planNow].shift = 5"/>
+
+   <table>
+  		<tr>
+  			<th></th>
+  			<th ng-repeat = "tp in root.data.t[planNow]['主題']">{{tp}}</th>
+  		</tr>
+
+  		<tr ng-repeat = "j in calanD[timeT] | shifted:root.data.t[planNow].shift">
+
+  			<th>
+  				{{j}}
+  			</th>
+
+  			<td ng-repeat = "tp in root.data.t[planNow]['主題']">
+
+  				<textarea cols="5" rows="12" 
+  				ng-model = "root.data.t[planNow].goal[tp+j]"
+  				placeholder= "您的目標">
+
+				</textarea>  				
+
+  				
+  			</td> 			
+  		</tr>
+  		
+  	</table>
+
+    你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
+    不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。政府的政策是，所有公立大學都開放旁聽。
+
+  </div>
+
+
+
+
+  <div id ='page6' ng-show = "pgNow == '學習資源'">
+
+  	<table>
+  		<tr><th ng-repeat = "t in root.data.t[planNow]['主題']"></th></tr>
+
+  		<tr ng-repeat = "j in [1,2,3,4,5]">
+
+  			<td ng-repeat =  "res in root.data.t[planNow].resources[t][j]">
+
+  				{{res}}
+
+  			</td>
+
+  		</tr>
+
+  		<tr><td ng-repeat = "t in root.data.t[planNow]['主題']"><input ng-model= "newResouce.t"> </td></tr>
+  		
+  	</table>
+
+    你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
+    不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。政府的政策是，所有公立大學都開放旁聽。
+
+  </div>
+
+
+
   <div id = 'action'>
-  	目前頁面是：{{pageNow}}
+  	目前頁面是：{{pgNow}}
 
     {{name}}要：
     <a id = 'save' ng-click = "save()">雲端儲存</a>還是
-    <a id = 'delete' ng-click = "deleteData(pageNow)">清空</a>呢?
+    <a id = 'delete' ng-click = "deleteData(planNow)">清空</a>呢?
     <br/>
     <hr>
     <br/>
     小幫手：<a id = 'save' ng-click = "save()">雲端儲存</a>的資料，將會用於協助其他計劃自學的人。
     <br/>
-    如您不願分享，請在編輯完成後，剪貼存下副本，再<a id = 'delete' ng-click = "deleteData(pageNow)">清空</a>雲端資料。
+    如您不願分享，請在編輯完成後，剪貼存下副本，再<a id = 'delete' ng-click = "deleteData(planNow)">清空</a>雲端資料。
   </div>
 
 </div>
@@ -498,8 +601,17 @@ $(document).ready(function(){
 //      console.log(x);
       return list.map(function(str){return str.replace(x+',', '').replace('all,', '')});
     }
-  })
-.directive('popup', function() {
+  }).filter('shifted',function(){
+    return function(list, x){
+    	var ans = [];
+    	var m = list.length;
+    	for (var i = 0; i < m; i++) {
+    		var k = (x+i-1) % m;
+    		ans.push(list[k]);
+    	};
+	    return ans;
+    }
+  }).directive('popup', function() {
   var p = {
       link : function(scope, iElement, iAttrs){
            //code to wrap the div (iElement) with a abs pos div (parentDiv)
@@ -535,8 +647,26 @@ $(document).ready(function(){
             '健康與體育運動' : true,
             '綜合活動生活自理' : true
         };
+
+        initData.t[inn].schedule = {
+         '日清晨':'運動',
+         '日早餐':'生活自理', 
+         '日午餐':'生活自理', 
+         '日晚餐':'生活自理', 
+         '日深夜':'休息',
+         '一清晨':'運動',
+         '二早餐':'生活自理', 
+         '三午餐':'生活自理', 
+         '四晚餐':'生活自理', 
+         '五深夜':'休息'
+        };
+
+        initData.t[inn].goal = {
+          '運動5月' : '每天運動半小時以上',
+          '生活自理今年' : '自己會作菜',
+        };
         
-        initData.t[inn]['主題'] = ['生活自理','運動','閱讀','寫作','參訪'];
+        initData.t[inn]['主題'] = ['生活自理','運動','閱讀','寫作','休息','社交'];
 
         initData.t[inn].timeline = [
           [true],
@@ -585,11 +715,17 @@ $(document).ready(function(){
     $scope.name = '您';
     $scope.lock = true;
 
+
     if(location.hash) {$scope.name = decodeURI(location.hash.replace('#','')) }
 
     $scope.planNow = 0;
-    $scope.pageNow = '自傳';
+    $scope.pgNow = '自傳';
     $scope.sevenFields = ['語文-國文','語文-鄉土語文','語文-英文','健康與體育','社會','數學','自然與科技','藝術與人文','綜合活動'];
+    $scope.calanD = {
+	    //  w:[]
+    	m: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+    	y: ['今年','明年','後年','3年後','4年後','5年後','10年後','20年後']
+    };
 
       $scope.clone = function(o) {
    
@@ -658,7 +794,7 @@ $(document).ready(function(){
 
       if (!$scope.root.data.t[planNow].timeline[y]) $scope.root.data.t[planNow].timeline[y] = [true];
 
-      var depth = ((x % 6) && 10) || 8;
+      var depth = ((x % 12 || x == 0 || x == 24) && 10) || 8;
 
       for (var i = 0; i < depth; i++) {      
         $scope.root.data.t[planNow].timeline[i][x] = colorNow;        
@@ -680,11 +816,17 @@ $(document).ready(function(){
     $scope.xs = $scope.range(72);
 
 
-    $scope.deleteData = function (pageNow) {
-	    if (confirm('確認刪除第'+(pageNow+1)+'頁嗎?這動作將在存檔後成效')) {
-        $scope.root.data.t[pageNow] = initData.t[0];
+    $scope.deleteData = function (planNow) {
+      console.log(planNow);
+      console.log("deleteData");
+	  
+	  if (confirm('確認刪除第'+(planNow+1)+'頁嗎?這動作將在存檔後生效') ) {
+	  	console.log(initData);
+
+       $scope.root.data.t[planNow] = $scope.clone(initData.t[0]);
+//        $scope.$digest();
       }
-	  }
+	}
 
     $scope.removeElem = function(list, elem) {
        return list.filter(function(str){ return str.indexOf(elem) == -1})
@@ -746,7 +888,11 @@ $(document).ready(function(){
                   $scope.save();
           //        $scope.updated = true;
                   return;
-                  break;      
+                  break;
+              case 'd':
+                  event.preventDefault();
+                  console.log('ctrl-d');
+	              $scope.deleteData($scope.planNow);     
             }
         }
 
@@ -774,37 +920,49 @@ $(document).ready(function(){
 
     $scope.save = function () {
 
-      if ($scope.name != '您')  {
+      	if ($scope.name != '您')  {
 
+        	if ($scope.root.password) {
 
-        if ($scope.root.password && $scope.lock) {
+        		if ($scope.lock) {
+			          var trypass = prompt("請輸入密碼以儲存變更");
 
-          var trypass = prompt("請輸入密碼以儲存變更" + $scope.root.password);
+			          if (trypass != $scope.root.password) {
+			            alert("密碼不符");
+			            return;
+			          }
 
-          if (trypass != $scope.root.password) {
-            alert("密碼不符");
-            return;
-          }
+			          else {
+			          	if (confirm("通過驗證，已解鎖!!要改密碼嗎?")){
+			          		var newPass = $scope.createPassword($scope.name);
+				            if (newPass) {
+				              $scope.root.password = newPass;
+				            } 
+			          	}
+			          }
+		        }
+	        }
 
-          } else {
-            var newPass = $scope.createPassword($scope.name);
-            if (newPass) {
-              $scope.root.password = newPass;
-    //          $scope.base.$child("password").$set(newPass);
-            } else {
-              return;
-            }
-          }
-      }
+	        else {
+	            var newPass = $scope.createPassword($scope.name);
+	            if (newPass) {
+	              $scope.root.password = newPass;
+	    //          $scope.base.$child("password").$set(newPass);
+	            } else {
+	              return;
+	            }
+	        }
+	      	
 
-      var d = new Date;
-      console.log(d.toLocaleString());
-      console.log($scope.root);
+		    var d = new Date;
+		    console.log(d.toLocaleString());
+		    console.log($scope.root);
 
-      $scope.root.data.time = d.toLocaleString();
-      $scope.base.$set($scope.root);
-      $scope.updated = true;
-      $scope.lock = false;
+		    $scope.root.data.time = d.toLocaleString();
+		    $scope.base.$set($scope.root);
+		    $scope.updated = true;
+		    $scope.lock = false;
+  	  	}
 
     }
 

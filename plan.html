@@ -238,7 +238,7 @@ textarea {
   <input ng-model = 'name'  ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)"/>
  <!-- 密碼(Password)：<input type = 'password' ng-model = 'password' /> -->
   
-  <a id = 'unlock' ng-click = 'lock = false' ng-show = 'lock && name != "您"'>已上鎖</a>
+  <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && name != "您"'>已上鎖</a>
   <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && name != "您"'>已解鎖</a>
 
 <!--

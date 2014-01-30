@@ -437,7 +437,7 @@ textarea {
   </div>
 
 
-  <div id ='page4' ng-show = "pgNow == '一週節奏'">
+  <div id ='page4' ng-show = "pgNow == '一週節奏'" >
 
    <table>
   		<tr>
@@ -453,15 +453,26 @@ textarea {
 
   			<td ng-repeat = "d in ['日','一','二','三','四','五','六']">
 
-  				<select ng-model = "root.data.t[planNow].schedule[d+j]" ng-init = "root.data.t[planNow].schedule[d+j] = '彈性' ">
-  					<option ng-repeat = "tp in root.data.t[planNow]['主題']" value="{{tp}}">{{tp}}</option>
+
+  				<select ng-model = "root.data.t[planNow].schedule[d+j]" ng-init = "root.data.t[planNow].schedule[d+j] = '彈性'" value="{{root.data.t[planNow].schedule[d+j]}}">
+
+  					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
+                    ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
+                    value="{{tp}}">
+                    {{tp}}
+            </option>
+
   					<option value="彈性">彈性</option>
+
   				</select>
 
 
   				<select ng-show = "j == '早上' || j == '下午'"
   					ng-model = "root.data.t[planNow].schedule[d+j+'b']" ng-init = "root.data.t[planNow].schedule[d+j+'b'] = '彈性' ">
-  					<option ng-repeat = "tp in root.data.t[planNow]['主題']" value="{{tp}}">{{tp}}</option>
+  					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
+                    ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
+                    value="{{tp}}">{{tp}}</option>
+                    
   					<option value="彈性">彈性</option>
   				</select>
 
@@ -666,7 +677,7 @@ $(document).ready(function(){
           '生活自理今年' : '自己會作菜',
         };
         
-        initData.t[inn]['主題'] = ['生活自理','運動','閱讀','寫作','休息','社交'];
+        initData.t[inn]['主題'] = ['生活自理','運動','社交','休息'];
 
         initData.t[inn].timeline = [
           [true],
@@ -892,7 +903,11 @@ $(document).ready(function(){
               case 'd':
                   event.preventDefault();
                   console.log('ctrl-d');
-	              $scope.deleteData($scope.planNow);     
+	              $scope.deleteData($scope.planNow);
+              case 'r':
+                  event.preventDefault();
+                  console.log('ctrl-r');
+                  $scope.$digest;        
             }
         }
 
@@ -1045,7 +1060,7 @@ $(document).ready(function(){
     $scope.overwrite = function() {  
 
         console.log("Overwriting"); 
-      
+
         $scope.root.data = $scope.clone($scope.base.data);
 
         try {
@@ -1061,8 +1076,9 @@ $(document).ready(function(){
           console.log(err);
         }
 
-
         console.log($scope.root) ;
+
+
 
     }
 

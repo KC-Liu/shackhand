@@ -47,7 +47,7 @@
 
 }
 
-#headInfos #unlock,#lock,#create,#delete,#main a {
+#headInfos #go,#unlock,#lock,#create,#delete,#main a {
   display: inline-block;
   border: green 1px ridge;
   background-color: #afa;
@@ -63,20 +63,25 @@
   top: 31px;
   left: 200px;
   width: 50%;
-  min-height: 20px;
+  min-height: 25px;
   background-color: rgba(255,255,255,0.2);
   text-align: center;
   border-radius: 0 0 10px 10px ;
-  padding-top: 5px;
+  padding: 5px;
 }
 
 #headPlans a{
   display: inline-block;
   border: 1px black solid;
-  min-width: 30px;
+  width: 30px;
+  height: 20px;
+  overflow: hidden;
   margin-left: 15px;
+  padding-top: 3px;
   border-radius: 10px 10px 0 0;
-  background: #eee;
+  background: rgba(255,255,255,0);
+  cursor: pointer;
+  color: #999;
 }
 
 
@@ -84,6 +89,7 @@
   border: 2px black solid;
   border-bottom: none;
   background: #fff;
+  color: #000;
 }
 
 
@@ -106,14 +112,15 @@ span#status {
 
 
 #leftPages li, #rightSupports li{
-  margin-top: 30px;
+  margin-top: 5px;
   display: block; 
-  border: 1px black solid;
+  border: 1px black dotted;
   border-radius: 10px 0 10px 0;
-  background-color: #eee; 
+  background-color: rgba(255,255,255,0); 
   padding: 2px;
   cursor: pointer;
   text-align: center;
+  color: #999;
 }
 
 #leftPages li:hover, #leftPages li.focus, #rightSupports li:hover {
@@ -121,6 +128,7 @@ span#status {
   background-color: #fff; 
   border-right: none;
   margin-right: -10px;
+  color: #000;
 }
 
 #rightSupports {
@@ -157,6 +165,7 @@ span#status {
   padding: 10px;
   display: block;
   border-radius: 0px 15px 15px 0px;
+  overflow: auto;
 }
 
 tr {
@@ -170,8 +179,14 @@ a#x, #x {
   cursor: not-allowed; 
 }
 
+img.leaf {
+	height: 40px;
+}
+
 img.shadow {
-  position:relative; left:-24px;
+  position:relative;
+  /* left:-24px; */
+  left:-14px;
 }
 
 #popup-content {
@@ -238,19 +253,22 @@ textarea {
   <input ng-model = 'name'  ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)"/>
  <!-- 密碼(Password)：<input type = 'password' ng-model = 'password' /> -->
   
-  <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && name != "您"'>已上鎖</a>
-  <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && name != "您"'>已解鎖</a>
+  <a id = 'go' ng-click = 'chName(name)'>Go!</a>
+
+  <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && !sandbox'>已上鎖</a>
+  <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && !sandbox'>已解鎖</a>
 
 <!--
   <a id = 'create' ng-click = 'create' ng-hide = 'logged'>創建帳號</a>
   <a id = 'delete' ng-click = 'create' ng-show = 'logged'>刪除帳號</a>
 -->
 
-  <span id = 'status' ng-show = 'name == "您"'>沙盒。可直接儲存</span>
-  <span id = 'status' ng-show = '!lock && name != "您"'>可直接儲存</span>
-  <span id = 'status' ng-show = 'lock && name != "您"'>輸入密碼才可儲存</span>
+  <span id = 'status' ng-show = 'sandbox'>沙盒。可直接儲存</span>
+  <span id = 'status' ng-show = '!lock && !sandbox'>可直接儲存</span>
+  <span id = 'status' ng-show = 'lock && !sandbox'>輸入密碼才可儲存</span>
 
-  <span id = 'lastTime'>上次存檔時間: {{root.data.time}} </span>
+  <span id = 'lastTime'>上次存檔: {{root.data.time | localTime }} </span>
+  <span id = 'remTime'>請在未來{{root.data.time | countTime:60:clock | showRemTime }}中再度使用^_^ </span>
 
 </div>
 
@@ -259,20 +277,9 @@ textarea {
 
   <span ng-repeat = 'n in [0,1,2,3,4,5,6,7,8,9,10,11]'>
 
-    <span id = 'init1' ng-init = "root.data.t[n]['自傳'] = root.data.t[n]['自傳'] || hint['自傳']"></span>
-
-    <span id = 'init2' ng-init = ""></span>
-
-
-    <span id = 'init3' ng-init = "">
-  </span>
-
-
-    <span id = 'init4' ng-init = ""></span>
-
-
     <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();'>
-      {{n+1}}
+      {{root.data.t[n].title || n+1}}
+
     </a>
 
   </span>
@@ -280,16 +287,13 @@ textarea {
 </div>
 
 
-<!---->
-
-
 <div id = 'leftPages' class = 'noPrint'>
 
   <ul>
-    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','學期進度表','學習空間與支持','學習資源','希望的協助','附件']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
+    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','學期進度表','學習空間與支持','學習資源','希望支援','附件']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
 
-      <img src="img/leaf-yellow.png" />
-      <img src="img/leaf-shadow.png" class="shadow"/> 
+      <img src="img/leaf-yellow.png" class = "leaf" />
+      <img src="img/leaf-shadow.png" class="leaf shadow"/> 
 
       <br/>
       {{name}}的{{ k }} </li>
@@ -303,13 +307,14 @@ textarea {
 <div id = 'rightSupports' class = 'noPrint'>
 
 <h3>{{pgNow}}</h3>
+
 <br/>參考資源：
   <hr>
 <ul>
 	<li ng-repeat = "sup in supports | has:pgNow | invis:pgNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.pop = true; $parent.popURL = sup.split(' ')[1]">
 
-    <img src="img/leaf-green.png"  />
-      <img src="img/leaf-shadow.png" class="shadow"/>
+      <img src="img/leaf-green.png" class="leaf" />
+      <img src="img/leaf-shadow.png" class="leaf shadow"/>
 
       <br/>
 
@@ -319,14 +324,17 @@ textarea {
 </div>
 
 
-
 <div id = 'main' >
+
+  <input ng-model = "root.data.t[planNow].title">
+    
 
   <span id = 'status' ng-show = 'updated'>所有更動已儲存</span>
   <span id = 'status' ng-hide = 'updated'>等待儲存...按Ctrl+S儲存</span>
   <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
 
   <div id ='page1' ng-show = "pgNow == '自傳'">
+
 
     <div id = "timeline" class = "draw noSelect">
 
@@ -512,8 +520,10 @@ textarea {
 
   			<td ng-repeat = "tp in root.data.t[planNow]['主題']">
 
-  				<textarea cols="5" rows="12" 
+  				<textarea cols="4" rows="8" 
   				ng-model = "root.data.t[planNow].goal[tp+j]"
+  				onfocus="$(this).attr('cols', 8)"
+ 				onblur="$(this).attr('cols', 4)" 
   				placeholder= "您的目標">
 
 				</textarea>  				
@@ -535,7 +545,7 @@ textarea {
   <div id ='page6' ng-show = "pgNow == '學習資源'">
 
   	<table>
-  		<tr><th ng-repeat = "t in root.data.t[planNow]['主題']"></th></tr>
+  		<tr><th ng-repeat = "t in root.data.t[planNow]['主題']">{{t}}</th></tr>
 
   		<tr ng-repeat = "j in [1,2,3,4,5]">
 
@@ -547,7 +557,15 @@ textarea {
 
   		</tr>
 
-  		<tr><td ng-repeat = "t in root.data.t[planNow]['主題']"><input ng-model= "newResouce.t"> </td></tr>
+  		<tr>
+  		<td ng-repeat = "t in root.data.t[planNow]['主題']">
+
+  			<textarea rows = "3" cols = "5" ng-model= "newResouce"> 
+  			</textarea>
+
+  			<a ng-click = "($parent.root.data.t[planNow].resources[t] && $parent.root.data.t[planNow].resources[t].push(newResouce)) || $parent.root.data.t[planNow].resources[t] = [newResouce]; newResouce.t = ''"> 新增!! </a>
+
+  		</td></tr>
   		
   	</table>
 
@@ -557,20 +575,6 @@ textarea {
   </div>
 
 
-
-  <div id = 'action'>
-  	目前頁面是：{{pgNow}}
-
-    {{name}}要：
-    <a id = 'save' ng-click = "save()">雲端儲存</a>還是
-    <a id = 'delete' ng-click = "deleteData(planNow)">清空</a>呢?
-    <br/>
-    <hr>
-    <br/>
-    小幫手：<a id = 'save' ng-click = "save()">雲端儲存</a>的資料，將會用於協助其他計劃自學的人。
-    <br/>
-    如您不願分享，請在編輯完成後，剪貼存下副本，再<a id = 'delete' ng-click = "deleteData(planNow)">清空</a>雲端資料。
-  </div>
 
 </div>
 
@@ -597,6 +601,7 @@ $(document).ready(function(){
   
   $('.noSelect').disableSelection();
 
+
 });
 
 
@@ -621,6 +626,20 @@ $(document).ready(function(){
     		ans.push(list[k]);
     	};
 	    return ans;
+    }
+  }).filter('localTime',function(){
+    return function(t){
+    	var d = new Date(t);
+    	l = d.toLocaleString();
+	    return l;
+    }
+  }).filter('countTime',function(){
+    return function(t,p,clock){
+	    return t + p*1000*60*60*24 - clock; 
+    }
+  }).filter('showRemTime',function(){
+    return function(t){
+	    return Math.floor(t / (1000*60*60*24)) +"天";
     }
   }).directive('popup', function() {
   var p = {
@@ -718,6 +737,12 @@ $(document).ready(function(){
   console.log(initData);
 
   var Ctrl = function ($scope, $firebase) {
+
+  	setInterval(function(){
+  		$scope.now = new Date;
+  		$scope.clock = $scope.now.getTime();
+	}, 1000);
+
 
   	$scope.confirm = window.confirm;
     $scope.console = window.console;
@@ -827,18 +852,6 @@ $(document).ready(function(){
     $scope.xs = $scope.range(72);
 
 
-    $scope.deleteData = function (planNow) {
-      console.log(planNow);
-      console.log("deleteData");
-	  
-	  if (confirm('確認刪除第'+(planNow+1)+'頁嗎?這動作將在存檔後生效') ) {
-	  	console.log(initData);
-
-       $scope.root.data.t[planNow] = $scope.clone(initData.t[0]);
-//        $scope.$digest();
-      }
-	}
-
     $scope.removeElem = function(list, elem) {
        return list.filter(function(str){ return str.indexOf(elem) == -1})
     }
@@ -903,7 +916,7 @@ $(document).ready(function(){
               case 'd':
                   event.preventDefault();
                   console.log('ctrl-d');
-	              $scope.deleteData($scope.planNow);
+	              $scope.overwrite();
               case 'r':
                   event.preventDefault();
                   console.log('ctrl-r');
@@ -967,17 +980,16 @@ $(document).ready(function(){
 	              return;
 	            }
 	        }
-	      	
-
-		    var d = new Date;
-		    console.log(d.toLocaleString());
-		    console.log($scope.root);
-
-		    $scope.root.data.time = d.toLocaleString();
-		    $scope.base.$set($scope.root);
-		    $scope.updated = true;
-		    $scope.lock = false;
   	  	}
+ 	
+	    var d = new Date;
+	    console.log(d.getTime());
+	    console.log($scope.root);
+
+	    $scope.root.data.time = d.getTime();
+	    $scope.base.$set($scope.root);
+	    $scope.updated = true;
+	    $scope.lock = false;
 
     }
 
@@ -985,12 +997,7 @@ $(document).ready(function(){
       $scope.mayBeChName = function(ev, n){
 
         if (ev.keyCode != 13 || !$scope.name) return;
-
-        location.hash = "#"+encodeURI(n);
-        location.reload();
-
-//        $scope.chName(n);
-
+        $scope.chName(n);
 
       }
 
@@ -999,6 +1006,11 @@ $(document).ready(function(){
         console.log("I see a data change!" + newValue);
 
         $scope.updated = false;
+        $scope.lock = true;
+
+        $scope.sandbox = (/^(您|我|他|她)$/).test(newValue) ? true : false;
+
+        location.hash = '#' + encodeURI(newValue);
 
         var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI(newValue));
 

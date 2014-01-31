@@ -49,29 +49,36 @@
 
 <div id = 'headInfos' class = 'noPrint'>
 
-  使用者名稱(ID)：
+
+  <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && !sandbox'>已上鎖</a>
+  <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && !sandbox'>已解鎖</a>
+  <span id = 'status' ng-show = 'sandbox'>沙盒</span>
+
+
+  使用者：
   <input ng-model = 'name'  ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)"/>
  <!-- 密碼(Password)：<input type = 'password' ng-model = 'password' /> -->
   
   <a id = 'go' ng-click = 'chName(name)'>Go!</a>
 
-  <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && !sandbox'>已上鎖</a>
-  <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && !sandbox'>已解鎖</a>
 
 <!--
   <a id = 'create' ng-click = 'create' ng-hide = 'logged'>創建帳號</a>
   <a id = 'delete' ng-click = 'create' ng-show = 'logged'>刪除帳號</a>
 -->
-
-  <span id = 'status' ng-show = 'sandbox'>沙盒。可直接儲存</span>
+<!--
   <span id = 'status' ng-show = '!lock && !sandbox'>可直接儲存</span>
   <span id = 'status' ng-show = 'lock && !sandbox'>輸入密碼才可儲存</span>
+-->
 
-  <span id = 'lastTime'>上次存檔: {{root.data.time | localTime }} </span>
-  <span id = 'remTime'>___還有{{root.data.time | countTime:delay:clock | showRemTime }}  
-    <a id = "info"
-      onclick = "confirm('非營利專案儲存空間有限\n\n如果放置不用將於99天後刪除\n\n每次存檔，即可延長期限至99天後\n\n常用就可一直使用喔^_^')">
-       ?  </a> </span>
+  <span id = 'lastTime' ng-bind = "'上次存檔: '+(root.data.time | localTime)"> </span>
+  
+  <span id = 'remTime' ng-bind = "'___尚餘'+(root.data.time | countTime:delay:clock | showRemTime)"></span>
+
+  <a id = "info"
+      onclick = "
+      	if (confirm('非營利專案^_^\n\n儲存空間為Firebase服務\n\n免費版容量有限(所有用戶共100MB)\n\n請珍惜使用\n\n放置不用將於期限後刪除\n\n每次存檔，即可延長期限至99天後\n\n常用就不受影響喔^_^')) window.open('https://www.firebase.com/pricing.html')">
+       ?  </a> 
 
 </div>
 
@@ -80,9 +87,8 @@
 
   <span ng-repeat = 'n in [0,1,2,3,4,5,6,7,8,9,10,11]'>
 
-    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();'>
-      {{root.data.t[n].title || n+1}}
-
+    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();' ng-bind = "root.data.t[n].title || n+1">
+      
     </a>
 
   </span>
@@ -95,11 +101,14 @@
   <ul>
     <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','進度與目標','學習支持與資源','希望支援']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
 
-      <img src="img/leaf-yellow.png" class = "leaf" />
+      <img src="img/leaf-yellow.png" class = "leaf" ng-show = "pgNow == k"/>
       <img src="img/leaf-shadow.png" class="leaf shadow"/> 
 
       <br/>
-      {{name}}的{{ k }} </li>
+
+      <span ng-bind = "name + '的' + k"></span>
+      
+      </li>
   </ul>
 
 </div>
@@ -109,9 +118,9 @@
 
 <div id = 'rightSupports' class = 'noPrint'>
 
-<h3>{{pgNow}}</h3>
-
-<br/>參考資源：
+<br>
+<h3 ng-bind = "pgNow">每頁都有不同的資源</h3>
+的參考資源：
   <hr>
 <ul>
 	<li ng-repeat = "sup in supports | has:pgNow | invis:pgNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.pop = true; $parent.popURL = sup.split(' ')[1]">
@@ -227,7 +236,7 @@
         <table>
            <tr>
             <th>
-            <span id = "status" ng-show = "count(root.data.t[planNow].correlation, sevenFields, root.data.t[planNow]['主題']) > 0">還有{{count(root.data.t[planNow].correlation, sevenFields, root.data.t[planNow]['主題'])}}個領域</span>
+            <span id = "status" ng-show = "count(root.data.t[planNow].correlation, sevenFields, root.data.t[planNow]['主題']) > 0">尚餘{{count(root.data.t[planNow].correlation, sevenFields, root.data.t[planNow]['主題'])}}個領域</span>
 
             <span id = "status" ng-hide= "count(root.data.t[planNow].correlation, sevenFields, root.data.t[planNow]['主題']) > 0">都對到了!!</span>
             </th>
@@ -238,8 +247,14 @@
             <th>{{a}}</th>
               <td ng-repeat = "t in root.data.t[planNow]['主題']">
               	
-                <input type = "checkbox" ng-model ="root.data.t[planNow].correlation[a+t]" /> 
-                <span class = "clipOnly"> {{ root.data.t[planNow].correlation[a+t] && "✓" || ''}} </span>
+<!--                <input type = "checkbox" ng-model ="root.data.t[planNow].correlation[a+t]"> -->
+
+                <a id = "aCheckbox" class="{{root.data.t[planNow].correlation[a+t]}}" 
+                 ng-click="root.data.t[planNow].correlation[a+t] = !root.data.t[planNow].correlation[a+t]">
+                	{{(root.data.t[planNow].correlation[a+t] && '✓') || ' '}}
+                </a>
+
+                <span class= "clipOnly"> {{ root.data.t[planNow].correlation[a+t] && "✓" || ''}} </span>
            </tr>
         </table>
   </div>
@@ -275,8 +290,11 @@
 
   				</select>
 
+  				<span ng-show = "j == '早上' || j == '下午'">
 
-  				<select ng-show = "j == '早上' || j == '下午'"
+  				<br>
+
+  				<select
   					ng-model = "root.data.t[planNow].schedule[d+j+'b']" >
   					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
                     ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
@@ -285,6 +303,8 @@
   					<option value="彈性">彈性</option>
             <option value="休息">休息</option>
   				</select>
+
+  				</span>
 
 
   			</td> 			
@@ -317,15 +337,21 @@
       <tr>
         <th>評量方式</th>
         <td ng-repeat = "tp in root.data.t[planNow]['主題']">
-          <ul>
-            <li ng-repeat = "m in ['學習檔案','實際作品','教師評估','家長評估','返校考試']">
-              
+          
+            <span style = "color:green" ng-repeat = "m in ['內省','檔案','作品','行動','老師評量','家長評量','紙筆考試']">
+               
               {{m}}
 
-              <input type = "checkbox"ng-model = "root.data.t[planNow].checkGoal[tp+m]" /> 
-               <span class = "clipOnly"> {{ root.data.t[planNow].checkGoal[tp+m] && "✓" || ''}} </span>  
+              <a id = "aCheckbox" class="{{root.data.t[planNow].checkGoal[tp+m] }}" 
+               ng-click="root.data.t[planNow].checkGoal[tp+m] = !root.data.t[planNow].checkGoal[tp+m]">
+                	{{(root.data.t[planNow].checkGoal[tp+m] && '✓') || ''}}
+                </a>
 
-            </li>
+              <span class = "clipOnly"> {{ root.data.t[planNow].checkGoal[tp+m] && "✓" || ''}} </span>
+
+              <br>
+
+            </span>
           <ul>
         </td>
       </tr>
@@ -508,7 +534,7 @@ $(document).ready(function(){
   }).filter('showRemTime',function(){
     return function(t){
 
-	    return t ? timeToDay(t) +"天到期^_^" : "很多時間^_^";
+	    return t ? timeToDay(t) +"天^_^" : "很多時間^_^";
     }
   }).directive('popup', function() {
   var p = {
@@ -581,7 +607,7 @@ $(document).ready(function(){
 
         initData.t[inn].resources = {};
         
-        initData.t[inn]['主題'] = ['生活自理','運動'];
+        initData.t[inn]['主題'] = ['生活自理','運動','收集資訊'];
 
         initData.t[inn].timeline = [
           [true],

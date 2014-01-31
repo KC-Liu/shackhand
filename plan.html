@@ -35,24 +35,30 @@
   top: 0px;
   left: 0px;
   width: 100%;
-  height: 30px;
+  height: 32px;
   background-color: #cc9;
   text-align: center;
   overflow: auto;
-  border: green 1px ridge;
+  border-bottom: black 3px solid;
 }
 
 #headInfos *{
   max-height: 28px;
-
+  min-width: 10px;
 }
 
-#headInfos #go,#unlock,#lock,#create,#delete,#main a {
+#headInfos a, #main a {
   display: inline-block;
-  border: green 1px ridge;
+  border: green 2px solid;
   background-color: #afa;
   cursor: pointer;
   border-radius: 5px 0 5px 0;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#info {
+  cursor: help;
 }
 
 
@@ -71,8 +77,10 @@
 }
 
 #headPlans a{
+  position: relative;
+  top: 3px;
   display: inline-block;
-  border: 1px black solid;
+  border: 1px black dotted;
   width: 30px;
   height: 20px;
   overflow: hidden;
@@ -86,7 +94,7 @@
 
 
 #headPlans a.focus {
-  border: 2px black solid;
+  border: 5px black solid;
   border-bottom: none;
   background: #fff;
   color: #000;
@@ -103,15 +111,20 @@ span#status {
   display: block;
   position: absolute;
   left: 0px;
-  top: 31px;
+  top: 33px;
   width: 200px;
-  min-height: 100%;
+  height: 297mm;
   background-color: #cc9;
   padding-right: 2px;
+  border-right: black 3px solid;
+  z-index: 105;
 }
 
 
 #leftPages li, #rightSupports li{
+  position: relative;
+  top: 20px;
+  left: -5px;
   margin-top: 5px;
   display: block; 
   border: 1px black dotted;
@@ -124,7 +137,8 @@ span#status {
 }
 
 #leftPages li:hover, #leftPages li.focus, #rightSupports li:hover {
-  border: 2px black solid;
+  border: 5px black solid;
+  border-radius: 10px 0 0 0;
   background-color: #fff; 
   border-right: none;
   margin-right: -10px;
@@ -133,13 +147,13 @@ span#status {
 
 #rightSupports {
   display: block;
-  position: absolute;
-  top: 30px;
+ position: absolute;
+  top: 0px;
   right: 0px;
   width: 200px;
-  min-height: 100%;
+  height: 297mm;
   background-color: #cc9;
-  border: 1px black solid;
+  border: 3px black solid;
   border-radius: 10px 0 0 10px ;
   padding: 5px;
   -webkit-transition: all .3s ease;
@@ -158,8 +172,8 @@ span#status {
 #main {
   position: absolute;
   background: #fff;
-  top: 55px;
-  left: 205px;
+  top: 65px;
+  left: 202px;
   width: 210mm;
   height: 297mm;
   padding: 10px;
@@ -230,6 +244,28 @@ textarea {
   border-radius: 5px;
 }
 
+table {
+  border-collapse:collapse;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table {
+  background: 3px solid green;
+}
+
+td,th {
+  border:1px solid green;
+}
+
+th {
+  background-color: #afa;
+}
+
+td {
+  background-color: #efe;
+}
+
 
 </style>
 
@@ -268,7 +304,10 @@ textarea {
   <span id = 'status' ng-show = 'lock && !sandbox'>輸入密碼才可儲存</span>
 
   <span id = 'lastTime'>上次存檔: {{root.data.time | localTime }} </span>
-  <span id = 'remTime'>請在未來{{root.data.time | countTime:60:clock | showRemTime }}中再度使用^_^ </span>
+  <span id = 'remTime'>___還有{{root.data.time | countTime:delay:clock | showRemTime }}  
+    <a id = "info"
+      onclick = "confirm('非營利專案儲存空間有限\n\n如果放置不用將於99天後刪除\n\n每次存檔，即可延長期限至99天後\n\n常用就可一直使用喔^_^')">
+       ?  </a> </span>
 
 </div>
 
@@ -290,7 +329,7 @@ textarea {
 <div id = 'leftPages' class = 'noPrint'>
 
   <ul>
-    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','學期進度表','學習空間與支持','學習資源','希望支援','附件']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
+    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','進度與目標','學習支持與資源','希望支援']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
 
       <img src="img/leaf-yellow.png" class = "leaf" />
       <img src="img/leaf-shadow.png" class="leaf shadow"/> 
@@ -326,7 +365,9 @@ textarea {
 
 <div id = 'main' >
 
-  <input ng-model = "root.data.t[planNow].title">
+  <input
+   ng-model = "root.data.t[planNow].title"
+   placeholder = "自訂標題">
     
 
   <span id = 'status' ng-show = 'updated'>所有更動已儲存</span>
@@ -372,7 +413,7 @@ textarea {
 
     ng-focus = " root.data.t[planNow]['自傳'] = hintToNull(root.data.t[planNow]['自傳']) "
 
-    ng-blur = "root.data.t[planNow]['自傳'] = root.data.t[planNow]['自傳'] || hint['自傳'] "
+    ng-blur = "root.data.t[planNow]['自傳'] = root.data.t[planNow]['自傳'] || hintData.t[planNow]['自傳'] "
     >
 
 
@@ -381,20 +422,12 @@ textarea {
 
   <div id ='page2' ng-show = "pgNow == '學習風格'">
 
-    <table>
-      <tr>
-        <td>
-      	  <textarea rows= '22' cols = '32' ng-model = 'root.data.t[planNow]["學習風格"]'> </textarea>
-        </td>
-        <td>
-          學習風格自我測試
-          <div > {{root.data.t[planNow].styleTester1}} </div>
+	  <textarea rows= '12' cols = '30'
+    ng-model = 'root.data.t[planNow]["學習風格"]'
+    ng-focus = " root.data.t[planNow]['學習風格'] = hintToNull(root.data.t[planNow]['學習風格']) "
+    ng-blur = "root.data.t[planNow]['學習風格'] = root.data.t[planNow]['學習風格'] || hintData.t[planNow]['學習風格'] "
 
-          學習階段自我測試
-          <div > {{root.data.t[planNow].styleTester2}} </div>
-        </td>
-      </tr>
-    </table>
+    > </textarea>
 
   </div>
 
@@ -407,8 +440,10 @@ textarea {
             <source src="voice/topic.ogg" type="audio/ogg">
     </audio>
 
+    <br/>
 
-    <input ng-model = "addTopic" ng-keydown = "adTPC($event)" placeholder = "寫上主題，再按Enter鍵"/>
+    <textarea rows = "3" cols = "20"
+     ng-model = "addTopic" ng-keydown = "adTPC($event)" placeholder = "寫上新主題，再按Enter新增"> </textarea>
 
 <!--  <a ng-click= "adTPC($event)">增加主題</a> -->
 
@@ -438,8 +473,9 @@ textarea {
            <tr ng-repeat = "a in sevenFields">
             <th>{{a}}</th>
               <td ng-repeat = "t in root.data.t[planNow]['主題']">
-              	<input type = "checkbox" ng-model ="root.data.t[planNow].correlation[a+t]" /> 
-              <span class = "clipOnly"> {{ root.data.t[planNow].correlation[a+t] && "V" || ''}} </span>
+              	
+                <input type = "checkbox" ng-model ="root.data.t[planNow].correlation[a+t]" /> 
+                <span class = "clipOnly"> {{ root.data.t[planNow].correlation[a+t] && "✓" || ''}} </span>
            </tr>
         </table>
   </div>
@@ -462,7 +498,7 @@ textarea {
   			<td ng-repeat = "d in ['日','一','二','三','四','五','六']">
 
 
-  				<select ng-model = "root.data.t[planNow].schedule[d+j]" ng-init = "root.data.t[planNow].schedule[d+j] = '彈性'" value="{{root.data.t[planNow].schedule[d+j]}}">
+  				<select ng-model = "root.data.t[planNow].schedule[d+j]"  value="{{root.data.t[planNow].schedule[d+j]}}">
 
   					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
                     ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
@@ -471,17 +507,19 @@ textarea {
             </option>
 
   					<option value="彈性">彈性</option>
+            <option value="休息">休息</option>
 
   				</select>
 
 
   				<select ng-show = "j == '早上' || j == '下午'"
-  					ng-model = "root.data.t[planNow].schedule[d+j+'b']" ng-init = "root.data.t[planNow].schedule[d+j+'b'] = '彈性' ">
+  					ng-model = "root.data.t[planNow].schedule[d+j+'b']" >
   					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
                     ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
                     value="{{tp}}">{{tp}}</option>
                     
   					<option value="彈性">彈性</option>
+            <option value="休息">休息</option>
   				</select>
 
 
@@ -496,15 +534,15 @@ textarea {
   </div>
 
 
-  <div id ='page5' ng-show = "pgNow == '學期進度表'">
+  <div id ='page5' ng-show = "pgNow == '進度與目標'">
 
    <select ng-model = "timeT" ng-init = "timeT = 'm'">
 	   	<option value="m">月進度</option>
-	   	<option value="y">年進度</option>
+<!--  	   	<option value="y">年進度</option>  -->
 <!--	    <option value="w">週進度</option> -->
    </select>
 
-   <input type="number" ng-model = "root.data.t[planNow].shift" ng-init = "root.data.t[planNow].shift = 5"/>
+   <input type="number" ng-model = "root.data.t[planNow].shift"/>
 
    <table>
   		<tr>
@@ -520,60 +558,104 @@ textarea {
 
   			<td ng-repeat = "tp in root.data.t[planNow]['主題']">
 
-  				<textarea cols="4" rows="8" 
+          {{tp + j}}
+        
+        <br>
+
+  			<textarea cols="4" rows="8" 
   				ng-model = "root.data.t[planNow].goal[tp+j]"
-  				onfocus="$(this).attr('cols', 8)"
- 				onblur="$(this).attr('cols', 4)" 
-  				placeholder= "您的目標">
+  				   onfocus="$(this).attr('cols', 8)"
+ 				     onblur="$(this).attr('cols', 4)" 
+  				   placeholder= "我給自己的目標">
 
 				</textarea>  				
+
+        <br>
+
+         <input type = "checkbox" ng-model = "root.data.t[planNow].checkGoal[tp+j]" />
+         
+        <span class = "clipOnly"> {{ root.data.t[planNow].checkGoal[tp+j] && "✓" || ''}} </span>
+
+
+          成功
 
   				
   			</td> 			
   		</tr>
   		
   	</table>
-
-    你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
-    不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。政府的政策是，所有公立大學都開放旁聽。
-
   </div>
 
 
+  <div id ='page6' ng-show = "pgNow == '學習支持與資源' ">
 
+    <ul>
+      <li>你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
+      <li>不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。
+      <li>政府的政策是，所有公立大學都開放旁聽。
+    </ul>
 
-  <div id ='page6' ng-show = "pgNow == '學習資源'">
+    <hr>
 
   	<table>
-  		<tr><th ng-repeat = "t in root.data.t[planNow]['主題']">{{t}}</th></tr>
+  		<tr>
+        <th></th>
+        <th ng-repeat = "tp in root.data.t[planNow]['主題']">{{tp}}</th></tr>
 
-  		<tr ng-repeat = "j in [1,2,3,4,5]">
+  		<tr ng-repeat = "j in ['教師','諮詢者','教材','同學','空間','社團','課程']">
 
-  			<td ng-repeat =  "res in root.data.t[planNow].resources[t][j]">
+        <th> {{j}} </th>
 
-  				{{res}}
+  			<td ng-repeat =  "tp in root.data.t[planNow]['主題']">
+          {{tp + j}}
+
+          <br>
+
+  				<textarea cols="4" rows="8"
+
+          ng-model = "root.data.t[planNow].resources[tp + j]"
+
+             onfocus="$(this).attr('cols', 8)"
+             onblur="$(this).attr('cols', 4)" 
+             placeholder= "{{ hintSupports[j].replace('t', tp) }}">
+
+          </textarea>
 
   			</td>
 
   		</tr>
 
-  		<tr>
-  		<td ng-repeat = "t in root.data.t[planNow]['主題']">
-
-  			<textarea rows = "3" cols = "5" ng-model= "newResouce"> 
-  			</textarea>
-
-  			<a ng-click = "($parent.root.data.t[planNow].resources[t] && $parent.root.data.t[planNow].resources[t].push(newResouce)) || $parent.root.data.t[planNow].resources[t] = [newResouce]; newResouce.t = ''"> 新增!! </a>
-
-  		</td></tr>
-  		
   	</table>
 
-    你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
-    不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。政府的政策是，所有公立大學都開放旁聽。
 
   </div>
 
+ <div id ='page7' ng-show = "pgNow == '希望支援' ">
+
+    <ul>
+      <li>自學生也具有正式的學生身份。
+      <li>您可以部份時間到學校上課。
+      <li>您可以使用學校的設備。
+      <li>您可以使用政府公家單位的教育資源，例如圖書館和博物館。
+    </ul>
+
+    <hr>
+
+      <textarea rows= '12' cols = '30'
+      ng-model = 'root.data.t[planNow].callHelp'
+
+      ng-focus = " root.data.t[planNow].callHelp = hintToNull(root.data.t[planNow].callHelp) "
+
+      ng-blur = "root.data.t[planNow].callHelp = root.data.t[planNow].callHelp || hintData.t[planNow].callHelp "> </textarea>
+
+      </td>
+
+      </tr>
+
+    </table>
+
+
+  </div>
 
 
 </div>
@@ -604,6 +686,14 @@ $(document).ready(function(){
 
 });
 
+  var ctt = function(t,p,clock){
+      return t + p*1000*60*60*24 - clock; 
+  }
+
+  var timeToDay = function(t) {
+    return Math.floor(t / (1000*60*60*24));
+  }
+
 
 
   var editApp = new angular.module('editApp',["firebase"]);
@@ -628,18 +718,17 @@ $(document).ready(function(){
 	    return ans;
     }
   }).filter('localTime',function(){
-    return function(t){
-    	var d = new Date(t);
-    	l = d.toLocaleString();
-	    return l;
+    return function(t){      
+      	var d = new Date(t);
+      	l = d.toLocaleString();
+  	    return t ? l.replace(/\[.*\]/,'') : "未創建";
     }
   }).filter('countTime',function(){
-    return function(t,p,clock){
-	    return t + p*1000*60*60*24 - clock; 
-    }
+    return ctt;
   }).filter('showRemTime',function(){
     return function(t){
-	    return Math.floor(t / (1000*60*60*24)) +"天";
+
+	    return t ? timeToDay(t) +"天到期^_^" : "很多時間^_^";
     }
   }).directive('popup', function() {
   var p = {
@@ -672,6 +761,11 @@ $(document).ready(function(){
          initData.t[inn] = new Object;
 
          initData.t[inn]['自傳'] = '小幫手：先照著你想到的去寫你的成長故事以及自我介紹\n\n再對應到申請書的「個性描述」「平時興趣」「健康狀況」「學習態度」「家庭成員」「家庭成員」「人際互動」「特殊表現」「其他方面」';
+
+         initData.t[inn]['學習風格'] = '小幫手：現代的教育研究者發現，每個人擅長的學習方法都不同\n\n你最擅長怎樣的在學習情摬中，用什麼樣的學習節奏，和誰一起，學習新事物呢?';
+
+
+         initData.t[inn].callHelp = '小幫手：你不孤單。很多人都願意伸手，只要你懂得在需要時向對的人求助。';
         
         initData.t[inn].correlation = {
             '健康與體育運動' : true,
@@ -679,24 +773,35 @@ $(document).ready(function(){
         };
 
         initData.t[inn].schedule = {
-         '日清晨':'運動',
+         '日清晨':'彈性',
+         '一清晨':'運動',
+         '二清晨':'運動',
+         '二清晨':'運動',
+         '四清晨':'運動',
+         '五清晨':'運動',
+         '六清晨':'彈性',
          '日早餐':'生活自理', 
          '日午餐':'生活自理', 
          '日晚餐':'生活自理', 
-         '日深夜':'休息',
-         '一清晨':'運動',
-         '二早餐':'生活自理', 
-         '三午餐':'生活自理', 
-         '四晚餐':'生活自理', 
-         '五深夜':'休息'
+         '日深夜':'休息', 
+         '一深夜':'休息',
+         '二深夜':'休息',
+         '三深夜':'休息', 
+         '四深夜':'休息',
+         '五深夜':'休息',
+         '六深夜':'休息',
         };
 
-        initData.t[inn].goal = {
-          '運動5月' : '每天運動半小時以上',
-          '生活自理今年' : '自己會作菜',
-        };
+        var dd = new Date;
+        initData.t[inn].shift = dd.getMonth() + 1;
+
+        initData.t[inn].goal = {};
+
+        initData.t[inn].checkGoal = {};
+
+        initData.t[inn].resources = {};
         
-        initData.t[inn]['主題'] = ['生活自理','運動','社交','休息'];
+        initData.t[inn]['主題'] = ['生活自理','運動'];
 
         initData.t[inn].timeline = [
           [true],
@@ -750,13 +855,27 @@ $(document).ready(function(){
     $scope.popURL = '';
     $scope.name = '您';
     $scope.lock = true;
+    $scope.delay = 100; // 到期延後日
 
 
     if(location.hash) {$scope.name = decodeURI(location.hash.replace('#','')) }
 
     $scope.planNow = 0;
     $scope.pgNow = '自傳';
+
+
+    $scope.hintSupports = { 教師 : "您要向誰學習t呢?",
+                            諮詢者 : "t遇到問題，要向誰求助?",
+                            教材 : "用哪些教材學習t?",
+                            同學 : "和誰一起學習t?",
+                            空間 : "您要在哪些地方學習t呢?",
+                            社團 : "參加學習t的社團?",
+                            課程 : "參加t課程?",
+
+                          };
+
     $scope.sevenFields = ['語文-國文','語文-鄉土語文','語文-英文','健康與體育','社會','數學','自然與科技','藝術與人文','綜合活動'];
+
     $scope.calanD = {
 	    //  w:[]
     	m: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
@@ -773,7 +892,9 @@ $(document).ready(function(){
         return m;
       }
 
-      $scope.hint = $scope.clone(initData.t[0]);
+//      $scope.hint = $scope.clone(initData.t[0]);
+
+      $scope.hintData = $scope.clone(initData);
 
       $scope.root = {};
       $scope.root.data = $scope.clone(initData);
@@ -781,17 +902,29 @@ $(document).ready(function(){
 
     $scope.supports = [
     '全球化與自主學習(自傳,13分鐘_講座) http://www.youtube.com/embed/Mi7qkTyqimE',
-    '各縣市自學申請表(附件,_正式申請用的表格是這份喔!) http://law.chen-wernik.net',
-    '學習風格自我測試(學習風格,5分鐘_自我探索) http://bestian.github.io/freemath/%E5%B7%A5%E5%85%B7%E8%BB%9F%E9%AB%94/styleTester.html',
+    '各縣市自學申請表(自傳,_正式申請用的表格是這份喔!) http://law.chen-wernik.net',
+
+    '學習風格自我測試(學習風格,7分鐘_自我探索) http://bestian.github.io/freemath/%E5%B7%A5%E5%85%B7%E8%BB%9F%E9%AB%94/styleTester.html',
+
+
     '七大領域的教學理念(學習主題與領域,3分鐘_瀏覽概要) http://163.24.138.110/jses/other/%E4%B8%83%E5%A4%A7%E9%A0%98%E5%9F%9F%E7%9A%84%E6%95%99%E5%AD%B8%E7%90%86%E5%BF%B5.html',
+
     '如何訂學習計畫_上(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/SUoT5P8_UOI',
     '如何訂學習計畫_中(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/2jF8Hu6aTCU',
     '如何訂學習計畫_下(學習主題與領域,10分鐘_講座) http:www.youtube.com/embed/yeWB3BhQ7lg',
-    '如何成為未來職場需要的自由人才_上(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/ZPzqw3x05-g',
-    '如何成為未來職場需要的自由人才_中(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/Yc-fHn5aevo',
-    '如何成為未來職場需要的自由人才_中(學習主題與領域,10分鐘_講座) http://www.youtube.com/embed/IqQTLQH-S_M',
-    '丙級技術師證照線上複習(學習主題與領域,3分鐘_瀏覽概要) http://onlinetest.slhs.tp.edu.tw/test2/main/review_setup.asp?examid=testr',
-    '乙級技術師證照線上複習(學習主題與領域,3分鐘_瀏覽概要) http://onlinetest2.slhs.tp.edu.tw'
+    
+
+    '如何成為未來職場需要的自由人才_上(進度與目標,10分鐘_講座) http://www.youtube.com/embed/ZPzqw3x05-g',
+    '如何成為未來職場需要的自由人才_中(進度與目標,10分鐘_講座) http://www.youtube.com/embed/Yc-fHn5aevo',
+    '如何成為未來職場需要的自由人才_下(進度與目標,10分鐘_講座) http://www.youtube.com/embed/IqQTLQH-S_M',
+
+    '支持與資源分享(學習支持與資源,3分鐘_檢索) http://bestian.github.io/shackhand/list_printer.html',
+
+    '自學2.0互認地圖(希望支援,7分鐘_認識附近的朋友) http://bestian.github.io/shackhand/auto20',
+
+    '丙級技術師證照線上複習(希望支援,5分鐘_考古題) http://onlinetest.slhs.tp.edu.tw/test2/main/review_setup.asp?examid=testr',
+
+    '乙級技術師證照線上複習(希望支援,5分鐘_考古題) http://onlinetest2.slhs.tp.edu.tw'
 
     ];
 
@@ -864,9 +997,6 @@ $(document).ready(function(){
 
     $scope.count = function(table, set1, set2) {
 
-   //   console.log(table);
-   //   console.log(set1);
-   //   console.log(set2);
 
       var ans = set1.length;
 
@@ -916,11 +1046,13 @@ $(document).ready(function(){
               case 'd':
                   event.preventDefault();
                   console.log('ctrl-d');
-	              $scope.overwrite();
+                  if (confirm("捨棄本次更新?")) $scope.overwrite();
               case 'r':
                   event.preventDefault();
                   console.log('ctrl-r');
-                  $scope.$digest;        
+                  if (confirm("清空資料，還原成範本?"))
+                  $scope.root.data = initData;
+                  $scope.$digest();
             }
         }
 
@@ -931,7 +1063,7 @@ $(document).ready(function(){
       var p1, p2;
 
       while (!p1 || p1 != p2) {
-        p1 = prompt("歡迎" + name + "!!請設定一組密碼");
+        p1 = prompt("歡迎" + name + "!!創建帳號，請設定一組密碼");
         p2 = prompt("請再輸入一次密碼以確認");
 
         if (!p1  || !p2) {
@@ -948,7 +1080,7 @@ $(document).ready(function(){
 
     $scope.save = function () {
 
-      	if ($scope.name != '您')  {
+      	if (!$scope.sandbox)  {
 
         	if ($scope.root.password) {
 
@@ -975,8 +1107,8 @@ $(document).ready(function(){
 	            var newPass = $scope.createPassword($scope.name);
 	            if (newPass) {
 	              $scope.root.password = newPass;
-	    //          $scope.base.$child("password").$set(newPass);
 	            } else {
+                $scope.base.$remove();
 	              return;
 	            }
 	        }
@@ -990,6 +1122,7 @@ $(document).ready(function(){
 	    $scope.base.$set($scope.root);
 	    $scope.updated = true;
 	    $scope.lock = false;
+
 
     }
 
@@ -1011,6 +1144,8 @@ $(document).ready(function(){
         $scope.sandbox = (/^(您|我|他|她)$/).test(newValue) ? true : false;
 
         location.hash = '#' + encodeURI(newValue);
+
+
 
         var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI(newValue));
 
@@ -1039,14 +1174,14 @@ $(document).ready(function(){
 
           if (!$scope.binding) $scope.overwrite();
 
-          setTimeout( function() {
+      /*    setTimeout( function() {
 
               if (!$scope.binding) {
                 $scope.bind3w();
               } else {
                 console.log("Already Binded");
               }
-          }  , 1000 );
+          }  , 1000 ); */
 
         });
 
@@ -1068,6 +1203,28 @@ $(document).ready(function(){
        
     }
 
+    $scope.updateInit = function(){
+      console.log('updating from Init');
+      var ks = Object.keys(initData.t[0]);
+    //  console.log(ks);
+
+      for (var i = 0; i < ks.length; i++) {
+        var k = ks[i];
+    //    console.log(k);
+        for (var j = 0; j < 12 ; j++) {
+     //       console.log(j);
+            if (typeof($scope.root.data.t[j]) == 'undefined') {
+              $scope.root.data.t[j] = new Object;
+              $scope.root.data.t[j] = initData.t[j];
+            }
+            if (typeof($scope.root.data.t[j][k]) == 'undefined') {
+              $scope.root.data.t[j][k] = initData.t[j][k];
+              console.log(k + ':updated 1 item:' + initData.t[j][k] + ' from Init');
+            }        
+        };
+      };
+
+    }
 
     $scope.overwrite = function() {  
 
@@ -1080,17 +1237,26 @@ $(document).ready(function(){
 
           if (!$scope.root.password.replace("undefined",'').replace("false",'')) {
               $scope.root.password = false;
-          } else {
-
-          }
+          } else {  }
 
         } catch (err) {
           console.log(err);
         }
 
-        console.log($scope.root) ;
+        // delete if outdated
+        var t = $scope.root.data.time;
+        var c = $scope.clock;
+        var p = $scope.delay;
 
+        console.log(timeToDay(ctt(t,p,c)));
 
+        if (!ctt(t,p,c) || ctt(t,p,c) < 0 ) {
+          $scope.root.data = $scope.clone(initData);
+          $scope.root.password = false;
+    //      alert("帳號超過"+p+"天未使用，已刪除。");
+        }
+
+        $scope.updateInit();
 
     }
 
@@ -1133,9 +1299,11 @@ $(document).ready(function(){
               }, 1000);  */
 
 
-     }
+    }
 
-  };
+    
+
+};
 
 </script>
 

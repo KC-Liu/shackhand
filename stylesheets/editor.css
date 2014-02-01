@@ -16,7 +16,7 @@
 
 form#frm {
   z-index: 1;
-  background: rgba(200, 200, 200, 0.5);
+  background: rgb(200, 220, 200);
  /* width: 20%; */
   height: 297mm;  
   width: 50%;
@@ -25,6 +25,8 @@ form#frm {
   border-radius: 5px;
   padding: 5px 15px;
   position: absolute;
+  filter: alpha(opacity=50);
+  opacity: 0.5;
   -webkit-transition: all .3s ease;
   -moz-transition: all .3s ease;
   -ms-transition: all .3s ease;
@@ -32,11 +34,11 @@ form#frm {
   transition: all .3s ease;
 }
 
-/*
 form#frm:hover {
-    background: rgba(200, 200, 200, 1);
+  filter: alpha(opacity=100);
+  opacity: 1;
 
-} */
+}
 
 input {
   font-size: 120%;
@@ -320,17 +322,20 @@ span#status {
   cursor: help;
 }
 
-#main {
-  position: absolute;
-  background: #fff;
-  top: 65px;
-  left: 202px;
+#main, #listA4 {
   width: 210mm;
   height: 297mm;
   padding: 10px;
   display: block;
   border-radius: 0px 15px 15px 0px;
   overflow: auto;
+}
+
+#main {
+  position: absolute;
+  background: #fff;
+  top: 65px;
+  left: 202px;
 }
 
 tr {

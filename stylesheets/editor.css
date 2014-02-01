@@ -237,7 +237,7 @@ input#tags {
   max-height: 18px;
   font-size: 16px;
   overflow: hidden;
-  margin-left: 50px;
+  margin-left: 200px;
   padding-top: 3px;
   border-radius: 10px 10px 0 0;
   background: rgba(255,255,255,0);
@@ -338,6 +338,12 @@ span#status {
   left: 202px;
 }
 
+#main #title {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
 tr {
   min-height: 20px;
 }
@@ -357,6 +363,15 @@ img.shadow {
   position:relative;
   /* left:-24px; */
   left:-14px;
+}
+
+img.face {
+  height: 25%;
+  border-radius: 15px;
+}
+
+#mainImg {  
+  text-align: center;
 }
 
 #popup-content {

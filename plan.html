@@ -20,7 +20,7 @@
 
 <meta charset=utf-8 />
 
-<title>計畫小幫手--協力完成自學計畫</title>
+<title>自學2.0計畫編輯器--製作你的學習計畫。與朋友分享。</title>
 
 
 <link rel="stylesheet" href="stylesheets/editor.css" />
@@ -38,7 +38,7 @@
 
 
 
-<body ng-controller = "Ctrl" ng-keydown = "maybeSave($event)">
+<body ng-controller = "Ctrl" ng-keydown = "maybeSave($event)" class = "{{root.data.c.theme}}">
 
   <audio id ="easy" controls autoplay class = 'noPrint'>
     <source src="voice/easy.mp3" type="audio/mpeg">
@@ -46,44 +46,41 @@
   </audio>
 
 
+<div id = "headInfos" class = "noPrint {{root.data.c.theme}}">
 
-<div id = 'headInfos' class = 'noPrint'>
+  <span id = 'status'>
+
+    <span id = 'lastTime' ng-bind = "'上次存檔: '+(root.data.time | localTime)"> </span>  
+    <span id = 'remTime' ng-bind = "'___尚餘'+(root.data.time | countTime:delay:clock | showRemTime)"></span>
+  </span>
+
+  <a id = "info" class = "msg-icon msg-icon-info"
+      onclick = "
+        if (confirm('非營利專案^_^\n\n免費版容量有限(所有用戶共100MB)\n\n請珍惜使用\n\n若放置不用將於期限後刪除\n\n每次存檔，即可延長期限^_^')) window.open('https://www.firebase.com/pricing.html')">
+   </a>
 
 
-  <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && !sandbox'>已上鎖</a>
-  <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && !sandbox'>已解鎖</a>
-  <span id = 'status' ng-show = 'sandbox'>沙盒</span>
 
-
-  使用者：
-  <input ng-model = 'name'  ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)"/>
- <!-- 密碼(Password)：<input type = 'password' ng-model = 'password' /> -->
+  前往：<input ng-model = 'name'  ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)"/>
   
   <a id = 'go' ng-click = 'chName(name)'>Go!</a>
 
+  <div id = "rightHead">
+    <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && !sandbox'>已上鎖</a>
+    <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && !sandbox'>已解鎖</a>
+    <span id = 'status' ng-show = 'sandbox'>沙盒</span>
+    <span ng-bind = "currentUser || '訪客' "></span>
+    <select ng-model = "root.data.c.theme">
+      <option value = "winter">冬</option>
+      <option value = "spring">春</option>
+    </select>
 
-<!--
-  <a id = 'create' ng-click = 'create' ng-hide = 'logged'>創建帳號</a>
-  <a id = 'delete' ng-click = 'create' ng-show = 'logged'>刪除帳號</a>
--->
-<!--
-  <span id = 'status' ng-show = '!lock && !sandbox'>可直接儲存</span>
-  <span id = 'status' ng-show = 'lock && !sandbox'>輸入密碼才可儲存</span>
--->
-
-  <span id = 'lastTime' ng-bind = "'上次存檔: '+(root.data.time | localTime)"> </span>
+  </div>
   
-  <span id = 'remTime' ng-bind = "'___尚餘'+(root.data.time | countTime:delay:clock | showRemTime)"></span>
-
-  <a id = "info"
-      onclick = "
-      	if (confirm('非營利專案^_^\n\n儲存空間為Firebase服務\n\n免費版容量有限(所有用戶共100MB)\n\n請珍惜使用\n\n放置不用將於期限後刪除\n\n每次存檔，即可延長期限至99天後\n\n常用就不受影響喔^_^')) window.open('https://www.firebase.com/pricing.html')">
-       ?  </a> 
-
 </div>
 
 
-<div id = 'headPlans' class = 'noPrint'>
+<div id = "headPlans" class = "noPrint {{root.data.c.theme}}">
 
   <span ng-repeat = 'n in [0,1,2,3,4,5,6,7,8,9,10,11]'>
 
@@ -96,7 +93,7 @@
 </div>
 
 
-<div id = 'leftPages' class = 'noPrint'>
+<div id = 'leftPages' class = "noPrint {{root.data.c.theme}}">
 
   <ul>
     <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','進度與目標','學習支持與資源','希望支援']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
@@ -106,7 +103,7 @@
 
       <br/>
 
-      <span ng-bind = "name + '的' + k"></span>
+      <span ng-bind = "currentName + '的' + k"></span>
       
       </li>
   </ul>
@@ -116,7 +113,7 @@
 <!---->
 
 
-<div id = 'rightSupports' class = 'noPrint'>
+<div id = 'rightSupports' class = 'noPrint {{root.data.c.theme}}'>
 
 <br>
 <h3 ng-bind = "pgNow">每頁都有不同的資源</h3>
@@ -136,7 +133,7 @@
 </div>
 
 
-<div id = 'main' >
+<div id = 'main' class = "root.data.c.theme">
 
   <input
    ng-model = "root.data.t[planNow].title"
@@ -174,7 +171,7 @@
       </div>
 
       <div style = "position:absolute; top:102px;left:60px"> 幼年 </div>
-      <div style = "position:absolute; top:102px;left:180px"> 小學 </div>
+      <div style = "position:absolute; top:102px;left:220px"> 小學 </div>
       <div style = "position:absolute; top:102px;left:420px"> 國中 </div>
       <div style = "position:absolute; top:102px;left:520px"> 高職/高中 </div>
       <div style = "position:absolute; top:102px;left:660px"> 社會/大學 </div>
@@ -276,41 +273,55 @@
 
   			<td ng-repeat = "d in ['日','一','二','三','四','五','六']">
 
-
   				<select ng-model = "root.data.t[planNow].schedule[d+j]"  value="{{root.data.t[planNow].schedule[d+j]}}">
 
   					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
                     ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
                     value="{{tp}}">
-                    {{tp}}
+                    {{root.data.c[tp] || tp}}
             </option>
 
-  					<option value="彈性">彈性</option>
-            <option value="休息">休息</option>
+            <option value="彈性">{{root.data.c.free || "\\^_^/"}}</option>
+            <option value="休息">{{root.data.c.rest || "休息"}}</option>
 
   				</select>
 
   				<span ng-show = "j == '早上' || j == '下午'">
 
   				<br>
+          <br>
 
   				<select
   					ng-model = "root.data.t[planNow].schedule[d+j+'b']" >
   					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
                     ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
-                    value="{{tp}}">{{tp}}</option>
+                    value="{{tp}}">
+                    {{root.data.c[tp] || tp}}
+            </option>
                     
-  					<option value="彈性">彈性</option>
-            <option value="休息">休息</option>
+  					<option value="彈性">{{root.data.c.free || "\\^_^/"}}</option>
+            <option value="休息">{{root.data.c.rest || "休息"}}</option>
   				</select>
 
   				</span>
-
 
   			</td> 			
   		</tr>
   		
   	</table>
+
+    <span>
+      休息<input ng-model = "root.data.c.rest">
+    </span>
+    <span>
+      彈性<input ng-model = "root.data.c.free">
+    </span>
+    <span style = "display:inline-block;" ng-repeat = "tp in root.data.t[planNow]['主題']">
+      {{tp}}<input ng-model = "root.data.c[tp]">
+
+    </span>
+
+    <hr>
 
     你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
     不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。政府的政策是，所有公立大學都開放旁聽。
@@ -561,6 +572,7 @@ $(document).ready(function(){
 });
 
   initData = new Object;
+  initData.c = new Object;
   initData.t = new Array;
       for (var inn = 0; inn < 12; inn++) {
 
@@ -771,9 +783,12 @@ $(document).ready(function(){
 
       var depth = ((x % 12 || x == 0 || x == 24) && 10) || 8;
 
-      for (var i = 0; i < depth; i++) {      
-        $scope.root.data.t[planNow].timeline[i][x] = colorNow;        
-      } 
+      if (0<x && x<72 && ($scope.root.data.t[planNow].timeline[y][x+1] || $scope.root.data.t[planNow].timeline[y][x+1]) ) {
+
+          for (var i = 0; i < depth; i++) {      
+            $scope.root.data.t[planNow].timeline[i][x] = colorNow;        
+          } 
+      }
 
       $scope.root.data.t[planNow].timeline[y][x] = !colorNow;
       $scope.updated = false; 
@@ -900,7 +915,7 @@ $(document).ready(function(){
 
 			          else {
 			          	if (confirm("通過驗證，已解鎖!!要改密碼嗎?")){
-			          		var newPass = $scope.createPassword($scope.name);
+			          		var newPass = $scope.createPassword($scope.currentName);
 				            if (newPass) {
 				              $scope.root.password = newPass;
 				            } 
@@ -910,7 +925,7 @@ $(document).ready(function(){
 	        }
 
 	        else {
-	            var newPass = $scope.createPassword($scope.name);
+	            var newPass = $scope.createPassword($scope.currentName);
 	            if (newPass) {
 	              $scope.root.password = newPass;
 	            } else {
@@ -928,6 +943,7 @@ $(document).ready(function(){
 	    $scope.base.$set($scope.root);
 	    $scope.updated = true;
 	    $scope.lock = false;
+      $scope.currentUser = $scope.currentName;
 
 
     }
@@ -946,6 +962,7 @@ $(document).ready(function(){
 
         $scope.updated = false;
         $scope.lock = true;
+        $scope.currentName = newValue;
 
         $scope.sandbox = (/^(您|我|他|她)$/).test(newValue) ? true : false;
 

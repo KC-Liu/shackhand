@@ -1,9 +1,4 @@
 
-body {
-  background-color: #cfc;
-}
-
-
 #page {
   display: block;
   position: absolute;
@@ -152,18 +147,13 @@ input#tags {
   top: 0px;
   left: 0px;
   width: 100%;
-  height: 35px;
+  height: 36px;
   font-size: 16px;
   line-height: 16px;
-  background-color: #cc9;
-  text-align: center;
+/*  text-align: center; */
   overflow: hidden;
-  border-top: black 2px solid;
+  border-top: black 1px solid;
  /* border-bottom: black 3px solid; */
-  background-image: -webkit-linear-gradient(#cc9 0%, #666 180%);
-  background-image: -moz-linear-gradient(#cc9 0%, #666 180%);
-  background-image: -o-linear-gradient(#cc9 0%, #666 180%);
-  background-image: linear-gradient(#cc9 0%, #666 180%);
 }
 
 #headInfos:hover {
@@ -175,21 +165,37 @@ input#tags {
   min-width: 10px;
 }
 
+#headInfos #rightHead {
+  display:inline-block; position:absolute; top:8px; right: 10px;
+}
+
 #headInfos a, #main a {
   display: inline-block;
   border: green 2px solid;
-  background-color: #afa;
   cursor: pointer;
   border-radius: 5px 0 5px 0;
   padding-left: 5px;
   padding-right: 5px;
   font-size: 12px;
+  background-color: #afa;
 }
 
-#info {
+#headInfos a#info {
   cursor: help;
 }
 
+
+#headInfos a.msg-icon{
+  border: 0;
+  background-color: transparent;
+  height:16px;
+  width:16px;
+  top:3px;
+  margin:0px 8px 0px 2px;
+  background:url(../javascripts/lib/jAlert/images/msg-icon-sprite.png) no-repeat;
+}
+
+#headInfos a.msg-icon-info{background-position:0px -48px;}
 
 
 #headPlans{
@@ -248,9 +254,9 @@ span#status {
   top: 33px;
   width: 200px;
   height: 297mm;
-  background-color: #cc9;
   padding-right: 2px;
 }
+
 
 
 #leftPages li, #rightSupports li{
@@ -284,8 +290,7 @@ span#status {
   right: 0px;
   width: 200px;
   height: 297mm;
-  background-color: #cc9;
-  border: 3px black solid;
+  border: 1px black solid;
   border-radius: 10px 0 0 10px ;
   padding: 5px;
   -webkit-transition: all .3s ease;
@@ -399,3 +404,59 @@ td {
   background-color: #efe;
 }
 
+
+
+/* themes */
+
+
+body {
+  background-color: #cfc;
+}
+
+body.winter {
+  background-color: #CDFEFF;
+}
+
+
+body.spring {
+  background-color: #FFE7CD;
+}
+
+
+#headInfos {
+  background-color: #E4D7CA;
+  background-image: -webkit-linear-gradient(#E4D7CA 0%, #666 180%);
+  background-image: -moz-linear-gradient(#E4D7CA 0%, #666 180%);
+  background-image: -o-linear-gradient(#E4D7CA 0%, #666 180%);
+  background-image: linear-gradient(#E4D7CA 0%, #666 180%);
+}
+
+#headInfos.winter {
+  background-color: #fff;  
+  background-image: -webkit-linear-gradient(#fff 0%, #666 180%);
+  background-image: -moz-linear-gradient(#fff 0%, #666 180%);
+  background-image: -o-linear-gradient(#fff 0%, #666 180%);
+  background-image: linear-gradient(#fff 0%, #666 180%);
+}
+
+#headInfos.spring {
+  background-color: #FEFFCD;  
+  background-image: -webkit-linear-gradient(#FEFFCD 0%, #666 180%);
+  background-image: -moz-linear-gradient(#FEFFCD 0%, #666 180%);
+  background-image: -o-linear-gradient(#FEFFCD 0%, #666 180%);
+  background-image: linear-gradient(#FEFFCD 0%, #666 180%);
+}
+
+
+#leftPages, #rightSupports {
+  background-color: #E4D7CA;
+}
+
+#leftPages.winter, #rightSupports.winter {
+  background-color: #fff;
+}
+
+
+#leftPages.spring, #rightSupports.spring {
+  background-color: #FEFFCD;
+}

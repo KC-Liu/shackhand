@@ -62,6 +62,17 @@ input[type=checkbox] {
   opacity: 1;  
 }
 
+span#present {
+  color: green;
+}
+
+span#present.false {
+  filter: alpha(opacity=50);
+  opacity: 0.5;  
+}
+span#present.true {
+  text-decoration: underline;
+}
 
 .clipOnly {
   color: rgba(0,0,0,0);
@@ -169,7 +180,7 @@ input#tags {
   display:inline-block; position:absolute; top:8px; right: 10px;
 }
 
-#headInfos a, #main a {
+#headInfos a, #main a, #rightSupports a {
   display: inline-block;
   border: green 2px solid;
   cursor: pointer;
@@ -180,12 +191,12 @@ input#tags {
   background-color: #afa;
 }
 
-#headInfos a#info {
+#headInfos a#info, #rightSupports a#info {
   cursor: help;
 }
 
 
-#headInfos a.msg-icon{
+#headInfos a.msg-icon, #rightSupports a.msg-icon{
   border: 0;
   background-color: transparent;
   height:16px;
@@ -195,7 +206,9 @@ input#tags {
   background:url(../javascripts/lib/jAlert/images/msg-icon-sprite.png) no-repeat;
 }
 
-#headInfos a.msg-icon-info{background-position:0px -48px;}
+#headInfos a.msg-icon-info, #rightSupports a.msg-icon-info{
+  background-position:0px -48px;
+}
 
 
 #headPlans{
@@ -204,7 +217,7 @@ input#tags {
   top: 31px;
   left: 200px;
   width: 50%;
-  min-height: 25px;
+  height: 27px;
   background-color: rgba(255,255,255,0);
   text-align: center;
   border-radius: 0 0 10px 10px ;
@@ -217,11 +230,12 @@ input#tags {
   top: 3px;
   display: inline-block;
   border: 1px black dotted;
-  width: 30px;
-  max-height: 16px;
+  border-bottom: white;
+  width: 50px;
+  max-height: 18px;
   font-size: 16px;
   overflow: hidden;
-  margin-left: 15px;
+  margin-left: 50px;
   padding-top: 3px;
   border-radius: 10px 10px 0 0;
   background: rgba(255,255,255,0);
@@ -343,12 +357,18 @@ img.shadow {
 #popup-content {
   display: block;
   background: #fff;
+  width: 1%;
+  height: 1%;
   position: fixed;
-  width: 80%;
-  height: 80%;
   top: 10%;
   left: 10%;
-  z-index: 98;
+  z-index: -1;
+}
+
+#popup-content.true {
+  width: 80%;
+  height: 80%;
+  z-index: 98;  
 }
 
 #popup-content * {
@@ -425,10 +445,10 @@ body.spring {
 
 #headInfos {
   background-color: #E4D7CA;
-  background-image: -webkit-linear-gradient(#E4D7CA 0%, #666 180%);
-  background-image: -moz-linear-gradient(#E4D7CA 0%, #666 180%);
-  background-image: -o-linear-gradient(#E4D7CA 0%, #666 180%);
-  background-image: linear-gradient(#E4D7CA 0%, #666 180%);
+  background-image: -webkit-linear-gradient(#E4D7CA 0%, #333 180%);
+  background-image: -moz-linear-gradient(#E4D7CA 0%, #333 180%);
+  background-image: -o-linear-gradient(#E4D7CA 0%, #333 180%);
+  background-image: linear-gradient(#E4D7CA 0%, #333 180%);
 }
 
 #headInfos.winter {
@@ -441,10 +461,10 @@ body.spring {
 
 #headInfos.spring {
   background-color: #FEFFCD;  
-  background-image: -webkit-linear-gradient(#FEFFCD 0%, #666 180%);
-  background-image: -moz-linear-gradient(#FEFFCD 0%, #666 180%);
-  background-image: -o-linear-gradient(#FEFFCD 0%, #666 180%);
-  background-image: linear-gradient(#FEFFCD 0%, #666 180%);
+  background-image: -webkit-linear-gradient(#FEFFCD 0%, #fff 180%);
+  background-image: -moz-linear-gradient(#FEFFCD 0%, #fff 180%);
+  background-image: -o-linear-gradient(#FEFFCD 0%, #fff 180%);
+  background-image: linear-gradient(#FEFFCD 0%, #fff 180%);
 }
 
 
@@ -459,4 +479,19 @@ body.spring {
 
 #leftPages.spring, #rightSupports.spring {
   background-color: #FEFFCD;
+}
+
+
+
+#main.winter {
+  background-image: url(../img/backgrounds/dotWinter.jpg);
+}
+#main.spring {
+  background-image: url(../img/backgrounds/dotSpring.jpg);
+}
+#main.summer {
+  background-image: url(../img/backgrounds/dotSummer.jpg);
+}
+#main.fall {
+  background-image: url(../img/backgrounds/dotFall.jpg);
 }

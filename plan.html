@@ -40,7 +40,7 @@
 
 <body ng-controller = "Ctrl" ng-keydown = "maybeSave($event)" class = "{{root.data.c.theme}}">
 
-  <audio id ="easy" controls autoplay class = 'noPrint'>
+  <audio id ="easy" controls autoplay class = 'noPrint' >
     <source src="voice/easy.mp3" type="audio/mpeg">
     <source src="voice/easy.ogg" type="audio/ogg">
   </audio>
@@ -51,7 +51,7 @@
   <span id = 'status'>
 
     <span id = 'lastTime' ng-bind = "'上次存檔: '+(root.data.time | localTime)"> </span>  
-    <span id = 'remTime' ng-bind = "'___尚餘'+(root.data.time | countTime:delay:clock | showRemTime)"></span>
+    <span id = 'remTime' ng-bind = "'___尚餘'+(root.data.time | countTime:delay:clock | showRemTime)">資料讀取中...</span>
   </span>
 
   <a id = "info" class = "msg-icon msg-icon-info"
@@ -69,12 +69,12 @@
     <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && !sandbox'>已上鎖</a>
     <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && !sandbox'>已解鎖</a>
     <span id = 'status' ng-show = 'sandbox'>沙盒</span>
-    <span ng-bind = "currentUser || '訪客' "></span>
+    <span ng-bind = "currentUser || '訪客' ">讀取中...</span>
     <select ng-model = "root.data.c.theme">
       <option value = "winter">冬</option>
       <option value = "spring">春</option>
+      <option value = "default">----</option>
     </select>
-
   </div>
   
 </div>
@@ -82,7 +82,7 @@
 
 <div id = "headPlans" class = "noPrint {{root.data.c.theme}}">
 
-  <span ng-repeat = 'n in [0,1,2,3,4,5,6,7,8,9,10,11]'>
+  <span ng-repeat = 'n in [0,1,2]'>
 
     <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();' ng-bind = "root.data.t[n].title || n+1">
       
@@ -118,6 +118,19 @@
 <br>
 <h3 ng-bind = "pgNow">每頁都有不同的資源</h3>
 的參考資源：
+
+    <audio id ="topic" controls ng-show = "pgNow == '學習主題與領域'" ng-init = "help['主題'] = false" ng-click = "help['主題'] = true">
+            <source src="voice/topic.mp3" type="audio/mpeg">
+            <source src="voice/topic.ogg" type="audio/ogg">
+    </audio>
+
+    <a id = "info" class = "msg-icon msg-icon-info" ng-click = "help['學習支持與資源'] = true" ng-show = "pgNow == '學習支持與資源'">
+    </a>
+
+    <a id = "info" class = "msg-icon msg-icon-info" ng-click = "help['希望支援'] = true" ng-show = "pgNow == '希望支援'">
+    </a>
+
+
   <hr>
 <ul>
 	<li ng-repeat = "sup in supports | has:pgNow | invis:pgNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.supNow = sup; $parent.pop = true; $parent.popURL = sup.split(' ')[1]">
@@ -127,13 +140,14 @@
 
       <br/>
 
-    {{sup.split(' ')[0]}}
+      <span ng-bind = "sup.split(' ')[0]"></span>
+   
 </ul>
 
 </div>
 
 
-<div id = 'main' class = "root.data.c.theme">
+<div id = 'main' class = "{{root.data.c.theme}}">
 
   <input
    ng-model = "root.data.t[planNow].title"
@@ -144,7 +158,18 @@
   <span id = 'status' ng-hide = 'updated'>等待儲存...按Ctrl+S儲存</span>
   <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
 
-  <div id ='page1' ng-show = "pgNow == '自傳'">
+
+  <div id ='pageAlt' ng-show = "(pgNow == '自傳' || pgNow == '學習風格')  && lock && !sandbox">
+  	只有<span ng-bind = "currentName"></span>本人和他願意分享的人
+  	<br/>
+  	<br/>
+  	可以檢視<span ng-bind = "currentName"></span>的「自傳」和「學習風格」
+  	<br/>
+  	<br/>
+  	您可以檢視其他頁面
+  </div>
+
+  <div id ='page1' ng-show = "pgNow == '自傳' && (!lock || sandbox)">
 
 
     <div id = "timeline" class = "draw noSelect">
@@ -162,21 +187,18 @@
 
           ng-dblclick = "resetDraw(planNow)"
 
-        >
-          
+        >          
           &nbsp;
 
         </div>
 
       </div>
 
-      <div style = "position:absolute; top:102px;left:60px"> 幼年 </div>
-      <div style = "position:absolute; top:102px;left:220px"> 小學 </div>
-      <div style = "position:absolute; top:102px;left:420px"> 國中 </div>
-      <div style = "position:absolute; top:102px;left:520px"> 高職/高中 </div>
-      <div style = "position:absolute; top:102px;left:660px"> 社會/大學 </div>
     </div>
-
+    
+    <div style="text-align:right">
+	    我今年<input type = "number" ng-model = "root.data.t[planNow].age" />歲
+	</div>
 
     <hr>
 	  <textarea rows= '22' cols = '52' ng-model = "root.data.t[planNow]['自傳']"  
@@ -190,14 +212,31 @@
     </textarea>
   </div>
 
-  <div id ='page2' ng-show = "pgNow == '學習風格'">
+  <div id ='page2' ng-show = "pgNow == '學習風格' && (!lock || sandbox)">
 
-	  <textarea rows= '12' cols = '30'
+	  <textarea rows= '8' cols = '45'
     ng-model = 'root.data.t[planNow]["學習風格"]'
     ng-focus = " root.data.t[planNow]['學習風格'] = hintToNull(root.data.t[planNow]['學習風格']) "
     ng-blur = "root.data.t[planNow]['學習風格'] = root.data.t[planNow]['學習風格'] || hintData.t[planNow]['學習風格'] "
 
     > </textarea>
+
+    <ul>「視聽讀作」參照
+    	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleV" />視覺:我喜歡看圖象來學習
+    	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleA" />聽覺:我喜歡聽聲音來學習
+    	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleR" />閱讀:我喜歡閱讀文字來學習
+    	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleK" />動作:我喜歡實際操作來學習
+    </ul>
+
+    <ul>「整體分析」參照
+    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[planNow].styleWhole" value="Whole"/>
+    	整體學習:我喜歡一次瞭解一個整體的輪廊，再進入部份
+    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[planNow].styleWhole" value="Part"/>
+    	分析學習:我喜歡一次瞭解一個部份，再進入整體
+    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[planNow].styleWhole" value="Both" />
+    	綜合學習:先瞭解整體或部份，我都可以學得很好
+    </ul>
+
 
   </div>
 
@@ -205,23 +244,16 @@
 
   <div id ='page3' ng-show = "pgNow == '學習主題與領域'">
 
-    <audio id ="topic" controls>
-            <source src="voice/topic.mp3" type="audio/mpeg">
-            <source src="voice/topic.ogg" type="audio/ogg">
-    </audio>
-
-    <br/>
-
-    <textarea rows = "3" cols = "20"
+    <textarea rows = "3" cols = "25"
      ng-model = "addTopic" ng-keydown = "adTPC($event)" placeholder = "寫上新主題，再按Enter新增"> </textarea>
 
 <!--  <a ng-click= "adTPC($event)">增加主題</a> -->
 
-      <span ng-repeat = "t in root.data.t[planNow]['主題']"> <a id = "x" ng-click = "root.data.t[planNow]['主題'] = removeElem(root.data.t[planNow]['主題'], t)">{{t}}</a></span>
+      <span ng-repeat = "t in root.data.t[planNow]['主題']"> <a id = "x" ng-click = "root.data.t[planNow]['主題'] = removeElem(root.data.t[planNow]['主題'], t)">{{t}}✘</a></span>
 
       <br>
           
-      <span id = "x" onclick = "$(this).fadeOut()" onmouseover = "$('#topic').trigger('play')">
+      <span id = "x" ng-click = "help['主題'] = false" ng-show = "help['主題']">
         <ul>
           <li>您的學習主題可以自訂好幾項，範圍不限。
           <li>例如修車、養昆蟲、寫程式、打籃球、繪畫...都可以。
@@ -281,7 +313,7 @@
                     {{root.data.c[tp] || tp}}
             </option>
 
-            <option value="彈性">{{root.data.c.free || "\\^_^/"}}</option>
+            <option value="彈性">{{root.data.c.free || "自由"}}</option>
             <option value="休息">{{root.data.c.rest || "休息"}}</option>
 
   				</select>
@@ -321,11 +353,7 @@
 
     </span>
 
-    <hr>
-
-    你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
-    不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。政府的政策是，所有公立大學都開放旁聽。
-
+   
   </div>
 
 
@@ -348,24 +376,39 @@
   		</tr>
 
       <tr>
-        <th>評量方式</th>
+        <th>自學評鑑項目</th>
         <td ng-repeat = "tp in root.data.t[planNow]['主題']">
           
-            <span style = "color:green" ng-repeat = "m in ['內省','檔案','作品','行動','老師評量','家長評量','紙筆考試']">
-               
-              {{m}}
+            <span  
+            ng-repeat = "m in ['口頭說明','學習檔案','教師評量','家長自評','考試檢定']">
+
+              <span id = "present" class = "{{root.data.t[planNow].checkGoal[tp+m] || false }}">
+              	{{m}}
+              </span>
 
               <a id = "aCheckbox" class="{{root.data.t[planNow].checkGoal[tp+m] }}" 
                ng-click="root.data.t[planNow].checkGoal[tp+m] = !root.data.t[planNow].checkGoal[tp+m]">
                 	{{(root.data.t[planNow].checkGoal[tp+m] && '✓') || ''}}
                 </a>
 
-              <span class = "clipOnly"> {{ root.data.t[planNow].checkGoal[tp+m] && "✓" || ''}} </span>
+     <!--         <span class = "clipOnly"> {{ root.data.t[planNow].checkGoal[tp+m] && "✓" || ''}} </span>  -->
 
               <br>
 
             </span>
-          <ul>
+			
+			<span id = "present">
+
+				<textarea cols="4" rows="1" ng-model = "root.data.t[planNow].checkGoal[tp+'自訂評量']"  ng-show = "root.data.t[planNow].checkGoal[tp+'自訂']">
+				</textarea>
+
+				<a id = "aCheckbox" class="{{root.data.t[planNow].checkGoal[tp+'自訂'] }}" 
+               ng-click="root.data.t[planNow].checkGoal[tp+'自訂'] = !root.data.t[planNow].checkGoal[tp+'自訂']">
+                	{{(root.data.t[planNow].checkGoal[tp+'自訂'] && '✓') || ''}}
+                </a>
+
+            </span>
+
         </td>
       </tr>
 
@@ -381,9 +424,9 @@
         
         <br>
 
-  			<textarea cols="4" rows="8" 
+  			<textarea cols="4" rows="6" 
   				ng-model = "root.data.t[planNow].goal[tp+j]"
-  				   onfocus="$(this).attr('cols', 8)"
+  				   onfocus="$(this).attr('cols', 6)"
  				     onblur="$(this).attr('cols', 4)" 
   				   placeholder= "我給自己的目標">
 
@@ -408,37 +451,32 @@
 
   <div id ='page6' ng-show = "pgNow == '學習支持與資源' ">
 
-    <ul>
-      <li>你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
-      <li>不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。
-      <li>政府的政策是，所有公立大學都開放旁聽。
-    </ul>
+	<span id = "x" ng-click = "help['學習支持與資源'] = false" ng-show = "help['學習支持與資源']">
+    	<ul>
+      		<li>你不一定要只在家裡或社區，自學生也可以規畫一部份時間，在學校上課。
+      		<li>不僅可以規畫在原本的學校上課，也可以去任何一所公立大學旁聽。
+      		<li>政府的政策是，所有公立大學都開放旁聽。
+    	</ul>
+    </span>
 
     <hr>
 
   	<table>
-  		<tr>
-        <th></th>
-        <th ng-repeat = "tp in root.data.t[planNow]['主題']">{{tp}}</th></tr>
+  		<tr><th></th><th>支持與資源</th></tr>
 
-  		<tr ng-repeat = "j in ['教師','諮詢者','教材','同學','空間','社團','課程']">
+  		<tr ng-repeat = "tp in root.data.t[planNow]['主題']">
 
-        <th> {{j}} </th>
+        <th> {{tp}} </th>
 
-  			<td ng-repeat =  "tp in root.data.t[planNow]['主題']">
-          {{tp + j}}
+  			<td>
 
-          <br>
+  			<textarea cols="30" rows="8"
 
-  				<textarea cols="4" rows="8"
+          	ng-model = "root.data.t[planNow].resources[tp]"
 
-          ng-model = "root.data.t[planNow].resources[tp + j]"
+            placeholder= "{{ hintSupports | tto:tp }}">
 
-             onfocus="$(this).attr('cols', 8)"
-             onblur="$(this).attr('cols', 4)" 
-             placeholder= "{{ hintSupports[j].replace('t', tp) }}">
-
-          </textarea>
+          		</textarea>
 
   			</td>
 
@@ -451,12 +489,16 @@
 
  <div id ='page7' ng-show = "pgNow == '希望支援' ">
 
-    <ul>
-      <li>自學生也具有正式的學生身份。
-      <li>您可以部份時間到學校上課。
-      <li>您可以使用學校的設備。
-      <li>您可以使用政府公家單位的教育資源，例如圖書館和博物館。
-    </ul>
+
+    <span id = "x" ng-click = "help['希望支援'] = false" ng-show = "help['希望支援']">
+        <ul>
+            <li>自學生也具有正式的學生身份。
+            <li>您可以部份時間到學校上課。
+            <li>您可以使用學校的設備。
+            <li>您可以使用政府公家單位的教育資源，例如圖書館和博物館。
+            <li>您可以到公立大學旁聽。
+        </ul>
+    </span>
 
     <hr>
 
@@ -480,7 +522,7 @@
 </div>
 
 
-<div id='popup-content' popup='popURL' ng-show = "pop" ng-mouseout = "pop = false">
+<div id='popup-content' popup='popURL' class = "{{pop}}" ng-mouseout = "pop = false">
 
   <iframe id ="myframe" width = "100%" height = "100%">
 
@@ -549,6 +591,10 @@ $(document).ready(function(){
 
 	    return t ? timeToDay(t) +"天^_^" : "很多時間^_^";
     }
+  }).filter('tto',function(){
+    return function(s,i){
+	    return s.replace(/t/g,i);
+    }
   }).directive('popup', function() {
   var p = {
       link : function(scope, iElement, iAttrs){
@@ -576,7 +622,7 @@ $(document).ready(function(){
   initData = new Object;
   initData.c = new Object;
   initData.t = new Array;
-      for (var inn = 0; inn < 12; inn++) {
+      for (var inn = 0; inn < 3; inn++) {
 
          initData.t[inn] = new Object;
 
@@ -624,16 +670,16 @@ $(document).ready(function(){
         initData.t[inn]['主題'] = ['生活自理','運動','收集資訊'];
 
         initData.t[inn].timeline = [
-          [true],
-          [true],
-          [true],
-          [true],
-          [true],
-          [true],
-          [true],
-          [true],
-          [true],
-          [true],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
         ];
 
          for (var i = 0; i < 10; i++) {
@@ -644,6 +690,7 @@ $(document).ready(function(){
             };
           };
 
+    /*
           initData.t[inn].timeline[8][12] = true;
           initData.t[inn].timeline[9][12] = true;
 
@@ -654,7 +701,7 @@ $(document).ready(function(){
           initData.t[inn].timeline[9][48] = true;
 
           initData.t[inn].timeline[8][60] = true;
-          initData.t[inn].timeline[9][60] = true;
+          initData.t[inn].timeline[9][60] = true; */
 
 
       };
@@ -673,6 +720,7 @@ $(document).ready(function(){
     $scope.console = window.console;
   	$scope.$ = jQuery;
     $scope.popURL = '';
+    $scope.help = new Object;
     $scope.name = '您';
     $scope.lock = true;
     $scope.delay = 100; // 到期延後日
@@ -684,15 +732,7 @@ $(document).ready(function(){
     $scope.pgNow = '自傳';
 
 
-    $scope.hintSupports = { 教師 : "您要向誰學習t呢?",
-                            諮詢者 : "t遇到問題，要向誰求助?",
-                            教材 : "用哪些教材學習t?",
-                            同學 : "和誰一起學習t?",
-                            空間 : "您要在哪些地方學習t呢?",
-                            社團 : "參加學習t的社團?",
-                            課程 : "參加t課程?",
-
-                          };
+    $scope.hintSupports = "t方面的老師?諮詢者?學習資源?同學?場地?" ;
 
     $scope.sevenFields = ['語文-國文','語文-鄉土語文','語文-英文','健康與體育','社會','數學','自然與科技','藝術與人文','綜合活動'];
 
@@ -751,29 +791,7 @@ $(document).ready(function(){
 
     $scope.resetDraw = function (planNow) {
       $scope.root.data.t[planNow].timeline = initData.t[0].timeline;
-      $scope.updated = false
-
-      /*
-
-      for (var i = 0; i < 10; i++) {
-        $scope.root.data.t[planNow].timeline[i][0] = true;
-
-        for (var j = 1; j < 72; j++) {
-          $scope.root.data.t[planNow].timeline[i][j] = false;
-        };
-      };
-
-      $scope.root.data.t[planNow].timeline[8][12] = true;
-      $scope.root.data.t[planNow].timeline[9][12] = true;
-
-      $scope.root.data.t[planNow].timeline[8][36] = true;
-      $scope.root.data.t[planNow].timeline[9][36] = true;
-
-      $scope.root.data.t[planNow].timeline[8][48] = true;
-      $scope.root.data.t[planNow].timeline[9][48] = true;
-
-      $scope.root.data.t[planNow].timeline[8][60] = true;
-      $scope.root.data.t[planNow].timeline[9][60] = true; */
+      $scope.updated = false;
 
     }
 
@@ -784,14 +802,13 @@ $(document).ready(function(){
 
       if (!$scope.root.data.t[planNow].timeline[y]) $scope.root.data.t[planNow].timeline[y] = [true];
 
-      var depth = ((x % 12 || x == 0 || x == 24) && 10) || 8;
+//      var depth = ((x % 12 || x == 0 || x == 24) && 10) || 8;
+      var depth = 10;
 
-      if (0<x && x<72 && ($scope.root.data.t[planNow].timeline[y][x+1] || $scope.root.data.t[planNow].timeline[y][x+1]) ) {
-
-          for (var i = 0; i < depth; i++) {      
+     
+      for (var i = 0; i < depth; i++) {      
             $scope.root.data.t[planNow].timeline[i][x] = colorNow;        
-          } 
-      }
+      } 
 
       $scope.root.data.t[planNow].timeline[y][x] = !colorNow;
       $scope.updated = false; 
@@ -1037,7 +1054,7 @@ $(document).ready(function(){
       for (var i = 0; i < ks.length; i++) {
         var k = ks[i];
     //    console.log(k);
-        for (var j = 0; j < 12 ; j++) {
+        for (var j = 0; j < 3 ; j++) {
      //       console.log(j);
             if (typeof($scope.root.data.t[j]) == 'undefined') {
               $scope.root.data.t[j] = new Object;

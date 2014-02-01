@@ -120,9 +120,9 @@
 的參考資源：
   <hr>
 <ul>
-	<li ng-repeat = "sup in supports | has:pgNow | invis:pgNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.pop = true; $parent.popURL = sup.split(' ')[1]">
+	<li ng-repeat = "sup in supports | has:pgNow | invis:pgNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.supNow = sup; $parent.pop = true; $parent.popURL = sup.split(' ')[1]">
 
-      <img src="img/leaf-green.png" class="leaf" />
+      <img src="img/leaf-green.png" class="leaf" ng-show = "supNow == sup"/>
       <img src="img/leaf-shadow.png" class="leaf shadow"/>
 
       <br/>
@@ -337,7 +337,9 @@
 <!--	    <option value="w">週進度</option> -->
    </select>
 
+   自
    <input type="number" ng-model = "root.data.t[planNow].shift"/>
+   月起
 
    <table>
   		<tr>
@@ -746,6 +748,7 @@ $(document).ready(function(){
 
     ];
 
+
     $scope.resetDraw = function (planNow) {
       $scope.root.data.t[planNow].timeline = initData.t[0].timeline;
       $scope.updated = false
@@ -1081,6 +1084,16 @@ $(document).ready(function(){
 
         $scope.updateInit();
 
+        $scope.mirror = $scope.clone($scope.root);
+
+        clearInterval($scope.mirrowInterval);
+        $scope.mirrowInterval = setInterval( function(){
+          console.log("checking");
+          if ($scope.lock && !$scope.sandbox) {
+            $scope.root = $scope.clone($scope.mirror);
+            $scope.$digest;
+          }
+        },1000);
     }
 
     $scope.bind3w = function() {

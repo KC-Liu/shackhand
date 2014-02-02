@@ -117,7 +117,7 @@ span#present.true {
   #page #main {
     position: absolute;
     top: 0px;
-
+    cursor: 'all-scroll';
   }  
 
 }
@@ -246,6 +246,7 @@ input#tags {
   color: #999;
   border-radius: 10px;
   overflow: hidden;
+  cursor: alias;
 }
 
 
@@ -265,6 +266,7 @@ input#tags {
   background: #fff;
   color: #000;
   z-index: 51;
+  cursor: context-menu;
 }
 
 
@@ -284,6 +286,7 @@ span#status {
   width: 200px;
   height: 297mm;
   padding-right: 2px;
+  cursor: context-menu;
 }
 
 
@@ -335,7 +338,6 @@ span#status {
 #leftSupports:hover {
   width: 300px;
   z-index: 89;
-  cursor: help;
   -webkit-transition: all .3s ease;
   -moz-transition: all .3s ease;
   -ms-transition: all .3s ease;
@@ -374,6 +376,14 @@ th,td {
 
 a#x, #x {
   cursor: not-allowed; 
+}
+
+a#y, #y {
+  cursor: copy;
+}
+
+.s {
+  cursor: alias;
 }
 
 img.leaf {

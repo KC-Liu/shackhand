@@ -80,7 +80,7 @@
 
     <a id = 'logut' ng-click = 'currentUser = false; lock = true;' ng-show = 'currentUser'>登出</a>
 
-    <select ng-model = "root.data.c.theme">
+    <select ng-model = "root.data.c.theme" class = "s">
       <option value = "winter">冬</option>
       <option value = "spring">春</option>
       <option value = "default">----</option>
@@ -165,7 +165,11 @@
 </div>
 
 
-<div id = 'main' class = "{{root.data.c.theme}}">
+<div id = 'main' class = "{{root.data.c.theme}}" 
+
+ng-dblclick = "focusRow = {}"
+ 
+>
 
   <div id = "title">
       
@@ -293,7 +297,7 @@
 
   <div id ='page3' ng-show = "pgNow == '學習主題與領域'">
 
-    <textarea rows = "3" cols = "25"
+    <textarea id = "y" rows = "3" cols = "25"
      ng-model = "addTopic" ng-keydown = "adTPC($event)" placeholder = "寫上新主題，再按Enter新增"> </textarea>
 
 <!--  <a ng-click= "adTPC($event)">增加主題</a> -->
@@ -338,9 +342,9 @@
   </div>
 
 
-  <div id ='page4' ng-show = "pgNow == '一週節奏'" >
+  <div id ='page4' ng-show = "pgNow == '一週節奏'">
 
-   <table ng-mouseout = "focusRow = {}">
+   <table >
   		<tr>
   			<th></th>
   			<th ng-repeat = "d in ['日','一','二','三','四','五','六']">{{d}}</th>
@@ -389,13 +393,12 @@
   			</td> 			
   		</tr>
 
-        <th id = "y" 
-          colspan="8">
-          <input ng-model = "newJ" placeholder = "新增時段"
+        <th colspan="8">
+          <input id = "y"  ng-model = "newJ" placeholder = "新增時段"
            ng-keypress = "mayBePushDJ($event, newJ)"
           />
 
-          <a ng-click = "root.data.c.dayTimes.push(newJ); newJ = ''">新增</a>
+          <a id = "y" ng-click = "root.data.c.dayTimes.push(newJ); newJ = ''">新增</a>
         </th>
 
       <tr>
@@ -1030,6 +1033,9 @@ $(document).ready(function(){
 
     ];
 
+    $scope.$watch('pageNow', function(newVal, oldVal) {
+      $scope.focusRow = {};
+    });
 
     $scope.resetDraw = function (planNow) {
       $scope.root.data.t[planNow].timeline = initData.t[0].timeline;

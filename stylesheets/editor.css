@@ -47,7 +47,7 @@ input {
 
 div#public {
   position: absolute;
-  top: 3px;
+  top: 6px;
   right: 3px;
 }
 
@@ -236,32 +236,35 @@ input#tags {
 }
 
 #headPlans a{
-  position: relative;
-  top: 3px;
-  display: inline-block;
-  border: 1px black dotted;
-  border-bottom: white;
+  position: absolute;
+  right: 5px;
+  padding: 3px;
   width: 50px;
   height: 24px;
   font-size: 16px;
+  cursor: pointer;
+  color: #999;
+  border-radius: 10px;
   overflow: hidden;
+}
+
+
+#headPlans a.focus {
+  position: relative;
+  top: 3px;
+  display: inline-block;
+  border-bottom: white;
   margin-left: 100px;
   margin-right: 100px;
   padding-top: 3px;
   border-radius: 10px 10px 0 0;
   background: rgba(255,255,255,0);
-  cursor: pointer;
-  color: #999;
-}
-
-
-#headPlans a.focus,#headPlans a:hover {
   border: 5px black solid;
   width: 150px;
   border-bottom: none;
   background: #fff;
   color: #000;
-  z-index: 91;
+  z-index: 51;
 }
 
 
@@ -454,6 +457,7 @@ td,th {
   border: 2px solid green;
   padding: 5px;
 }
+
 
 th {
   background-color: #afa;

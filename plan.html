@@ -94,7 +94,7 @@
 
   <span ng-repeat = 'n in [0,1]' >
 
-    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();'  ng-mouseover = "editTitle[n] = true" ng-mouseout = "editTitle[n] = false">     
+    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();'  ng-mouseover = "editTitle[n] = $parent.planNow == n" ng-mouseout = "editTitle[n] = false">     
 
      <span ng-bind = "root.data.t[n].title || n+1" 
      ng-hide = "editTitle[n]"></span>
@@ -194,7 +194,10 @@
       <img id = "x" class = "face" src = "{{root.data.t[planNow].mainImg}}" ng-show = "root.data.t[planNow].mainImg" ng-click = "root.data.t[planNow].mainImg = ''" />
 
       <div id ="public">
-            <input  type="checkbox" ng-model="root.data.c.share[planNow]['自傳']">公開分享
+            <input  type="checkbox" ng-model="root.data.c.share[planNow]['自傳']">
+
+            <span ng-bind = "(root.data.c.share[planNow]['自傳'] && '公開分享自傳') || '不公開自傳'"></span>
+
             <a id = "info" class = "msg-icon msg-icon-info"
               onclick = "alert('個人檔案中的自傳，可選擇公開或不公開^_^')">
             </a>
@@ -261,12 +264,11 @@
     ng-blur = "root.data.t[planNow]['學習風格'] = root.data.t[planNow]['學習風格'] || hintData.t[planNow]['學習風格'] "
     > </textarea>
 
-          <div id ="public">
-            <input  type="checkbox" ng-model="root.data.c.share[planNow]['學習風格']">公開分享
+           <span ng-bind = "(root.data.c.share[planNow]['學習風格'] && '公開分享學習風格') || '不公開學習風格'"></span>
+
             <a id = "info" class = "msg-icon msg-icon-info"
               onclick = "alert('個人檔案中的學習風格，可選擇公開或不公開^_^')">
             </a>
-          </div>
 
     <ul>「視聽讀作」參照
     	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleV" />視覺:我喜歡看圖象來學習
@@ -338,21 +340,40 @@
 
   <div id ='page4' ng-show = "pgNow == '一週節奏'" >
 
-   <table>
+   <table ng-mouseout = "focusRow = {}">
   		<tr>
   			<th></th>
   			<th ng-repeat = "d in ['日','一','二','三','四','五','六']">{{d}}</th>
   		</tr>
 
-  		<tr ng-repeat = "j in ['清晨','早餐','早上','午餐','下午','晚餐','晚上','深夜']">
+  		<tr ng-repeat = "j in root.data.c.dayTimes">
 
-  			<th>
-  				{{j}}
+  			<th id = "x" ng-click = "$parent.root.data.c.dayTimes = removeElem($parent.root.data.c.dayTimes, j)">
+  				
+          {{root.data.c[j] || j}}
   			</th>
 
-  			<td ng-repeat = "d in ['日','一','二','三','四','五','六']">
+  			<td ng-repeat = "d in ['日','一','二','三','四','五','六']"
 
-  				<select ng-model = "root.data.t[planNow].schedule[d+j]"  value="{{root.data.t[planNow].schedule[d+j]}}">
+          rowspan="{{ 
+           
+           (focusRow[d] && 1) || 
+            (d | countRowSpan:j:(root.data.t[planNow].schedule):root.data.c.dayTimes:root.data.c) 
+
+          }}" style = " display: {{ 
+
+          (focusRow[d] && true) ||
+
+          (d | countRowSpan:j:(root.data.t[planNow].schedule):root.data.c.dayTimes:root.data.c)  || 'none' }}"
+
+          ng-mouseover = "focusRow[d] = true"
+
+          >
+
+  				<select ng-model = "root.data.t[planNow].schedule[d+j]"  value="{{root.data.t[planNow].schedule[d+j]}}"
+
+
+          >
 
   					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
                     ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
@@ -365,40 +386,43 @@
 
   				</select>
 
-  				<span ng-show = "j == '早上' || j == '下午'">
-
-  				<br>
-          <br>
-
-  				<select
-  					ng-model = "root.data.t[planNow].schedule[d+j+'b']" >
-  					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
-                    ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
-                    value="{{tp}}">
-                    {{root.data.c[tp] || tp}}
-            </option>
-                    
-  					<option value="彈性">{{root.data.c.free || "\\^_^/"}}</option>
-            <option value="休息">{{root.data.c.rest || "休息"}}</option>
-  				</select>
-
-  				</span>
-
   			</td> 			
   		</tr>
+
+        <th id = "y" 
+          colspan="8">
+          <input ng-model = "newJ" placeholder = "新增時段"
+           ng-keypress = "mayBePushDJ($event, newJ)"
+          />
+
+          <a ng-click = "root.data.c.dayTimes.push(newJ); newJ = ''">新增</a>
+        </th>
+
+      <tr>
+
+
+      </tr>
   		
   	</table>
 
     <span>
-      休息<input ng-model = "root.data.c.rest">
+      休息 → <input ng-model = "root.data.c.rest">
     </span>
     <span>
-      彈性<input ng-model = "root.data.c.free">
+      彈性 → <input ng-model = "root.data.c.free">
     </span>
     <span style = "display:inline-block;" ng-repeat = "tp in root.data.t[planNow]['主題']">
-      {{tp}}<input ng-model = "root.data.c[tp]">
-
+      {{tp}} → <input ng-model = "root.data.c[tp]" placeholder = "自訂顯示的記號">
     </span>
+
+<!--dayTime-->
+
+<hr>
+
+    <span style = "display:inline-block;" ng-repeat = "j in root.data.c.dayTimes">
+      {{j}} → <input ng-model = "root.data.c[j]" placeholder = "可自訂時間">
+    </span>
+
 
    
   </div>
@@ -745,6 +769,30 @@ $(document).ready(function(){
     	};
 	    return ans;
     }
+  }).filter('countRowSpan',function(){
+    return function(d,j,schedule,dayTimes,cObj){
+
+        var inx = dayTimes.indexOf(j);
+
+        var ans = (schedule[d+j] && 1) || 0;
+
+        if (inx ==0 || inx == dayTimes.length) ans = 1;
+
+ //       if (cObj[jj] == 'none') ans = 0;
+
+        if (ans == 0 ) return;
+
+        for (var i = inx+1; i < dayTimes.length; i++) {
+          var jj = dayTimes[i];
+          
+          if ( schedule[d+jj] ) { break } else { 
+            // if (cObj[jj] != 'none')
+             ans++; 
+          }
+        };
+      
+        return ans;
+    }
   }).filter('localTime',function(){
     return function(t){      
       	var d = new Date(t);
@@ -812,6 +860,8 @@ $(document).ready(function(){
   initData.c = new Object;
   initData.c.supports = ['您'];
   initData.c.share = [ {'自傳':false, '學習風格':false}, {'自傳':false, '學習風格':false}  ] ;
+
+  initData.c.dayTimes = ['清晨','早餐','早上','午餐','下午','晚餐','晚上','深夜'];
   initData.t = new Array;
       for (var inn = 0; inn < 2; inn++) {
 
@@ -909,13 +959,14 @@ $(document).ready(function(){
 
   	$scope.confirm = window.confirm;
     $scope.console = window.console;
+    $scope.Math = window.Math;
   	$scope.$ = jQuery;
     $scope.popURL = '';
     $scope.help = new Object;
     $scope.name = '您';
     $scope.lock = true;
     $scope.delay = 100; // 到期延後日
-
+    $scope.focusRow = new Object;
 
     if(location.hash) {$scope.name = decodeURI(location.hash.replace('#','')) }
 
@@ -1155,16 +1206,20 @@ $(document).ready(function(){
 	    $scope.updated = true;
 	    $scope.lock = false;
       $scope.currentUser = $scope.currentName;
-
-
     }
+
+
+      $scope.mayBePushDJ = function(ev,elem){
+        if (ev.keyCode != 13 || !elem) return;
+        $scope.root.data.c.dayTimes.push(elem);
+   //     $scope.$digest();
+      }
 
     //NAME CHANGE
       $scope.mayBeChName = function(ev, n, password){
 
         if (ev.keyCode != 13 || !$scope.name) return;
         $scope.chName(n,password);
-
       }
 
       $scope.chName = function(newValue,password) {  

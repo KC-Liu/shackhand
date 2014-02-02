@@ -91,7 +91,7 @@
 <div id = 'leftPages' class = "noPrint {{root.data.c.theme}}">
 
   <ul>
-    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','進度與目標','學習支持與資源','希望支援']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
+    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','進度與目標','學習支持與資源','希望支援','意見箱']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
 
       <img src="img/leaf-yellow.png" class = "leaf" ng-show = "pgNow == k"/>
       <img src="img/leaf-shadow.png" class="leaf shadow"/> 
@@ -521,13 +521,134 @@
 
       ng-blur = "root.data.t[planNow].callHelp = root.data.t[planNow].callHelp || hintData.t[planNow].callHelp "> </textarea>
 
-      </td>
+      <!-- 糊糊地址   Join 自學2.0  -->
 
-      </tr>
+  </div>
 
-    </table>
+  <div id ='feedback' ng-show = "pgNow == '意見箱' ">
+
+      〈自學2.0計畫編輯器〉的功能，我覺得：<br/>
+
+      <input name = "function" type = "radio" ng-model = "root.data.feedback.function" value="5"/>非常好
+         <input name = "function" type = "radio" ng-model = "root.data.feedback.function" value="4"/>好
+             <input name = "function" type = "radio" ng-model = "root.data.feedback.function" value="2"/>待改進
+                 <input name = "function" type = "radio" ng-model = "root.data.feedback.function" value="1"/>非常待改進
+
+      <br>
+
+      <span ng-show = "root.data.feedback.function < 3">具體建議:
+        <textarea rows= '4' cols = '30' ng-model = "root.data.feedback.functionText" >
+        </textarea>
+      </span> 
+
+    <hr>
+
+      〈自學2.0計畫編輯器〉的畫面，我覺得：<br/>
+
+      <input name = "style" type = "radio" ng-model = "root.data.feedback.style" value="5"/>非常好
+         <input name = "style" type = "radio" ng-model = "root.data.feedback.style" value="4"/>好
+             <input name = "style" type = "radio" ng-model = "root.data.feedback.style" value="2"/>待改進
+                 <input name = "style" type = "radio" ng-model = "root.data.feedback.style" value="1"/>非常待改進
+
+      <br>
+
+      <span ng-show = "root.data.feedback.style < 3">具體建議:
+        <textarea rows= '4' cols = '30' ng-model = "root.data.feedback.styleText" >
+        </textarea>
+      </span> 
+
+    <hr>
+
+      <ol>未來資料量增多後，<a href = "https://www.firebase.com/pricing.html" target = "_blank">firebase免費方案可能無法容納</a>
+        
+        <br/><br/>
+
+        屆時自學2.0可能要將服務分成免費方案和付費方案兩種，免費方案保有一切基本的功能：<hr/>
+
+        <li>免費方案，我覺得最應該保留的一項功能是：<br/><br/>
+
+  <input name = "keepNoPay" type = "radio" ng-model = "root.data.feedback.keepNoPay" value="自訂封面相片"/>自訂封面相片
+
+     <input name = "keepNoPay" type = "radio" ng-model = "root.data.feedback.keepNoPay" value="自訂版面風格"/>自訂版面風格
+
+         <input name = "keepNoPay" type = "radio" ng-model = "root.data.feedback.keepNoPay" value="時間軸繪製"/>時間軸繪製
+
+             <input name = "keepNoPay" type = "radio" ng-model = "root.data.feedback.keepNoPay" value="每人可以存兩份計畫"/>每人可以存兩份計畫
+
+                      <input name = "keepNoPay" type = "radio" ng-model = "root.data.feedback.keepNoPay" value="其他"/>其他：
+
+      <span ng-show = "root.data.feedback.keepNoPay == '其他'">
+        <input ng-model = "root.data.feedback.keepNoPayText" >
+
+        <li style ="margin-top: 20px;">付費方案(假設每月75元)，我覺得最應擴充的一項功能是：<br/><br/>
+
+    <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="可上傳更多更大的相片"/>可上傳更多更大的相片
+
+       <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="更多更精緻的版面風格"/>更多更精緻的版面風格
+
+           <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="每人可以存更多計畫"/>每人可以存更多計畫
+
+              <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="和自學2.0互認地圖整合"/>和自學2.0互認地圖整合
+
+                <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="和facebook等平台整合"/>和facebook等平台整合
+
+                  <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="更豐富的提示和指引"/>更豐富的提示和指引
+
+                      <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="其他"/>其他：
+
+      <span ng-show = "root.data.feedback.ifPay == '其他'">
+        <input ng-model = "root.data.feedback.ifPayText" >
+
+      </span> 
 
 
+      </ol>
+
+
+      <textarea rows= '6' cols = '30'
+      ng-model = "root.data.feedback.text"  placeholder = "其他您想說的話">
+
+       </textarea>
+
+    
+    <hr>
+
+      <h3>邀約志願者</h3>
+
+      <p>自學2.0是一個非營利的「教育-學習」專案。</p>
+      <p>我們很需要人手一起協力。</p>
+      <p>邀請您參與共創。</p>
+      <p>不為什麼，只為著手實現一個未來：</p>
+      <p>任何年段、任何家庭背景的人都可以適性學習，想學習的人都能尋得好的支持和資源。自學普及化。</p>
+
+      <h3>誠徵：</h3>
+
+      <ul>
+        <li>自學教師(自學經驗, 協助人自學的經驗)
+          <br/>協力方向：內容擴充與修訂、音檔錄製、第一線使用與測試
+
+        <li>網路視覺設計志願者(CSS與視覺設計經驗)
+          <br/>版型設計、圖示設計、printer friendly設計、clipboard friendly設計 
+
+        <li>網路後端設計志願者(node.js, php, sql...)
+
+          <br/>資料庫設計、使用與瀏覽權限設計
+
+        <li>網路前端設計志願者(angularJs, facebook API...)
+          <br/>使用者經驗設計、註冊與維護流程設計、與facebook整合
+
+
+        <li>行動應用設計志願者(cordeva, jquery mobile...)
+          <br/>手機版App開發、media query for moble設計
+
+
+      </ul>
+      
+      意者請洽：自學2.0專案發起人 唐宗浩 bestian@gmail.com
+      <br/>
+
+      ==請附上您的Github ID和自我介紹，謝謝!==
+      
   </div>
 
 
@@ -541,8 +662,6 @@
   </iframe>
 
 </div>
-
-
 
 
 

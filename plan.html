@@ -56,15 +56,30 @@
         if (confirm('非營利專案^_^\n\n免費版容量有限(所有用戶共100MB)\n\n請珍惜使用\n\n若放置不用將於期限後刪除\n\n每次存檔，即可延長期限^_^')) window.open('https://www.firebase.com/pricing.html')">
    </a>
 
-  前往：<input ng-model = 'name'  ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)"/>
+  前往：<input ng-model = 'name' ng-focus = "name = (!currentUser && currentName) || root.data.c.supports[0] " ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)" placeholder ="輸入名字" />
   
-  <a id = 'go' ng-click = 'chName(name)'>Go!</a>
+  <a id = 'go' ng-click = 'chName(name)'>拜訪</a>
+  
+  <span id = "loginSpan" ng-hide = "currentUser">
+  或
+    <input ng-model = "password" type = "password"  ng-keypress = "mayBeChName($event, name, password)" placeholder ="輸入密碼以登入"/> 
+
+    <a id = 'login' ng-click = 'chName(name, password)'>登入</a>
+
+  </span>
+
+
 
   <div id = "rightHead">
     <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && !sandbox'>已上鎖</a>
     <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && !sandbox'>已解鎖</a>
+
+    
     <span id = 'status' ng-show = 'sandbox'>沙盒</span>
     <span ng-bind = "currentUser || '訪客' ">讀取中...</span>
+
+    <a id = 'logut' ng-click = 'currentUser = false; lock = true;' ng-show = 'currentUser'>登出</a>
+
     <select ng-model = "root.data.c.theme">
       <option value = "winter">冬</option>
       <option value = "spring">春</option>
@@ -75,12 +90,20 @@
 </div>
 
 
-<div id = "headPlans" class = "noPrint {{root.data.c.theme}}">
+<div id = "headPlans" class = "noPrint {{root.data.c.theme}}" ng-init = "editTitle = [false, false]">
 
-  <span ng-repeat = 'n in [0,1]'>
+  <span ng-repeat = 'n in [0,1]' >
 
-    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();' ng-bind = "root.data.t[n].title || n+1">
-      
+    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();'  ng-mouseover = "editTitle[n] = true" ng-mouseout = "editTitle[n] = false">     
+
+     <span ng-bind = "root.data.t[n].title || n+1" 
+     ng-hide = "editTitle[n]"></span>
+
+     <input
+     ng-model = "root.data.t[n].title"
+     placeholder = "自訂標題" 
+     ng-show = "editTitle[n]" />
+
     </a>
 
   </span>
@@ -88,7 +111,7 @@
 </div>
 
 
-<div id = 'leftPages' class = "noPrint {{root.data.c.theme}}">
+<div id = 'rightPages' class = "noPrint {{root.data.c.theme}}">
 
   <ul>
     <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','進度與目標','學習支持與資源','希望支援','意見箱']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
@@ -108,7 +131,7 @@
 <!---->
 
 
-<div id = 'rightSupports' class = 'noPrint {{root.data.c.theme}}'>
+<div id = 'leftSupports' class = 'noPrint {{root.data.c.theme}}'>
 
 <br>
 <h3 ng-bind = "pgNow">每頁都有不同的資源</h3>
@@ -145,16 +168,14 @@
 <div id = 'main' class = "{{root.data.c.theme}}">
 
   <div id = "title">
-    <input
-     ng-model = "root.data.t[planNow].title"
-     placeholder = "自訂標題">
       
     <span id = 'status' ng-show = 'updated'>所有更動已儲存</span>
     <span id = 'status' ng-hide = 'updated'>等待儲存...按Ctrl+S儲存</span>
     <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
   </div>
 
-  <div id ='pageAlt' ng-show = "(pgNow == '自傳' || pgNow == '學習風格')  && lock && !sandbox">
+  <div id ='pageAlt' ng-show = "(pgNow == '自傳' || pgNow == '學習風格')  && lock && !sandbox && !root.data.c.share[pgNow]">
+
   	只有<span ng-bind = "currentName"></span>本人和他願意分享的人
   	<br/>
   	<br/>
@@ -164,21 +185,29 @@
   	您可以檢視其他頁面
   </div>
 
-  <div id ='page1' ng-show = "pgNow == '自傳' && (!lock || sandbox)">
+  <div id ='page1' ng-show = "pgNow == '自傳' && (!lock || sandbox || root.data.c.share[pgNow])">
+
+    <h2 ng-bind = "currentName"></h2>
 
     <div id = "mainImg" >
 
       <img id = "x" class = "face" src = "{{root.data.t[planNow].mainImg}}" ng-show = "root.data.t[planNow].mainImg" ng-click = "root.data.t[planNow].mainImg = ''" />
 
+      <div id ="public">
+            <input  type="checkbox" ng-model="root.data.c.share[planNow]['自傳']">公開分享
+            <a id = "info" class = "msg-icon msg-icon-info"
+              onclick = "alert('個人檔案中的自傳，可選擇公開或不公開^_^')">
+            </a>
+      </div>
+
       <br>
       <span ng-hide = "root.data.t[planNow].mainImg">
 
-        上傳一張我的照片(檔案大小:100KB以下) 
+        上傳一張照片(檔案大小:100KB以下) 
 
         <input class="hidden" type="file" fileread="root.data.t[planNow].mainImg" accept="image/*" capture="camera" id="file-upload" />
 
         
-
       </span>
 
 
@@ -224,14 +253,20 @@
     </textarea>
   </div>
 
-  <div id ='page2' ng-show = "pgNow == '學習風格' && (!lock || sandbox)">
+  <div id ='page2' ng-show = "pgNow == '學習風格' && (!lock || sandbox || root.data.c.share[pgNow])">
 
 	  <textarea rows= '8' cols = '45'
     ng-model = 'root.data.t[planNow]["學習風格"]'
     ng-focus = " root.data.t[planNow]['學習風格'] = hintToNull(root.data.t[planNow]['學習風格']) "
     ng-blur = "root.data.t[planNow]['學習風格'] = root.data.t[planNow]['學習風格'] || hintData.t[planNow]['學習風格'] "
-
     > </textarea>
+
+          <div id ="public">
+            <input  type="checkbox" ng-model="root.data.c.share[planNow]['學習風格']">公開分享
+            <a id = "info" class = "msg-icon msg-icon-info"
+              onclick = "alert('個人檔案中的學習風格，可選擇公開或不公開^_^')">
+            </a>
+          </div>
 
     <ul>「視聽讀作」參照
     	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleV" />視覺:我喜歡看圖象來學習
@@ -440,7 +475,7 @@
   				ng-model = "root.data.t[planNow].goal[tp+j]"
   				   onfocus="$(this).attr('cols', 6)"
  				     onblur="$(this).attr('cols', 4)" 
-  				   placeholder= "我給自己的目標">
+  				   placeholder= "目標">
 
 				</textarea>  				
 
@@ -563,9 +598,11 @@
         
         <br/><br/>
 
-        屆時自學2.0可能要將服務分成免費方案和付費方案兩種，免費方案保有一切基本的功能：<hr/>
+        屆時自學2.0可能將服務分成免費方案和付費方案兩種。
 
-        <li>免費方案，我覺得最應該保留的一項功能是：<br/><br/>
+        <br/><br/>免費方案保有一切基本的功能(計畫的編輯、輔助資源與文字儲存)：<hr/>
+
+        <li>免費方案，除基本功能外，我覺得最應保留的一項功能是：<br/><br/>
 
   <input name = "keepNoPay" type = "radio" ng-model = "root.data.feedback.keepNoPay" value="自訂封面相片"/>自訂封面相片
 
@@ -582,19 +619,18 @@
 
         <li style ="margin-top: 20px;">付費方案(假設每月75元)，我覺得最應擴充的一項功能是：<br/><br/>
 
-    <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="可上傳更多更大的相片"/>可上傳更多更大的相片
 
-       <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="更多更精緻的版面風格"/>更多更精緻的版面風格
+           <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="每人可以存不只2份計畫"/>每人可以存不只2份計畫
 
-           <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="每人可以存更多計畫"/>每人可以存更多計畫
+              <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="與自學2.0互認地圖與臉書等平台整合"/>與自學2.0互認地圖與臉書等平台整合
 
-              <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="和自學2.0互認地圖整合"/>和自學2.0互認地圖整合
+                  <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="自訂隱私權與自訂參考資料"/>自訂隱私權與自訂參考資料
 
-                <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="和facebook等平台整合"/>和facebook等平台整合
+                    <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="觀摹與交友的功能"/>觀摹與交友的功能
 
-                  <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="更豐富的提示和指引"/>更豐富的提示和指引
+                      <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="相片容量與更精緻的版面"/>相片容量與更精緻的版面
 
-                      <input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="其他"/>其他：
+                      	<input name = "ifPay" type = "radio" ng-model = "root.data.feedback.ifPay" value="其他"/>其他：
 
       <span ng-show = "root.data.feedback.ifPay == '其他'">
         <input ng-model = "root.data.feedback.ifPayText" >
@@ -624,7 +660,7 @@
       <h3>誠徵：</h3>
 
       <ul>
-        <li>自學教師(自學經驗, 協助人自學的經驗)
+        <li>自學教師、資深自學家長(自學經驗, 協助人自學的經驗)
           <br/>協力方向：內容擴充與修訂、音檔錄製、第一線使用與測試
 
         <li>網路視覺設計志願者(CSS與視覺設計經驗)
@@ -759,10 +795,10 @@ $(document).ready(function(){
                         scope.fileread = loadEvent.target.result;
                     });
                 }
-                var filesize = ((changeEvent.target.files[0].size/1024)/1024).toFixed(4); // MB
+                var filesize = ((changeEvent.target.files[0].size/1024)/1024).toFixed(4)*1024; // KB
 
-                if (filesize > 0.1) {
-                  alert("檔案超過100KB");                // limit: 0.1MB
+                if (filesize > 100) {
+                  alert("檔案超過100KB");                // limit: 100KB
                 } else {
                   reader.readAsDataURL(changeEvent.target.files[0]);
                 }
@@ -772,7 +808,10 @@ $(document).ready(function(){
 }]);
 
   initData = new Object;
+  initData.feedback = new Object;
   initData.c = new Object;
+  initData.c.supports = ['您'];
+  initData.c.share = [ {'自傳':false, '學習風格':false}, {'自傳':false, '學習風格':false}  ] ;
   initData.t = new Array;
       for (var inn = 0; inn < 2; inn++) {
 
@@ -1121,14 +1160,14 @@ $(document).ready(function(){
     }
 
     //NAME CHANGE
-      $scope.mayBeChName = function(ev, n){
+      $scope.mayBeChName = function(ev, n, password){
 
         if (ev.keyCode != 13 || !$scope.name) return;
-        $scope.chName(n);
+        $scope.chName(n,password);
 
       }
 
-      $scope.chName = function(newValue) {  
+      $scope.chName = function(newValue,password) {  
 
         console.log("I see a data change!" + newValue);
 
@@ -1140,54 +1179,27 @@ $(document).ready(function(){
 
         location.hash = '#' + encodeURI(newValue);
 
-
-
         var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI(newValue));
-
-      //  try {
-
-      //    $scope.binding = false;
-
-      //    $scope.base.$bind($scope, "root").then(function(unbind) {
-      //      unbind();          // No changes have been made to the remote data.
-      //    });
-
-      //    console.log("unbinded");
-
-      //  } catch (err) {
-      //    console.log(err);
-      //  }
 
         $scope.base = $firebase(ref);
         console.log($scope.base);
-
         //
 
         $scope.base.$on("loaded", function() {
 
           console.log("File Loaded!!");
 
-          if (!$scope.binding) $scope.overwrite();
-
-      /*    setTimeout( function() {
-
-              if (!$scope.binding) {
-                $scope.bind3w();
-              } else {
-                console.log("Already Binded");
-              }
-          }  , 1000 ); */
+          if (!$scope.binding) $scope.overwrite(newValue, password);
 
         });
 
         //
 
-
         $scope.base.$on("change", function() {
           
           if (!$scope.binding) {
             console.log("A remote change was applied locally!");
-            $scope.overwrite();
+            $scope.overwrite(newValue, password);
 
           }
           else {
@@ -1195,7 +1207,9 @@ $(document).ready(function(){
           }
 
         });
-       
+
+        $scope.name = '';       
+        $scope.password = '';     
     }
 
     $scope.updateInit = function(){
@@ -1210,18 +1224,33 @@ $(document).ready(function(){
      //       console.log(j);
             if (typeof($scope.root.data.t[j]) == 'undefined') {
               $scope.root.data.t[j] = new Object;
-              $scope.root.data.t[j] = initData.t[j];
+              $scope.root.data.t[j] = $scope.clone(initData.t[j]);
             }
             if (typeof($scope.root.data.t[j][k]) == 'undefined') {
-              $scope.root.data.t[j][k] = initData.t[j][k];
+              $scope.root.data.t[j][k] = $scope.clone(initData.t[j][k]);
               console.log(k + ':updated 1 item:' + initData.t[j][k] + ' from Init');
             }        
         };
       };
 
+      var cs = Object.keys(initData.c);
+
+      for (var i = 0; i < cs.length; i++) {
+        var k = cs[i];
+     //       console.log(j);
+            if (typeof($scope.root.data.c) == 'undefined') {
+              $scope.root.data.c = new Object;
+              $scope.root.data.c = $scope.clone(initData.c);
+            }
+            if (typeof($scope.root.data.c[k]) == 'undefined') {
+              $scope.root.data.c[k] = $scope.clone(initData.c[k]);
+              console.log(k + ':updated 1 item:' + initData.c[k] + ' from Init');
+            }     
+      };
+
     }
 
-    $scope.overwrite = function() {  
+    $scope.overwrite = function(name,password) {  
 
         console.log("Overwriting"); 
 
@@ -1248,7 +1277,7 @@ $(document).ready(function(){
         if (!ctt(t,p,c) || ctt(t,p,c) < 0 ) {
           $scope.root.data = $scope.clone(initData);
           $scope.root.password = false;
-    //      alert("帳號超過"+p+"天未使用，已刪除。");
+ //         alert("帳號超過"+p+"天未使用，已刪除。");
         }
 
         $scope.updateInit();
@@ -1263,6 +1292,11 @@ $(document).ready(function(){
             $scope.$digest;
           }
         },1000);
+
+        if($scope.root.password == password) {
+          $scope.currentUser = name;
+          $scope.lock = false;
+        }
     }
 
     $scope.bind3w = function() {

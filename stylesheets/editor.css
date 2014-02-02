@@ -11,7 +11,7 @@
 }
 
 #page:hover {
-  z-index: 99;
+  z-index: 89;
 }
 
 form#frm {
@@ -45,9 +45,11 @@ input {
   color: rgba(0,0,0,0.7);
 }
 
-input[type=checkbox] { 
-  /*  */
-}  
+div#public {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
 
 #aCheckbox {
   display: inline-block;
@@ -156,7 +158,7 @@ input#tags {
 
 #headInfos {
   position: fixed;
-  z-index: 108;
+  z-index: 88;
   top: 0px;
   left: 0px;
   width: 100%;
@@ -169,20 +171,26 @@ input#tags {
  /* border-bottom: black 3px solid; */
 }
 
-#headInfos:hover {
-  z-index: 99;
-}
 
 #headInfos *{
   max-height: 28px;
   min-width: 10px;
 }
 
+
+#headInfos input{
+  width: 150px;
+}
+
 #headInfos #rightHead {
   display:inline-block; position:absolute; top:8px; right: 10px;
 }
 
-#headInfos a, #main a, #rightSupports a {
+#main h1,#main h2, #main h3 {
+  text-align: center;
+}
+
+#headInfos a, #main a, #leftSupports a {
   display: inline-block;
   border: green 2px solid;
   cursor: pointer;
@@ -193,12 +201,12 @@ input#tags {
   background-color: #afa;
 }
 
-#headInfos a#info, #rightSupports a#info {
+#main a#info, #headInfos a#info, #leftSupports a#info {
   cursor: help;
 }
 
 
-#headInfos a.msg-icon, #rightSupports a.msg-icon{
+#main a.msg-icon, #headInfos a.msg-icon, #leftSupports a.msg-icon{
   border: 0;
   background-color: transparent;
   height:16px;
@@ -208,7 +216,7 @@ input#tags {
   background:url(../javascripts/lib/jAlert/images/msg-icon-sprite.png) no-repeat;
 }
 
-#headInfos a.msg-icon-info, #rightSupports a.msg-icon-info{
+#main a.msg-icon-info, #headInfos a.msg-icon-info, #leftSupports a.msg-icon-info{
   background-position:0px -48px;
 }
 
@@ -218,7 +226,7 @@ input#tags {
   position: absolute;
   top: 31px;
   left: 200px;
-  width: 50%;
+  width: 66%;
   height: 27px;
   background-color: rgba(255,255,255,0);
   text-align: center;
@@ -234,10 +242,11 @@ input#tags {
   border: 1px black dotted;
   border-bottom: white;
   width: 50px;
-  max-height: 18px;
+  height: 24px;
   font-size: 16px;
   overflow: hidden;
-  margin-left: 200px;
+  margin-left: 100px;
+  margin-right: 100px;
   padding-top: 3px;
   border-radius: 10px 10px 0 0;
   background: rgba(255,255,255,0);
@@ -246,14 +255,13 @@ input#tags {
 }
 
 
-#headPlans a.focus {
+#headPlans a.focus,#headPlans a:hover {
   border: 5px black solid;
-  width: auto;
-  height: 24px;
+  width: 150px;
   border-bottom: none;
   background: #fff;
   color: #000;
-  z-index: 107;
+  z-index: 91;
 }
 
 
@@ -262,8 +270,10 @@ span#status {
   color: #999;
 }
 
+/* 
+#rightPages */
 
-#leftPages {
+#leftSupports {
   display: block;
   position: absolute;
   left: 0px;
@@ -275,7 +285,7 @@ span#status {
 
 
 
-#leftPages li, #rightSupports li{
+#rightPages li, #leftSupports li{
   position: relative;
   top: 20px;
   left: -5px;
@@ -290,16 +300,19 @@ span#status {
   color: #999;
 }
 
-#leftPages li:hover, #leftPages li.focus, #rightSupports li:hover {
+#rightPages li:hover, #rightPages li.focus, #leftSupports li:hover {
   border: 5px black solid;
-  border-radius: 10px 0 0 0;
-  background-color: #fff; 
-  border-right: none;
+ /* border-radius: 10px 0 0 0;  
   margin-right: -10px;
+  border-right: none;
+ */
+  background-color: #fff; 
   color: #000;
 }
 
-#rightSupports {
+/* #leftSupports */
+
+#rightPages {
   display: block;
  position: absolute;
   top: 0px;
@@ -316,10 +329,15 @@ span#status {
   transition: all .3s ease;
 }
 
-#rightSupports:hover {
+#leftSupports:hover {
   width: 300px;
-  z-index: 99;
+  z-index: 89;
   cursor: help;
+  -webkit-transition: all .3s ease;
+  -moz-transition: all .3s ease;
+  -ms-transition: all .3s ease;
+  -o-transition: all .3s ease;
+  transition: all .3s ease;
 }
 
 #main, #listA4 {
@@ -366,9 +384,10 @@ img.shadow {
 }
 
 img.face {
-  height: 25%;
+  height: 300px;
   border-radius: 15px;
 }
+
 
 #mainImg {  
   text-align: center;
@@ -465,10 +484,10 @@ body.spring {
 
 #headInfos {
   background-color: #E4D7CA;
-  background-image: -webkit-linear-gradient(#E4D7CA 0%, #333 180%);
-  background-image: -moz-linear-gradient(#E4D7CA 0%, #333 180%);
-  background-image: -o-linear-gradient(#E4D7CA 0%, #333 180%);
-  background-image: linear-gradient(#E4D7CA 0%, #333 180%);
+  background-image: -webkit-linear-gradient(#E4D7CA 0%, #fff 180%);
+  background-image: -moz-linear-gradient(#E4D7CA 0%, #fff 180%);
+  background-image: -o-linear-gradient(#E4D7CA 0%, #fff 180%);
+  background-image: linear-gradient(#E4D7CA 0%, #fff 180%);
 }
 
 #headInfos.winter {
@@ -488,16 +507,17 @@ body.spring {
 }
 
 
-#leftPages, #rightSupports {
+#rightPages, #leftSupports {
   background-color: #E4D7CA;
+  text-align: center;
 }
 
-#leftPages.winter, #rightSupports.winter {
+#rightPages.winter, #leftSupports.winter {
   background-color: #fff;
 }
 
 
-#leftPages.spring, #rightSupports.spring {
+#rightPages.spring, #leftSupports.spring {
   background-color: #FEFFCD;
 }
 

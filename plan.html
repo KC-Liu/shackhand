@@ -378,6 +378,7 @@ ng-dblclick = "focusRow = {}"
 
 
           >
+            <option value=""> </option>
 
   					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
                     ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
@@ -1033,8 +1034,8 @@ $(document).ready(function(){
 
     ];
 
-    $scope.$watch('pageNow', function(newVal, oldVal) {
-      $scope.focusRow = {};
+    $scope.$watch('pgNow', function(newVal, oldVal) {
+      $scope.focusRow = new Object;
     });
 
     $scope.resetDraw = function (planNow) {

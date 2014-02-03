@@ -177,9 +177,23 @@ ng-dblclick = "focusCol = {}"
     <span id = 'status' ng-hide = 'updated'>等待儲存...按Ctrl+S儲存</span>
     <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
 
-    <span id = 'download'>
+    <br>
+    <span id = 'updownload'>
 
-      <a ng-click = "download(currentName)">下載資料檔</a>
+      <a id = 'd' ng-href="{{root | forDownload}} " download = "{{currentName | forDownloadName }}" target = "_blank" ng-mouseover = "hintUD = true" ng-mouseout = "hintUD = false"
+
+
+      > 下載資料檔<span ng-show = "hintUD">
+      <br>
+      如未自動下載卻出現資料頁面，請依下列指示：
+      <ol>
+        <li>在空白處按「右鍵」</li>
+        <li>選「將網頁諸存為」</li>
+        <li>自訂檔名.json。例如：{{currentName}}的學習計劃.json</li>
+      </ol>
+    </span></a>
+
+  <!--    <a ng-click = "download(currentName)">下載資料檔</a>  -->
 
       <input type="file" fileread = "root"/>
     </span>
@@ -237,13 +251,17 @@ ng-dblclick = "focusCol = {}"
           top : {{y*10}}px; left : {{x*10}}px;
 
           background-color: {{
-           (root.data.t[root.data.c.planNow].timeline[y][x] && 'rgb(' + (50 + x*3) + ',' + (255 - y *10 - x*3) + ',50)' ) || '#cfc' }} ;
+           (root.data.t[root.data.c.planNow].timeline[x] == y && 'rgb(' + (50 + x*3) + ',' + (255 - y *10 - x*3) + ',50)' ) || '#cfc' }}
 
         " ng-mouseover = "draw($event,y,x,root.data.c.planNow,colorNow)"
 
           ng-dblclick = "resetDraw(root.data.c.planNow)"
 
         >          
+
+     <!--     background-color: {{
+           (root.data.t[root.data.c.planNow].timeline[y][x] && 'rgb(' + (50 + x*3) + ',' + (255 - y *10 - x*3) + ',50)' ) || '#cfc' }} ;  -->
+
           &nbsp;
 
         </div>
@@ -757,7 +775,6 @@ $(document).ready(function(){
   
   $('.noSelect').disableSelection();
 
-
 });
 
   var ctt = function(t,p,clock){
@@ -771,15 +788,24 @@ $(document).ready(function(){
 
 
   var editApp = new angular.module('editApp',["firebase"]);
-  editApp.filter('has',function(){
+  editApp.config(['$compileProvider', function($compileProvider) {
+      $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|tel|data):/);
+  }]).filter('has',function(){
   	return function(list, x){
   		return list.filter(function(str){return (str.indexOf(x) > -1) || (str.indexOf('all') > -1) })
   	}
   }).filter('invis',function(){
     return function(list, x){
       return list.map(function(str){return str.replace(x+',', '').replace('all,', '')});
-    }  
-  }).filter('shifted',function(){
+    } 
+  }).filter('forDownload',function(){
+    return function(obj){
+      return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj))
+    }   //的學習計劃.json
+  }).filter('forDownloadName',function(){
+    return function(str){
+      return str+'的學習計劃.json'
+    }   
     return function(list, x){
     	var ans = [];
     	var m = list.length;
@@ -935,26 +961,15 @@ $(document).ready(function(){
         
         initData.t[inn]['主題'] = ['生活自理','運動','收集資訊'];
 
-        initData.t[inn].timeline = [
-          [],
-          [],
-          [],
-          [],
-          [],
-          [],
-          [],
-          [],
-          [],
-          [],
-        ];
+        initData.t[inn].timeline = [];
 
-         for (var i = 0; i < 10; i++) {
+  //       for (var i = 0; i < 10; i++) {
   //          $scope.root.data.t[root.data.c.planNow].timeline[i][0] = true;
 
-            for (var j = 1; j < 72; j++) {
-              initData.t[inn].timeline[i][j] = false;
-            };
-          };
+    //        for (var j = 1; j < 72; j++) {
+      //        initData.t[inn].timeline[i][j] = false;
+     //       };
+    //      };
 
     /*
           initData.t[inn].timeline[8][12] = true;
@@ -1081,7 +1096,9 @@ $(document).ready(function(){
 
       if (!colorNow) colorNow = false;
 
-      if (!$scope.root.data.t[plan].timeline[y]) $scope.root.data.t[plan].timeline[y] = [true];
+      $scope.root.data.t[$scope.root.data.c.planNow].timeline[x] = y;
+
+   /*   if (!$scope.root.data.t[plan].timeline[y]) $scope.root.data.t[plan].timeline[y] = [true];
 
 //      var depth = ((x % 12 || x == 0 || x == 24) && 10) || 8;
       var depth = 10;
@@ -1091,7 +1108,7 @@ $(document).ready(function(){
             $scope.root.data.t[$scope.root.data.c.planNow].timeline[i][x] = colorNow;        
       } 
 
-      $scope.root.data.t[root.data.c.planNow].timeline[y][x] = !colorNow;
+      $scope.root.data.t[root.data.c.planNow].timeline[y][x] = !colorNow; */
       $scope.updated = false; 
     }
 

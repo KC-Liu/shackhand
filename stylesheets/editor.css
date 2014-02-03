@@ -382,6 +382,10 @@ a#y, #y {
   cursor: copy;
 }
 
+a#d:hover, #d:hover {
+  font-size: 200%;
+}
+
 .s {
   cursor: alias;
 }

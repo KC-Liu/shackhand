@@ -176,6 +176,14 @@ ng-dblclick = "focusCol = {}"
     <span id = 'status' ng-show = 'updated'>所有更動已儲存</span>
     <span id = 'status' ng-hide = 'updated'>等待儲存...按Ctrl+S儲存</span>
     <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
+
+    <span id = 'download'>
+
+      <a ng-click = "download(currentName)">下載資料檔</a>
+
+      <input type="file" fileread = "root"/>
+    </span>
+
   </div>
 
   <div id ='pageAlt' ng-show = "(root.data.c.pageNow == '自傳' || root.data.c.pageNow == '學習風格')  && lock && !sandbox && !root.data.c.share[root.data.c.pageNow]">
@@ -770,7 +778,7 @@ $(document).ready(function(){
   }).filter('invis',function(){
     return function(list, x){
       return list.map(function(str){return str.replace(x+',', '').replace('all,', '')});
-    }
+    }  
   }).filter('shifted',function(){
     return function(list, x){
     	var ans = [];
@@ -845,11 +853,19 @@ $(document).ready(function(){
         link: function (scope, element, attributes) {
             element.bind("change", function (changeEvent) {
                 var reader = new FileReader();
+
                 reader.onload = function (loadEvent) {
                     scope.$apply(function () {
-                        scope.fileread = loadEvent.target.result;
+                        var f = loadEvent.target.result;
+
+                  //      f = angular.toJson(f);
+
+                        console.log(f); 
+                        scope.fileread = f;
+
                     });
                 }
+
                 var filesize = ((changeEvent.target.files[0].size/1024)/1024).toFixed(4)*1024; // KB
 
                 if (filesize > 100) {
@@ -1050,6 +1066,10 @@ $(document).ready(function(){
       $scope.focusCol = new Object;
     });
 
+    $scope.download = function(name) {
+      window.open('https://shackhand-plan.firebaseio.com/'+name+'.json?print=pretty&format=export&download='+encodeURI(name+'的學習計畫')+'.json');
+    }
+
     $scope.resetDraw = function (plan) {
       $scope.root.data.t[plan].timeline = initData.t[0].timeline;
       $scope.updated = false;
@@ -1068,7 +1088,7 @@ $(document).ready(function(){
 
      
       for (var i = 0; i < depth; i++) {      
-            $scope.root.data.t[root.data.c.planNow].timeline[i][x] = colorNow;        
+            $scope.root.data.t[$scope.root.data.c.planNow].timeline[i][x] = colorNow;        
       } 
 
       $scope.root.data.t[root.data.c.planNow].timeline[y][x] = !colorNow;

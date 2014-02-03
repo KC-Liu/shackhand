@@ -94,7 +94,7 @@
 
   <span ng-repeat = 'n in [0,1]' >
 
-    <a class = "{{$parent.planNow == n && 'focus'}}" ng-click = '$parent.planNow = n; quite();'  ng-mouseover = "editTitle[n] = $parent.planNow == n" ng-mouseout = "editTitle[n] = false">     
+    <a class = "{{$parent.root.data.c.planNow == n && 'focus'}}" ng-click = '$parent.root.data.c.planNow = n; quite();'  ng-mouseover = "editTitle[n] = $parent.root.data.c.planNow == n" ng-mouseout = "editTitle[n] = false">     
 
      <span ng-bind = "root.data.t[n].title || n+1" 
      ng-hide = "editTitle[n]"></span>
@@ -114,9 +114,9 @@
 <div id = 'rightPages' class = "noPrint {{root.data.c.theme}}">
 
   <ul>
-    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','進度與目標','學習支持與資源','希望支援','意見箱']" class = "{{$parent.pgNow == k && 'focus'}}" ng-mouseover = '$parent.pgNow = k;quite()'> 
+    <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','進度與目標','學習支持與資源','希望支援','意見箱']" class = "{{$parent.root.data.c.pageNow == k && 'focus'}}" ng-mouseover = '$parent.root.data.c.pageNow = k;quite()'> 
 
-      <img src="img/leaf-yellow.png" class = "leaf" ng-show = "pgNow == k"/>
+      <img src="img/leaf-yellow.png" class = "leaf" ng-show = "root.data.c.pageNow == k"/>
       <img src="img/leaf-shadow.png" class="leaf shadow"/> 
 
       <br/>
@@ -134,24 +134,24 @@
 <div id = 'leftSupports' class = 'noPrint {{root.data.c.theme}}'>
 
 <br>
-<h3 ng-bind = "pgNow">每頁都有不同的資源</h3>
+<h3 ng-bind = "root.data.c.pageNow">每頁都有不同的資源</h3>
 的參考資源：
 
-    <audio id ="topic" controls ng-show = "pgNow == '學習主題與領域'" ng-init = "help['主題'] = false" ng-click = "help['主題'] = true">
+    <audio id ="topic" controls ng-show = "root.data.c.pageNow == '學習主題與領域'" ng-init = "help['主題'] = false" ng-click = "help['主題'] = true">
             <source src="voice/topic.mp3" type="audio/mpeg">
             <source src="voice/topic.ogg" type="audio/ogg">
     </audio>
 
-    <a id = "info" class = "msg-icon msg-icon-info" ng-click = "help['學習支持與資源'] = true" ng-show = "pgNow == '學習支持與資源'">
+    <a id = "info" class = "msg-icon msg-icon-info" ng-click = "help['學習支持與資源'] = true" ng-show = "root.data.c.pageNow == '學習支持與資源'">
     </a>
 
-    <a id = "info" class = "msg-icon msg-icon-info" ng-click = "help['希望支援'] = true" ng-show = "pgNow == '希望支援'">
+    <a id = "info" class = "msg-icon msg-icon-info" ng-click = "help['希望支援'] = true" ng-show = "root.data.c.pageNow == '希望支援'">
     </a>
 
 
   <hr>
 <ul>
-	<li ng-repeat = "sup in supports | has:pgNow | invis:pgNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.supNow = sup; $parent.pop = true; $parent.popURL = sup.split(' ')[1]">
+	<li ng-repeat = "sup in supports | has:root.data.c.pageNow | invis:root.data.c.pageNow " ng-click = "op(sup.split(' ')[1])" ng-mouseover = "$parent.supNow = sup; $parent.pop = true; $parent.popURL = sup.split(' ')[1]">
 
       <img src="img/leaf-green.png" class="leaf" ng-show = "supNow == sup"/>
       <img src="img/leaf-shadow.png" class="leaf shadow"/>
@@ -167,7 +167,7 @@
 
 <div id = 'main' class = "{{root.data.c.theme}}" 
 
-ng-dblclick = "focusRow = {}"
+ng-dblclick = "focusCol = {}"
  
 >
 
@@ -178,7 +178,7 @@ ng-dblclick = "focusRow = {}"
     <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
   </div>
 
-  <div id ='pageAlt' ng-show = "(pgNow == '自傳' || pgNow == '學習風格')  && lock && !sandbox && !root.data.c.share[pgNow]">
+  <div id ='pageAlt' ng-show = "(root.data.c.pageNow == '自傳' || root.data.c.pageNow == '學習風格')  && lock && !sandbox && !root.data.c.share[root.data.c.pageNow]">
 
   	只有<span ng-bind = "currentName"></span>本人和他願意分享的人
   	<br/>
@@ -189,18 +189,18 @@ ng-dblclick = "focusRow = {}"
   	您可以檢視其他頁面
   </div>
 
-  <div id ='page1' ng-show = "pgNow == '自傳' && (!lock || sandbox || root.data.c.share[pgNow])">
+  <div id ='page1' ng-show = "root.data.c.pageNow == '自傳' && (!lock || sandbox || root.data.c.share[root.data.c.pageNow])">
 
     <h2 ng-bind = "currentName"></h2>
 
     <div id = "mainImg" >
 
-      <img id = "x" class = "face" src = "{{root.data.t[planNow].mainImg}}" ng-show = "root.data.t[planNow].mainImg" ng-click = "root.data.t[planNow].mainImg = ''" />
+      <img id = "x" class = "face" src = "{{root.data.t[root.data.c.planNow].mainImg}}" ng-show = "root.data.t[root.data.c.planNow].mainImg" ng-click = "root.data.t[root.data.c.planNow].mainImg = ''" />
 
       <div id ="public">
-            <input  type="checkbox" ng-model="root.data.c.share[planNow]['自傳']">
+            <input  type="checkbox" ng-model="root.data.c.share[root.data.c.planNow]['自傳']">
 
-            <span ng-bind = "(root.data.c.share[planNow]['自傳'] && '公開分享自傳') || '不公開自傳'"></span>
+            <span ng-bind = "(root.data.c.share[root.data.c.planNow]['自傳'] && '公開分享自傳') || '不公開自傳'"></span>
 
             <a id = "info" class = "msg-icon msg-icon-info"
               onclick = "alert('個人檔案中的自傳，可選擇公開或不公開^_^')">
@@ -208,11 +208,11 @@ ng-dblclick = "focusRow = {}"
       </div>
 
       <br>
-      <span ng-hide = "root.data.t[planNow].mainImg">
+      <span ng-hide = "root.data.t[root.data.c.planNow].mainImg">
 
         上傳一張照片(檔案大小:100KB以下) 
 
-        <input class="hidden" type="file" fileread="root.data.t[planNow].mainImg" accept="image/*" capture="camera" id="file-upload" />
+        <input class="hidden" type="file" fileread="root.data.t[root.data.c.planNow].mainImg" accept="image/*" capture="camera" id="file-upload" />
 
         
       </span>
@@ -229,11 +229,11 @@ ng-dblclick = "focusRow = {}"
           top : {{y*10}}px; left : {{x*10}}px;
 
           background-color: {{
-           (root.data.t[planNow].timeline[y][x] && 'rgb(' + (50 + x*3) + ',' + (255 - y *10 - x*3) + ',50)' ) || '#cfc' }} ;
+           (root.data.t[root.data.c.planNow].timeline[y][x] && 'rgb(' + (50 + x*3) + ',' + (255 - y *10 - x*3) + ',50)' ) || '#cfc' }} ;
 
-        " ng-mouseover = "draw($event,y,x,planNow,colorNow)"
+        " ng-mouseover = "draw($event,y,x,root.data.c.planNow,colorNow)"
 
-          ng-dblclick = "resetDraw(planNow)"
+          ng-dblclick = "resetDraw(root.data.c.planNow)"
 
         >          
           &nbsp;
@@ -245,48 +245,48 @@ ng-dblclick = "focusRow = {}"
     </div>
     
     <div style="text-align:right">
-	    我今年<input type = "number" ng-model = "root.data.t[planNow].age" />歲
+	    我今年<input type = "number" ng-model = "root.data.t[root.data.c.planNow].age" />歲
 	</div>
 
     <hr>
-	  <textarea rows= '22' cols = '52' ng-model = "root.data.t[planNow]['自傳']"  
+	  <textarea rows= '22' cols = '52' ng-model = "root.data.t[root.data.c.planNow]['自傳']"  
 
-    ng-focus = " root.data.t[planNow]['自傳'] = hintToNull(root.data.t[planNow]['自傳']) "
+    ng-focus = " root.data.t[root.data.c.planNow]['自傳'] = hintToNull(root.data.t[root.data.c.planNow]['自傳']) "
 
-    ng-blur = "root.data.t[planNow]['自傳'] = root.data.t[planNow]['自傳'] || hintData.t[planNow]['自傳'] "
+    ng-blur = "root.data.t[root.data.c.planNow]['自傳'] = root.data.t[root.data.c.planNow]['自傳'] || hintData.t[root.data.c.planNow]['自傳'] "
     >
 
 
     </textarea>
   </div>
 
-  <div id ='page2' ng-show = "pgNow == '學習風格' && (!lock || sandbox || root.data.c.share[pgNow])">
+  <div id ='page2' ng-show = "root.data.c.pageNow == '學習風格' && (!lock || sandbox || root.data.c.share[root.data.c.pageNow])">
 
 	  <textarea rows= '8' cols = '45'
-    ng-model = 'root.data.t[planNow]["學習風格"]'
-    ng-focus = " root.data.t[planNow]['學習風格'] = hintToNull(root.data.t[planNow]['學習風格']) "
-    ng-blur = "root.data.t[planNow]['學習風格'] = root.data.t[planNow]['學習風格'] || hintData.t[planNow]['學習風格'] "
+    ng-model = 'root.data.t[root.data.c.planNow]["學習風格"]'
+    ng-focus = " root.data.t[root.data.c.planNow]['學習風格'] = hintToNull(root.data.t[root.data.c.planNow]['學習風格']) "
+    ng-blur = "root.data.t[root.data.c.planNow]['學習風格'] = root.data.t[root.data.c.planNow]['學習風格'] || hintData.t[root.data.c.planNow]['學習風格'] "
     > </textarea>
 
-           <span ng-bind = "(root.data.c.share[planNow]['學習風格'] && '公開分享學習風格') || '不公開學習風格'"></span>
+           <span ng-bind = "(root.data.c.share[root.data.c.planNow]['學習風格'] && '公開分享學習風格') || '不公開學習風格'"></span>
 
             <a id = "info" class = "msg-icon msg-icon-info"
               onclick = "alert('個人檔案中的學習風格，可選擇公開或不公開^_^')">
             </a>
 
     <ul>「視聽讀作」參照
-    	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleV" />視覺:我喜歡看圖象來學習
-    	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleA" />聽覺:我喜歡聽聲音來學習
-    	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleR" />閱讀:我喜歡閱讀文字來學習
-    	<li><input type = "checkbox" ng-model = "root.data.t[planNow].styleK" />動作:我喜歡實際操作來學習
+    	<li><input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].styleV" />視覺:我喜歡看圖象來學習
+    	<li><input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].styleA" />聽覺:我喜歡聽聲音來學習
+    	<li><input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].styleR" />閱讀:我喜歡閱讀文字來學習
+    	<li><input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].styleK" />動作:我喜歡實際操作來學習
     </ul>
 
     <ul>「整體分析」參照
-    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[planNow].styleWhole" value="Whole"/>
+    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[root.data.c.planNow].styleWhole" value="Whole"/>
     	整體學習:我喜歡一次瞭解一個整體的輪廊，再進入部份
-    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[planNow].styleWhole" value="Part"/>
+    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[root.data.c.planNow].styleWhole" value="Part"/>
     	分析學習:我喜歡一次瞭解一個部份，再進入整體
-    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[planNow].styleWhole" value="Both" />
+    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[root.data.c.planNow].styleWhole" value="Both" />
     	綜合學習:先瞭解整體或部份，我都可以學得很好
     </ul>
 
@@ -295,14 +295,14 @@ ng-dblclick = "focusRow = {}"
 
 
 
-  <div id ='page3' ng-show = "pgNow == '學習主題與領域'">
+  <div id ='page3' ng-show = "root.data.c.pageNow == '學習主題與領域'">
 
     <textarea id = "y" rows = "3" cols = "25"
      ng-model = "addTopic" ng-keydown = "adTPC($event)" placeholder = "寫上新主題，再按Enter新增"> </textarea>
 
 <!--  <a ng-click= "adTPC($event)">增加主題</a> -->
 
-      <span ng-repeat = "t in root.data.t[planNow]['主題']"> <a id = "x" ng-click = "root.data.t[planNow]['主題'] = removeElem(root.data.t[planNow]['主題'], t)">{{t}}✘</a></span>
+      <span ng-repeat = "t in root.data.t[root.data.c.planNow]['主題']"> <a id = "x" ng-click = "root.data.t[root.data.c.planNow]['主題'] = removeElem(root.data.t[root.data.c.planNow]['主題'], t)">{{t}}✘</a></span>
 
       <br>
           
@@ -318,31 +318,31 @@ ng-dblclick = "focusRow = {}"
         <table>
            <tr>
             <th>
-            <span id = "status" ng-show = "count(root.data.t[planNow].correlation, sevenFields, root.data.t[planNow]['主題']) > 0">尚餘{{count(root.data.t[planNow].correlation, sevenFields, root.data.t[planNow]['主題'])}}個領域</span>
+            <span id = "status" ng-show = "count(root.data.t[root.data.c.planNow].correlation, sevenFields, root.data.t[root.data.c.planNow]['主題']) > 0">尚餘{{count(root.data.t[root.data.c.planNow].correlation, sevenFields, root.data.t[root.data.c.planNow]['主題'])}}個領域</span>
 
-            <span id = "status" ng-hide= "count(root.data.t[planNow].correlation, sevenFields, root.data.t[planNow]['主題']) > 0">都對到了!!</span>
+            <span id = "status" ng-hide= "count(root.data.t[root.data.c.planNow].correlation, sevenFields, root.data.t[root.data.c.planNow]['主題']) > 0">都對到了!!</span>
             </th>
 
-            <th ng-repeat = "t in root.data.t[planNow]['主題']"> {{t}}</th>
+            <th ng-repeat = "t in root.data.t[root.data.c.planNow]['主題']"> {{t}}</th>
            </tr>
            <tr ng-repeat = "a in sevenFields">
             <th>{{a}}</th>
-              <td ng-repeat = "t in root.data.t[planNow]['主題']">
+              <td ng-repeat = "t in root.data.t[root.data.c.planNow]['主題']">
               	
-<!--                <input type = "checkbox" ng-model ="root.data.t[planNow].correlation[a+t]"> -->
+<!--                <input type = "checkbox" ng-model ="root.data.t[root.data.c.planNow].correlation[a+t]"> -->
 
-                <a id = "aCheckbox" class="{{root.data.t[planNow].correlation[a+t]}}" 
-                 ng-click="root.data.t[planNow].correlation[a+t] = !root.data.t[planNow].correlation[a+t]">
-                	{{(root.data.t[planNow].correlation[a+t] && '✓') || ' '}}
+                <a id = "aCheckbox" class="{{root.data.t[root.data.c.planNow].correlation[a+t]}}" 
+                 ng-click="root.data.t[root.data.c.planNow].correlation[a+t] = !root.data.t[root.data.c.planNow].correlation[a+t]">
+                	{{(root.data.t[root.data.c.planNow].correlation[a+t] && '✓') || ' '}}
                 </a>
 
-                <span class= "clipOnly"> {{ root.data.t[planNow].correlation[a+t] && "✓" || ''}} </span>
+                <span class= "clipOnly"> {{ root.data.t[root.data.c.planNow].correlation[a+t] && "✓" || ''}} </span>
            </tr>
         </table>
   </div>
 
 
-  <div id ='page4' ng-show = "pgNow == '一週節奏'">
+  <div id ='page4' ng-show = "root.data.c.pageNow == '一週節奏'">
 
    <table >
   		<tr>
@@ -352,7 +352,8 @@ ng-dblclick = "focusRow = {}"
 
   		<tr ng-repeat = "j in root.data.c.dayTimes">
 
-  			<th id = "x" ng-click = "$parent.root.data.c.dayTimes = removeElem($parent.root.data.c.dayTimes, j)">
+  			<th id = "x" ng-click = "$parent.root.data.c.dayTimes = removeElem($parent.root.data.c.dayTimes, j)"
+          ng-mouseover = "onlyTrue(focusCol,'h')">
   				
           {{root.data.c[j] || j}}
   			</th>
@@ -361,27 +362,24 @@ ng-dblclick = "focusRow = {}"
 
           rowspan="{{ 
            
-           (focusRow[d] && 1) || 
-            (d | countRowSpan:j:(root.data.t[planNow].schedule):root.data.c.dayTimes:root.data.c) 
+           (focusCol[d] && 1) || 
+            (d | countRowSpan:j:(root.data.t[root.data.c.planNow].schedule):root.data.c.dayTimes) 
 
           }}" style = " display: {{ 
 
-          (focusRow[d] && true) ||
+          (focusCol[d] && true) ||
+            (d | countRowSpan:j:(root.data.t[root.data.c.planNow].schedule):root.data.c.dayTimes)  || 'none' }} "
 
-          (d | countRowSpan:j:(root.data.t[planNow].schedule):root.data.c.dayTimes:root.data.c)  || 'none' }}"
+          ng-mouseover = "focusCol = onlyTrue(focusCol,d)">
 
-          ng-mouseover = "focusRow[d] = true"
+          <span ng-bind = "root.data.t[root.data.c.planNow].schedule[d+j]" ng-hide = "focusCol[d]"></span>
 
-          >
+  				<select ng-model = "root.data.t[root.data.c.planNow].schedule[d+j]" ng-show = "focusCol[d]" value="{{root.data.t[root.data.c.planNow].schedule[d+j]}}">
 
-  				<select ng-model = "root.data.t[planNow].schedule[d+j]"  value="{{root.data.t[planNow].schedule[d+j]}}"
-
-
-          >
             <option value=""> </option>
 
-  					<option ng-repeat = "tp in root.data.t[planNow]['主題']"
-                    ng-selected="{{tp == root.data.t[planNow].schedule[d+j]}}"
+  					<option ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']"
+                    ng-selected="{{tp == root.data.t[root.data.c.planNow].schedule[d+j]}}"
                     value="{{tp}}">
                     {{root.data.c[tp] || tp}}
             </option>
@@ -394,6 +392,7 @@ ng-dblclick = "focusRow = {}"
   			</td> 			
   		</tr>
 
+      <tr ng-show = "focusCol['h']">
         <th colspan="8">
           <input id = "y"  ng-model = "newJ" placeholder = "新增時段"
            ng-keypress = "mayBePushDJ($event, newJ)"
@@ -401,10 +400,6 @@ ng-dblclick = "focusRow = {}"
 
           <a id = "y" ng-click = "root.data.c.dayTimes.push(newJ); newJ = ''">新增</a>
         </th>
-
-      <tr>
-
-
       </tr>
   		
   	</table>
@@ -415,8 +410,14 @@ ng-dblclick = "focusRow = {}"
     <span>
       彈性 → <input ng-model = "root.data.c.free">
     </span>
-    <span style = "display:inline-block;" ng-repeat = "tp in root.data.t[planNow]['主題']">
+    <span style = "display:inline-block;" ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']">
       {{tp}} → <input ng-model = "root.data.c[tp]" placeholder = "自訂顯示的記號">
+
+<!--
+      <input ng-model = ""
+
+      placeholder = "自訂背景色">   -->
+
     </span>
 
 <!--dayTime-->
@@ -432,7 +433,7 @@ ng-dblclick = "focusRow = {}"
   </div>
 
 
-  <div id ='page5' ng-show = "pgNow == '進度與目標'">
+  <div id ='page5' ng-show = "root.data.c.pageNow == '進度與目標'">
 
    <select ng-model = "timeT" ng-init = "timeT = 'm'">
 	   	<option value="m">月進度</option>
@@ -441,32 +442,32 @@ ng-dblclick = "focusRow = {}"
    </select>
 
    自
-   <input type="number" ng-model = "root.data.t[planNow].shift"/>
+   <input type="number" ng-model = "root.data.t[root.data.c.planNow].shift"/>
    月起
 
    <table>
   		<tr>
   			<th></th>
-  			<th ng-repeat = "tp in root.data.t[planNow]['主題']">{{tp}}</th>
+  			<th ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']">{{tp}}</th>
   		</tr>
 
       <tr>
         <th>自學評鑑項目</th>
-        <td ng-repeat = "tp in root.data.t[planNow]['主題']">
+        <td ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']">
           
             <span  
             ng-repeat = "m in ['口頭說明','學習檔案','教師評量','家長自評','考試檢定']">
 
-              <span id = "present" class = "{{root.data.t[planNow].checkGoal[tp+m] || false }}">
+              <span id = "present" class = "{{root.data.t[root.data.c.planNow].checkGoal[tp+m] || false }}">
               	{{m}}
               </span>
 
-              <a id = "aCheckbox" class="{{root.data.t[planNow].checkGoal[tp+m] }}" 
-               ng-click="root.data.t[planNow].checkGoal[tp+m] = !root.data.t[planNow].checkGoal[tp+m]">
-                	{{(root.data.t[planNow].checkGoal[tp+m] && '✓') || ''}}
+              <a id = "aCheckbox" class="{{root.data.t[root.data.c.planNow].checkGoal[tp+m] }}" 
+               ng-click="root.data.t[root.data.c.planNow].checkGoal[tp+m] = !root.data.t[root.data.c.planNow].checkGoal[tp+m]">
+                	{{(root.data.t[root.data.c.planNow].checkGoal[tp+m] && '✓') || ''}}
                 </a>
 
-     <!--         <span class = "clipOnly"> {{ root.data.t[planNow].checkGoal[tp+m] && "✓" || ''}} </span>  -->
+     <!--         <span class = "clipOnly"> {{ root.data.t[root.data.c.planNow].checkGoal[tp+m] && "✓" || ''}} </span>  -->
 
               <br>
 
@@ -474,33 +475,42 @@ ng-dblclick = "focusRow = {}"
 			
 			<span id = "present">
 
-				<textarea cols="4" rows="1" ng-model = "root.data.t[planNow].checkGoal[tp+'自訂評量']"  ng-show = "root.data.t[planNow].checkGoal[tp+'自訂']">
+				<textarea cols="4" rows="1" ng-model = "root.data.t[root.data.c.planNow].checkGoal[tp+'自訂評量']"  ng-show = "root.data.t[root.data.c.planNow].checkGoal[tp+'自訂']">
 				</textarea>
 
-				<a id = "aCheckbox" class="{{root.data.t[planNow].checkGoal[tp+'自訂'] }}" 
-               ng-click="root.data.t[planNow].checkGoal[tp+'自訂'] = !root.data.t[planNow].checkGoal[tp+'自訂']">
-                	{{(root.data.t[planNow].checkGoal[tp+'自訂'] && '✓') || ''}}
+				<a id = "aCheckbox" class="{{root.data.t[root.data.c.planNow].checkGoal[tp+'自訂'] }}" 
+               ng-click="root.data.t[root.data.c.planNow].checkGoal[tp+'自訂'] = !root.data.t[root.data.c.planNow].checkGoal[tp+'自訂']">
+                	{{(root.data.t[root.data.c.planNow].checkGoal[tp+'自訂'] && '✓') || ''}}
                 </a>
 
-            </span>
+        </span>
 
         </td>
       </tr>
 
-  		<tr ng-repeat = "j in calanD[timeT] | shifted:root.data.t[planNow].shift">
+  		<tr ng-repeat = "j in calanD[timeT] | shifted:root.data.t[root.data.c.planNow].shift">
 
   			<th>
   				{{j}}
   			</th>
 
-  			<td ng-repeat = "tp in root.data.t[planNow]['主題']">
+  			<td ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']"
 
-          {{tp + j}}
-        
+          ng-mouseover = "focusCol = onlyTrue(focusCol,tp)"
+
+          style = "width:150px"
+        >
+
+          {{tp + j}}        
+        <br>
         <br>
 
-  			<textarea cols="4" rows="6" 
-  				ng-model = "root.data.t[planNow].goal[tp+j]"
+        <span ng-hide = "focusCol[tp]" ng-bind = "root.data.t[root.data.c.planNow].goal[tp + j]">
+
+        </span>
+
+  			<textarea ng-show = "focusCol[tp]" cols="4" rows="6" 
+  				ng-model = "root.data.t[root.data.c.planNow].goal[tp + j]"
   				   onfocus="$(this).attr('cols', 6)"
  				     onblur="$(this).attr('cols', 4)" 
   				   placeholder= "目標">
@@ -509,12 +519,12 @@ ng-dblclick = "focusRow = {}"
 
         <br>
 
-         <input type = "checkbox" ng-model = "root.data.t[planNow].checkGoal[tp+j]" />
+         <input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].checkGoal[tp+j]" ng-show = "root.data.t[root.data.c.planNow].goal[tp + j]"/>
          
-        <span class = "clipOnly"> {{ root.data.t[planNow].checkGoal[tp+j] && "✓" || ''}} </span>
+        <span class = "clipOnly"> {{ root.data.t[root.data.c.planNow].checkGoal[tp+j] && "✓" || ''}} </span>
 
 
-          成功
+          <span ng-show = "root.data.t[root.data.c.planNow].checkGoal[tp+j]">成功</a>
 
   				
   			</td> 			
@@ -524,7 +534,7 @@ ng-dblclick = "focusRow = {}"
   </div>
 
 
-  <div id ='page6' ng-show = "pgNow == '學習支持與資源' ">
+  <div id ='page6' ng-show = "root.data.c.pageNow == '學習支持與資源' ">
 
 	<span id = "x" ng-click = "help['學習支持與資源'] = false" ng-show = "help['學習支持與資源']">
     	<ul>
@@ -539,7 +549,7 @@ ng-dblclick = "focusRow = {}"
   	<table>
   		<tr><th></th><th>支持與資源</th></tr>
 
-  		<tr ng-repeat = "tp in root.data.t[planNow]['主題']">
+  		<tr ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']">
 
         <th> {{tp}} </th>
 
@@ -547,7 +557,7 @@ ng-dblclick = "focusRow = {}"
 
   			<textarea cols="30" rows="8"
 
-          	ng-model = "root.data.t[planNow].resources[tp]"
+          	ng-model = "root.data.t[root.data.c.planNow].resources[tp]"
 
             placeholder= "{{ hintSupports | tto:tp }}">
 
@@ -562,7 +572,7 @@ ng-dblclick = "focusRow = {}"
 
   </div>
 
- <div id ='page7' ng-show = "pgNow == '希望支援' ">
+ <div id ='page7' ng-show = "root.data.c.pageNow == '希望支援' ">
 
 
     <span id = "x" ng-click = "help['希望支援'] = false" ng-show = "help['希望支援']">
@@ -578,17 +588,17 @@ ng-dblclick = "focusRow = {}"
     <hr>
 
       <textarea rows= '12' cols = '30'
-      ng-model = 'root.data.t[planNow].callHelp'
+      ng-model = 'root.data.t[root.data.c.planNow].callHelp'
 
-      ng-focus = " root.data.t[planNow].callHelp = hintToNull(root.data.t[planNow].callHelp) "
+      ng-focus = " root.data.t[root.data.c.planNow].callHelp = hintToNull(root.data.t[root.data.c.planNow].callHelp) "
 
-      ng-blur = "root.data.t[planNow].callHelp = root.data.t[planNow].callHelp || hintData.t[planNow].callHelp "> </textarea>
+      ng-blur = "root.data.t[root.data.c.planNow].callHelp = root.data.t[root.data.c.planNow].callHelp || hintData.t[root.data.c.planNow].callHelp "> </textarea>
 
       <!-- 糊糊地址   Join 自學2.0  -->
 
   </div>
 
-  <div id ='feedback' ng-show = "pgNow == '意見箱' ">
+  <div id ='feedback' ng-show = "root.data.c.pageNow == '意見箱' ">
 
       〈自學2.0計畫編輯器〉的功能，我覺得：<br/>
 
@@ -755,12 +765,10 @@ $(document).ready(function(){
   var editApp = new angular.module('editApp',["firebase"]);
   editApp.filter('has',function(){
   	return function(list, x){
-//  		console.log(x);
   		return list.filter(function(str){return (str.indexOf(x) > -1) || (str.indexOf('all') > -1) })
   	}
   }).filter('invis',function(){
     return function(list, x){
-//      console.log(x);
       return list.map(function(str){return str.replace(x+',', '').replace('all,', '')});
     }
   }).filter('shifted',function(){
@@ -774,25 +782,20 @@ $(document).ready(function(){
 	    return ans;
     }
   }).filter('countRowSpan',function(){
-    return function(d,j,schedule,dayTimes,cObj){
+    return function(d,j,schedule,rowTitles){
 
-        var inx = dayTimes.indexOf(j);
+        var inx = rowTitles.indexOf(j);
 
-        var ans = (schedule[d+j] && 1) || 0;
+        var ans = (schedule[d + j] && 1) || 0;
 
-        if (inx ==0 || inx == dayTimes.length) ans = 1;
-
- //       if (cObj[jj] == 'none') ans = 0;
+        if (inx ==0 || inx == rowTitles.length) ans = 1;
 
         if (ans == 0 ) return;
 
-        for (var i = inx+1; i < dayTimes.length; i++) {
-          var jj = dayTimes[i];
+        for (var i = inx+1; i < rowTitles.length; i++) {
+          var jj = rowTitles[i];
           
-          if ( schedule[d+jj] ) { break } else { 
-            // if (cObj[jj] != 'none')
-             ans++; 
-          }
+          if ( schedule[d + jj] ) { break } else { ans++; }
         };
       
         return ans;
@@ -862,6 +865,8 @@ $(document).ready(function(){
   initData = new Object;
   initData.feedback = new Object;
   initData.c = new Object;
+  initData.c.planNow = 0;
+  initData.c.pageNow = '自傳';
   initData.c.supports = ['您'];
   initData.c.share = [ {'自傳':false, '學習風格':false}, {'自傳':false, '學習風格':false}  ] ;
 
@@ -928,7 +933,7 @@ $(document).ready(function(){
         ];
 
          for (var i = 0; i < 10; i++) {
-  //          $scope.root.data.t[planNow].timeline[i][0] = true;
+  //          $scope.root.data.t[root.data.c.planNow].timeline[i][0] = true;
 
             for (var j = 1; j < 72; j++) {
               initData.t[inn].timeline[i][j] = false;
@@ -970,12 +975,10 @@ $(document).ready(function(){
     $scope.name = '您';
     $scope.lock = true;
     $scope.delay = 100; // 到期延後日
-    $scope.focusRow = new Object;
+    $scope.focusCol = new Object;
 
     if(location.hash) {$scope.name = decodeURI(location.hash.replace('#','')) }
 
-    $scope.planNow = 0;
-    $scope.pgNow = '自傳';
 
 
     $scope.hintSupports = "t方面的老師?諮詢者?學習資源?同學?場地?" ;
@@ -987,6 +990,15 @@ $(document).ready(function(){
     	m: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
     	y: ['今年','明年','後年','3年後','4年後','5年後','10年後','20年後']
     };
+
+      $scope.onlyTrue = function(obj,a) {
+        var keys =Object.keys(obj);
+        for (var i = 0; i < keys.length; i++) {
+          obj[keys[i]] = false;
+        };
+        obj[a] = true;
+        return obj;
+      }
 
       $scope.clone = function(o) {
    
@@ -1034,32 +1046,32 @@ $(document).ready(function(){
 
     ];
 
-    $scope.$watch('pgNow', function(newVal, oldVal) {
-      $scope.focusRow = new Object;
+    $scope.$watch('root.data.c.pageNow', function(newVal, oldVal) {
+      $scope.focusCol = new Object;
     });
 
-    $scope.resetDraw = function (planNow) {
-      $scope.root.data.t[planNow].timeline = initData.t[0].timeline;
+    $scope.resetDraw = function (plan) {
+      $scope.root.data.t[plan].timeline = initData.t[0].timeline;
       $scope.updated = false;
 
     }
 
-    $scope.draw = function (ev,y,x,planNow, colorNow) {
-   //   console.log($scope.root.data.t[planNow]);
+    $scope.draw = function (ev,y,x,plan, colorNow) {
+   //   console.log($scope.root.data.t[root.data.c.planNow]);
 
       if (!colorNow) colorNow = false;
 
-      if (!$scope.root.data.t[planNow].timeline[y]) $scope.root.data.t[planNow].timeline[y] = [true];
+      if (!$scope.root.data.t[plan].timeline[y]) $scope.root.data.t[plan].timeline[y] = [true];
 
 //      var depth = ((x % 12 || x == 0 || x == 24) && 10) || 8;
       var depth = 10;
 
      
       for (var i = 0; i < depth; i++) {      
-            $scope.root.data.t[planNow].timeline[i][x] = colorNow;        
+            $scope.root.data.t[root.data.c.planNow].timeline[i][x] = colorNow;        
       } 
 
-      $scope.root.data.t[planNow].timeline[y][x] = !colorNow;
+      $scope.root.data.t[root.data.c.planNow].timeline[y][x] = !colorNow;
       $scope.updated = false; 
     }
 
@@ -1081,7 +1093,7 @@ $(document).ready(function(){
 
     $scope.adTPC = function(ev){
       if ((ev.keyCode && ev.keyCode != 13) || !$scope.addTopic) return;
-      $scope.root.data.t[$scope.planNow]['主題'].push($scope.addTopic);
+      $scope.root.data.t[$scope.root.data.c.planNow]['主題'].push($scope.addTopic);
       $scope.addTopic = '';
     }
 

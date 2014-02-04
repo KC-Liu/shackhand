@@ -1,17 +1,10 @@
 
-
-<!-- backbround image colored bots -->
-
-<!-- li icons before -->
-
-
-
 <!DOCTYPE html>
 <html ng-app = "editApp">
 
 <head>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script src="javascripts/lib/jquery-1.10.2.js"></script>
+<script src="javascripts/lib/jquery-ui.js"></script>
 <script src="javascripts/lib/angular.min.js"></script>
 
 <script src='https://cdn.firebase.com/v0/firebase.js'></script>
@@ -21,18 +14,14 @@
 
 <meta charset=utf-8 />
 
-<title>自學2.0計畫編輯器--製作你的學習計畫。與朋友分享。</title>
+<title>自學2.0計畫編輯器--製作你的學習計畫</title>
 
 
 <link rel="stylesheet" href="stylesheets/editor.css" />
 
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
 
-
-
 </head>
-
-
 
 
 <body ng-controller = "Ctrl" ng-keydown = "maybeSave($event)" class = "{{root.data.c.theme}}">
@@ -45,40 +34,90 @@
 
 <div id = "headInfos" class = "noPrint {{root.data.c.theme}}">
 
-  <span id = 'status'>
+  <div>
 
-    <span id = 'lastTime' ng-bind = "'上次存檔: '+(root.data.time | localTime)"> </span>  
-    <span id = 'remTime' ng-bind = "'___尚餘'+(root.data.time | countTime:delay:clock | showRemTime)">資料讀取中...</span>
-  </span>
+    <span id = 'updownload'>
 
-  <a id = "info" class = "msg-icon msg-icon-info"
-      onclick = "
-        if (confirm('非營利專案^_^\n\n免費版容量有限(所有用戶共100MB)\n\n請珍惜使用\n\n若放置不用將於期限後刪除\n\n每次存檔，即可延長期限^_^')) window.open('https://www.firebase.com/pricing.html')">
-   </a>
+      <a id = "download" class ="d" ng-href="{{root | forDownload}} " download = "{{root.data.myName | forDownloadName }}" target = "_blank" ng-mouseover = "hintD = true" ng-mouseout = "hintD = false"
+      ng-click = "save('noAlert')"> 儲存檔案
 
-  前往：<input ng-model = 'name' ng-focus = "name = (!currentUser && currentName) || root.data.c.supports[0] " ng-init = "chName(name)" ng-keypress = "mayBeChName($event, name)" placeholder ="輸入名字" />
-  
-  <a id = 'go' ng-click = 'chName(name)'>拜訪</a>
-  
-  <span id = "loginSpan" ng-hide = "currentUser">
-  或
-    <input ng-model = "password" type = "password"  ng-keypress = "mayBeChName($event, name, password)" placeholder ="輸入密碼以登入"/> 
+      <span ng-show = "hintD">
+      <br>
 
-    <a id = 'login' ng-click = 'chName(name, password)'>登入</a>
+        <span ng-bind = " '如出現一個很多字的頁面，請依下列指示：在空白處按「右鍵」→ 選「將網頁諸存為」→ 「'+ root.data.myName + '的學習計劃.json」'">
 
-  </span>
+       </span>
+      
+      </span></a>
 
+        <span>
+
+      <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.data.public" value="2"/>
+        公開
+      <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.data.public" value="1"/>
+       不公開
+      
+      <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.data.public" value="0" />
+        私人
+
+
+    <a id = "info" class = "msg-icon msg-icon-info"
+        ng-click = "askPublic()">
+     </a>
+    
+    
+        </span>
+
+
+      開啟舊檔
+      
+        <input id ="upload" type="file" fileread = "root" filetype = "json" accept="application/json"/>
+
+
+    </span>
+  </div>
+
+  <div ng-show = "tube">
+
+    <span id = 'status'>
+
+      <span id = 'lastTime' ng-bind = "'上次存檔: '+(root.data.time | localTime)"> </span>  
+      <span id = 'remTime' ng-bind = "'___尚餘'+(root.data.time | countTime:delay:clock | showRemTime)">資料讀取中...</span>
+    </span>
+
+    <a id = "info" class = "msg-icon msg-icon-info"
+        onclick = "
+          if (confirm('非營利專案^_^\n\n免費版容量有限(所有用戶共100MB)\n\n請珍惜使用\n\n若放置不用將於期限後刪除\n\n每次存檔，即可延長期限^_^')) window.open('https://www.firebase.com/pricing.html')">
+     </a>
+
+    前往：<input ng-model = 'name' ng-focus = "name = (!currentUser && currentName) || root.data.c.supports[0] "  ng-keypress = "mayBeChName($event, name)" placeholder ="輸入名字" />
+    
+    <a id = 'go' ng-click = 'chName(name)'>拜訪</a>
+    
+    <span id = "loginSpan" ng-hide = "currentUser">
+    或
+      <input ng-model = "password" type = "password"  ng-keypress = "mayBeChName($event, name, password)" placeholder ="輸入密碼以登入"/> 
+
+      <a id = 'login' ng-click = 'chName(name, password)'>登入</a>
+
+    </span>
+
+  </div>
 
 
   <div id = "rightHead">
-    <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && !sandbox'>已上鎖</a>
-    <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && !sandbox'>已解鎖</a>
 
-    
-    <span id = 'status' ng-show = 'sandbox'>沙盒</span>
-    <span ng-bind = "currentUser || '訪客' ">讀取中...</span>
+    <div ng-show = "tube">
+      <a id = 'unlock' ng-click = 'save()' ng-show = 'lock && !sandbox'>已上鎖</a>
+      <a id = 'lock' ng-click = 'lock = true' ng-show = '!lock && !sandbox'>已解鎖</a>
 
-    <a id = 'logut' ng-click = 'currentUser = false; lock = true;' ng-show = 'currentUser'>登出</a>
+      
+      <span id = 'status' ng-show = 'sandbox'>沙盒</span>
+      <span ng-bind = "currentUser || '訪客' ">讀取中...</span>
+
+      <a id = 'logut' ng-click = 'currentUser = false; lock = true;' ng-show = 'currentUser'>登出</a>
+
+    </div>
 
     <select ng-model = "root.data.c.theme" class = "s">
       <option value = "winter">冬</option>
@@ -113,6 +152,8 @@
 
 <div id = 'rightPages' class = "noPrint {{root.data.c.theme}}">
 
+
+
   <ul>
     <li ng-repeat = "k in ['自傳', '學習風格','學習主題與領域','一週節奏','進度與目標','學習支持與資源','希望支援','意見箱']" class = "{{$parent.root.data.c.pageNow == k && 'focus'}}" ng-mouseover = '$parent.root.data.c.pageNow = k;quite()'> 
 
@@ -121,7 +162,7 @@
 
       <br/>
 
-      <span ng-bind = "currentName + '的' + k"></span>
+      <span ng-bind = "(currentName || root.data.myName || '您') + '的' + k"></span>
       
       </li>
   </ul>
@@ -171,37 +212,17 @@ ng-dblclick = "focusCol = {}"
  
 >
 
-  <div id = "title">
+  <div id = "title" ng-show = "tube">
       
     <span id = 'status' ng-show = 'updated'>所有更動已儲存</span>
     <span id = 'status' ng-hide = 'updated'>等待儲存...按Ctrl+S儲存</span>
     <span id = 'status' ng-show = 'justDeleted'>本頁已刪除</span>
 
     <br>
-    <span id = 'updownload'>
-
-      <a id = 'd' ng-href="{{root | forDownload}} " download = "{{currentName | forDownloadName }}" target = "_blank" ng-mouseover = "hintUD = true" ng-mouseout = "hintUD = false"
-
-
-      > 下載資料檔<span ng-show = "hintUD">
-      <br>
-      如未自動下載卻出現資料頁面，請依下列指示：
-      <ol>
-        <li>在空白處按「右鍵」</li>
-        <li>選「將網頁諸存為」</li>
-        <li>自訂檔名.json。例如：{{currentName}}的學習計劃.json</li>
-      </ol>
-    </span></a>
-
-  <!--    <a ng-click = "download(currentName)">下載資料檔</a>  -->
-
-      <input type="file" fileread = "root"/>
-    </span>
 
   </div>
 
-  <div id ='pageAlt' ng-show = "(root.data.c.pageNow == '自傳' || root.data.c.pageNow == '學習風格')  && lock && !sandbox && !root.data.c.share[root.data.c.pageNow]">
-
+  <div id ='pageAlt' ng-show = "(root.data.c.pageNow == '自傳' || root.data.c.pageNow == '學習風格') && tube && lock && !sandbox && !root.data.c.share[root.data.c.pageNow]">
   	只有<span ng-bind = "currentName"></span>本人和他願意分享的人
   	<br/>
   	<br/>
@@ -211,28 +232,33 @@ ng-dblclick = "focusCol = {}"
   	您可以檢視其他頁面
   </div>
 
-  <div id ='page1' ng-show = "root.data.c.pageNow == '自傳' && (!lock || sandbox || root.data.c.share[root.data.c.pageNow])">
+  <div id ='page1' ng-show = "root.data.c.pageNow == '自傳' && ( !tube || !lock || sandbox || root.data.c.share[root.data.c.pageNow])">
 
-    <h2 ng-bind = "currentName"></h2>
+    <span ng-mouseover = "editMyName = true" ng-mouseout = "editMyName = false">
 
-    <div id = "mainImg" >
+      <h2 ng-hide = "editMyName" ng-bind = "root.data.myName || '您'"></h2>
+      <h2 ng-show = "editMyName"> <input ng-model ="root.data.myName"></h2>
+
+    </span>
+
+    <div id = "photo"  >
 
       <img id = "x" class = "face" src = "{{root.data.t[root.data.c.planNow].mainImg}}" ng-show = "root.data.t[root.data.c.planNow].mainImg" ng-click = "root.data.t[root.data.c.planNow].mainImg = ''" />
 
-      <div id ="public">
-            <input  type="checkbox" ng-model="root.data.c.share[root.data.c.planNow]['自傳']">
+          <div id ="public" ng-show = "tube">
+                <input id = "mainImg"  type="checkbox" ng-model="root.data.c.share[root.data.c.planNow]['自傳']">
 
-            <span ng-bind = "(root.data.c.share[root.data.c.planNow]['自傳'] && '公開分享自傳') || '不公開自傳'"></span>
+                <span ng-bind = "(root.data.c.share[root.data.c.planNow]['自傳'] && '公開分享自傳') || '不公開自傳'"></span>
 
-            <a id = "info" class = "msg-icon msg-icon-info"
-              onclick = "alert('個人檔案中的自傳，可選擇公開或不公開^_^')">
-            </a>
-      </div>
+                <a id = "info" class = "msg-icon msg-icon-info"
+                  onclick = "alert('個人檔案中的自傳，可選擇公開或不公開^_^')">
+                </a>
+          </div>
 
       <br>
       <span ng-hide = "root.data.t[root.data.c.planNow].mainImg">
 
-        上傳一張照片(檔案大小:100KB以下) 
+        貼一張照片(檔案大小:100KB以下) 
 
         <input class="hidden" type="file" fileread="root.data.t[root.data.c.planNow].mainImg" accept="image/*" capture="camera" id="file-upload" />
 
@@ -259,8 +285,6 @@ ng-dblclick = "focusCol = {}"
 
         >          
 
-     <!--     background-color: {{
-           (root.data.t[root.data.c.planNow].timeline[y][x] && 'rgb(' + (50 + x*3) + ',' + (255 - y *10 - x*3) + ',50)' ) || '#cfc' }} ;  -->
 
           &nbsp;
 
@@ -286,7 +310,7 @@ ng-dblclick = "focusCol = {}"
     </textarea>
   </div>
 
-  <div id ='page2' ng-show = "root.data.c.pageNow == '學習風格' && (!lock || sandbox || root.data.c.share[root.data.c.pageNow])">
+  <div id ='page2' ng-show = "root.data.c.pageNow == '學習風格' && (!tube || !lock || sandbox || root.data.c.share[root.data.c.pageNow])">
 
 	  <textarea rows= '8' cols = '45'
     ng-model = 'root.data.t[root.data.c.planNow]["學習風格"]'
@@ -882,13 +906,14 @@ $(document).ready(function(){
 
                 reader.onload = function (loadEvent) {
                     scope.$apply(function () {
-                        var f = loadEvent.target.result;
-
-                  //      f = angular.toJson(f);
-
-                        console.log(f); 
+                        var f = loadEvent.target.result; 
+                        
+                        if (f.substr(0,1) == '{') {
+                            f = JSON.parse(f);
+                        }                     
+                        
                         scope.fileread = f;
-
+                      
                     });
                 }
 
@@ -897,7 +922,13 @@ $(document).ready(function(){
                 if (filesize > 100) {
                   alert("檔案超過100KB");                // limit: 100KB
                 } else {
-                  reader.readAsDataURL(changeEvent.target.files[0]);
+
+                  if (attributes.filetype == 'json') {
+                    reader.readAsText(changeEvent.target.files[0]);
+                  } else {
+                    reader.readAsDataURL(changeEvent.target.files[0]);
+                  
+                  }
                 }
             });
         }
@@ -906,6 +937,7 @@ $(document).ready(function(){
 
   initData = new Object;
   initData.feedback = new Object;
+  initData.public = 1;
   initData.c = new Object;
   initData.c.planNow = 0;
   initData.c.pageNow = '自傳';
@@ -1008,8 +1040,6 @@ $(document).ready(function(){
     $scope.delay = 100; // 到期延後日
     $scope.focusCol = new Object;
 
-    if(location.hash) {$scope.name = decodeURI(location.hash.replace('#','')) }
-
 
 
     $scope.hintSupports = "t方面的老師?諮詢者?學習資源?同學?場地?" ;
@@ -1022,32 +1052,6 @@ $(document).ready(function(){
     	y: ['今年','明年','後年','3年後','4年後','5年後','10年後','20年後']
     };
 
-      $scope.onlyTrue = function(obj,a) {
-        var keys =Object.keys(obj);
-        for (var i = 0; i < keys.length; i++) {
-          obj[keys[i]] = false;
-        };
-        obj[a] = true;
-        return obj;
-      }
-
-      $scope.clone = function(o) {
-   
-        var m = $.extend(true, {}, o);
- //       console.log("Cloning this"); 
-   //     console.log(m);
-     //   console.log("well done"); 
-
-        return m;
-      }
-
-//      $scope.hint = $scope.clone(initData.t[0]);
-
-      $scope.hintData = $scope.clone(initData);
-
-      $scope.root = {};
-      $scope.root.data = $scope.clone(initData);
-      
 
     $scope.supports = [
     '全球化與自主學習(自傳,13分鐘_講座) http://www.youtube.com/embed/Mi7qkTyqimE',
@@ -1077,13 +1081,48 @@ $(document).ready(function(){
 
     ];
 
+      $scope.onlyTrue = function(obj,a) {
+        var keys =Object.keys(obj);
+        for (var i = 0; i < keys.length; i++) {
+          obj[keys[i]] = false;
+        };
+        obj[a] = true;
+        return obj;
+      }
+
+      $scope.clone = function(o) {
+   
+        var m = $.extend(true, {}, o);
+ //       console.log("Cloning this"); 
+   //     console.log(m);
+     //   console.log("well done"); 
+
+        return m;
+      }
+
+//      $scope.hint = $scope.clone(initData.t[0]);
+
+      $scope.hintData = $scope.clone(initData);
+
+      $scope.root = {};
+      $scope.root.data = $scope.clone(initData);
+
+
+    if(location.hash) {
+      $scope.root.data.myName = decodeURI(location.hash.replace('#',''));
+      $scope.name = decodeURI(location.hash.replace('#',''));
+    }
+
+      
+
+
     $scope.$watch('root.data.c.pageNow', function(newVal, oldVal) {
       $scope.focusCol = new Object;
     });
-
+/*
     $scope.download = function(name) {
       window.open('https://shackhand-plan.firebaseio.com/'+name+'.json?print=pretty&format=export&download='+encodeURI(name+'的學習計畫')+'.json');
-    }
+    }*/
 
     $scope.resetDraw = function (plan) {
       $scope.root.data.t[plan].timeline = initData.t[0].timeline;
@@ -1170,6 +1209,13 @@ $(document).ready(function(){
       window.open(url);
     }
 
+    $scope.askPublic = function() {
+            $scope.data.public = (confirm(
+               '公開: 公開分享給任何需要的人當參考\n\n'
+              +'不公開: 資料僅供研發團隊改進參考，不公開分享\n\n'
+              +'私人: 研發團隊也不會儲存您的資料') && 2) || 1;
+    }
+
 
     $scope.maybeSave = function (event) {
 
@@ -1185,13 +1231,18 @@ $(document).ready(function(){
               case 'd':
                   event.preventDefault();
                   console.log('ctrl-d');
-                  if (confirm("捨棄本次更新?")) $scope.overwrite();
+                  if (confirm("捨棄本次更新?") && $scope.tube) $scope.overwrite();
               case 'r':
                   event.preventDefault();
                   console.log('ctrl-r');
-                  if (confirm("清空資料，還原成範本?"))
-                  $scope.root.data = initData;
-                  $scope.$digest();
+                  if (confirm("清空資料，還原成範本?")) {
+                    $scope.root.data = initData;
+                    $scope.$digest();
+                  }
+              case 'l':
+                  event.preventDefault();
+                  console.log('ctrl-l');
+                  $('input#upload').trigger('click');
             }
         }
 
@@ -1217,7 +1268,27 @@ $(document).ready(function(){
       return p1 && p2;
     }
 
-    $scope.save = function () {
+    $scope.save = function (noAlert) {
+
+        if(!$scope.tube) {
+          if (!noAlert) alert("請按左上角的「儲存檔案」鈕");
+
+            if ($scope.root.data.public > 0) {
+
+              var d = new Date;
+              console.log(d.getTime());
+              console.log($scope.root);
+              $scope.root.data.time = d.getTime();
+
+              var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI($scope.root.data.myName));
+
+              $scope.base = $firebase(ref);
+              $scope.base.$set($scope.root);
+
+            }
+
+          return;
+        }
 
       	if (!$scope.sandbox)  {
 

@@ -155,7 +155,6 @@ input#tags {
   width: 45mm;
 }
 
-
 #headInfos {
   position: fixed;
   z-index: 88;
@@ -172,9 +171,14 @@ input#tags {
 }
 
 
-#headInfos *{
+#headInfos span{
   max-height: 28px;
   min-width: 10px;
+}
+
+#headInfos span:hover{
+  max-height: 300px;
+  z-index: 999;
 }
 
 
@@ -197,9 +201,14 @@ input#tags {
   border-radius: 5px 0 5px 0;
   padding-left: 5px;
   padding-right: 5px;
-  font-size: 12px;
+  font-size: 14px;
   background-color: #afa;
 }
+
+#headInfos a:hover, #main a:hover, #leftSupports a:hover {
+  font-size: 16px;
+}
+
 
 #main a#info, #headInfos a#info, #leftSupports a#info {
   cursor: help;
@@ -273,6 +282,14 @@ input#tags {
 span#status {
   display: inline-block;
   color: #999;
+}
+
+span#updownload {
+  margin-left: 30px;
+}
+
+.d {
+  margin-right: 30px;
 }
 
 /* 
@@ -382,9 +399,6 @@ a#y, #y {
   cursor: copy;
 }
 
-a#d:hover, #d:hover {
-  font-size: 200%;
-}
 
 .s {
   cursor: alias;
@@ -406,7 +420,7 @@ img.face {
 }
 
 
-#mainImg {  
+#photo {  
   text-align: center;
 }
 

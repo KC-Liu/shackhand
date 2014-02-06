@@ -182,8 +182,9 @@ input#tags {
 }
 
 
-#headInfos input{
-  width: 150px;
+#headInfos input[type=radio]{
+  width: 130px;
+  margin-right: -3px;
 }
 
 #headInfos #rightHead {

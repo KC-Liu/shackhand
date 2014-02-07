@@ -5,7 +5,7 @@
 <head>
 <script src="javascripts/lib/jquery-1.10.2.js"></script>
 
-<!--<script src="javascripts/lib/jquery-ui.js"></script>  -->
+<script src="javascripts/lib/jquery-ui.js"></script>
 <script src="javascripts/lib/angular.min.js"></script>
 
 <script src='https://cdn.firebase.com/v0/firebase.js'></script>
@@ -44,7 +44,7 @@
       <span ng-show = "hintD">
       <br>
 
-        <span ng-bind = " '如出現一個很多字的頁面，請依下列指示：在空白處按「右鍵」→ 選「將網頁諸存為」→ 「'+ root.data.myName + '的學習計劃.json」'">
+        <span ng-bind = " '如出現一個很多字的頁面，請依下列指示：在空白處按「右鍵」→ 選「將網頁諸存為」→ 「'+ root.data.myName + '的學習計劃.plan.json」'">
 
        </span>
       
@@ -829,7 +829,8 @@ $(document).ready(function(){
 
 
   var editApp = new angular.module('editApp',["firebase"]);
-  editApp.config(['$compileProvider', function($compileProvider) {
+
+  editApp.config(['$compileProvider', function($compileProvider) {  // fix unsafe bug
       $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|tel|data):/);
   }]).filter('has',function(){
   	return function(list, x){
@@ -855,7 +856,7 @@ $(document).ready(function(){
     }   //的學習計劃.json
   }).filter('forDownloadName',function(){
     return function(str){
-      return str+'的學習計劃.json'
+      return str+'的學習計劃.plan.json'
     }   
     return function(list, x){
     	var ans = [];
@@ -909,7 +910,7 @@ $(document).ready(function(){
     }
   }).filter('shifted',function(){
     return function(list,num){
-    	var ansList = [];
+    	var ansList = new Array;
     	for (var i = num-1; i < list.length; i++) {
     		ansList.push(list[i % list.length]);
     	};

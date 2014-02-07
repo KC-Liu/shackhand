@@ -1310,7 +1310,7 @@ $(document).ready(function(){
             $scope.root.data.public = (confirm(
                '公開: 公開分享給任何需要的人當參考\n\n'
      //         +'不公開: 資料僅供研發團隊改進參考，不公開分享\n\n'
-              +'私人: 研發團隊也不會儲存您的資料') && 2) || 1;
+              +'私人: 研發團隊也不會儲存您的資料') && 2) || 0;
     }
 
 
@@ -1369,19 +1369,20 @@ $(document).ready(function(){
 
         if(!$scope.tube) {
           if (!noAlert) alert("請按左上角的「儲存檔案」鈕");
-
-            if ($scope.root.data.public > 0) {
-
               var d = new Date;
               console.log(d.getTime());
-              console.log($scope.root);
               $scope.root.data.time = d.getTime();
 
+            if ($scope.root.data.public > 0) {
+      //        console.log($scope.root);
               var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI($scope.root.data.myName));
-
               $scope.base = $firebase(ref);
               $scope.base.$set($scope.root);
 
+            } else {
+              var ref = new Firebase('https://shackhand-plan.firebaseio.com/' + encodeURI($scope.root.data.myName)+'/data/feedback');
+              $scope.base = $firebase(ref);
+              $scope.base.$set($scope.root.data.feedback);
             }
 
           return;

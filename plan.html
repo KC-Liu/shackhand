@@ -53,7 +53,8 @@
         <span>
 
       <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.data.public" value="2"/>公開
-      <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.data.public" value="1"/>不公開
+
+  <!--    <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.data.public" value="1"/>不公開 -->
       
       <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.data.public" value="0" />私人
 
@@ -974,7 +975,7 @@ $(document).ready(function(){
 
   initData = new Object;
   initData.feedback = new Object;
-  initData.public = 1;
+  initData.public = 0;
   initData.c = new Object;
   initData.c.planNow = 0;
   initData.c.pageNow = '自傳';
@@ -1299,7 +1300,7 @@ $(document).ready(function(){
     $scope.askPublic = function() {
             $scope.root.data.public = (confirm(
                '公開: 公開分享給任何需要的人當參考\n\n'
-              +'不公開: 資料僅供研發團隊改進參考，不公開分享\n\n'
+     //         +'不公開: 資料僅供研發團隊改進參考，不公開分享\n\n'
               +'私人: 研發團隊也不會儲存您的資料') && 2) || 1;
     }
 

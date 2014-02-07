@@ -1,3 +1,14 @@
+.flashStart {
+  display: block;
+  position: fixed;
+  width: 50%;
+  height: 50%;
+  top: 33%;
+  left: 25%;
+  text-align: center;
+  vertical-align: middle;
+  z-index: 1096;
+}
 
 #page {
   display: block;

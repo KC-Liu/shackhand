@@ -31,6 +31,12 @@
     <source src="voice/easy.ogg" type="audio/ogg">
   </audio>
 
+<div id = "logo" class = "flashStart noPrint">
+  <a href = "http:/www.alearn.org.tw" target = "_blank">
+    <img src="img/top01.jpg"/>
+  </a>
+</div>
+
 
 <div id = "headInfos" class = "noPrint {{root.data.c.theme}}">
 
@@ -812,6 +818,9 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
 $(document).ready(function(){
   
   $('.noSelect').disableSelection();
+
+    $('.flashStart').fadeOut(6000);
+//    $('.flashStart').css('z-index', 0);
 
 });
 

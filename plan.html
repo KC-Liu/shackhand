@@ -1297,7 +1297,7 @@ $(document).ready(function(){
     }
 
     $scope.askPublic = function() {
-            $scope.data.public = (confirm(
+            $scope.root.data.public = (confirm(
                '公開: 公開分享給任何需要的人當參考\n\n'
               +'不公開: 資料僅供研發團隊改進參考，不公開分享\n\n'
               +'私人: 研發團隊也不會儲存您的資料') && 2) || 1;

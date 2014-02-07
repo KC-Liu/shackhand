@@ -358,12 +358,12 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
     <hr>
 
     <ul>「整體-分析」
-    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[root.data.c.planNow].styleWhole" value="Whole"/><br/><br/>
-    	整體學習：我喜歡一次瞭解一個整體的輪廊，再進入部份
-    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[root.data.c.planNow].styleWhole" value="Part"/><br/><br/>
-    	分析學習：我喜歡一次瞭解一個部份，再進入整體
-    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[root.data.c.planNow].styleWhole" value="Both" /><br/><br/>
-    	綜合學習：先瞭解整體或部份，我都可以學得很好
+    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[root.data.c.planNow].styleWhole" value="Whole"/>
+    	整體學習：我喜歡一次瞭解一個整體的輪廊，再進入部份<br/><br/>
+    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[root.data.c.planNow].styleWhole" value="Part"/>
+    	分析學習：我喜歡一次瞭解一個部份，再進入整體<br/><br/>
+    	<li><input name = "whole" type = "radio" ng-model = "root.data.t[root.data.c.planNow].styleWhole" value="Both" />
+    	綜合學習：先瞭解整體或部份，我都可以學得很好<br/><br/>
     </ul>
 
   </div>
@@ -967,19 +967,20 @@ $(document).ready(function(){
                     });
                 }
 
-                var filesize = ((changeEvent.target.files[0].size/1024)/1024).toFixed(4)*1024; // KB
-
-                if (filesize > 100) {
-                  alert("檔案超過100KB");                // limit: 100KB
+                if (attributes.filetype == 'json') {
+                    reader.readAsText(changeEvent.target.files[0]);
                 } else {
 
-                  if (attributes.filetype == 'json') {
-                    reader.readAsText(changeEvent.target.files[0]);
-                  } else {
-                    reader.readAsDataURL(changeEvent.target.files[0]);
+                    var filesize = ((changeEvent.target.files[0].size/1024)/1024).toFixed(4)*1024; // KB
+
+                    if (filesize > 100) {
+                      alert("檔案超過100KB");                // limit: 100KB
+                    } else {
+                      reader.readAsDataURL(changeEvent.target.files[0]);                     
+                    }
                   
                   }
-                }
+                
             });
         }
     }

@@ -379,7 +379,7 @@ span#updownload {
   height: 297mm;
   padding: 10px;
   display: block;
-  border-radius: 0px 15px 15px 0px;
+  border-radius: 15px;
   overflow: auto;
 }
 
@@ -387,7 +387,7 @@ span#updownload {
   position: absolute;
   background: #fff;
   top: 65px;
-  left: 202px;
+  left: 212px;
 }
 
 #main #title {

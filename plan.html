@@ -372,11 +372,9 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
 
   <div id ='page3' ng-show = "root.data.c.pageNow == '學習主題與領域'">
 
-  <div class="noPrint">
-    <textarea id = "y" rows = "3" cols = "25"
-     ng-model = "addTopic" ng-keydown = "adTPC($event)" placeholder = "寫上新主題，再按Enter新增"> </textarea>
-
-<!--  <a ng-click= "adTPC($event)">增加主題</a> -->
+    <div class="noPrint">
+      <textarea id = "y" rows = "3" cols = "25"
+     ng-model = "addTopic" ng-keydown = "adTPC($event,'addTopic',root.data.t[root.data.c.planNow]['主題']);" placeholder = "寫上新主題，再按Enter新增"> </textarea>
 
       <span ng-repeat = "t in root.data.t[root.data.c.planNow]['主題']"> <a id = "x" ng-click = "root.data.t[root.data.c.planNow]['主題'] = removeElem(root.data.t[root.data.c.planNow]['主題'], t)">{{t}}✘</a></span>
 
@@ -403,7 +401,8 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
 
             <th ng-repeat = "t in root.data.t[root.data.c.planNow]['主題']"> {{t}}</th>
            </tr>
-           <tr ng-repeat = "a in sevenFields">
+           <tr ng-repeat = "a in sevenFields" ng-show = "root.data.t[root.data.c.planNow].enable7F">
+
             <th>{{a}}</th>
               <td ng-repeat = "t in root.data.t[root.data.c.planNow]['主題']">
               	
@@ -417,11 +416,42 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
 
        <!--         <span class= "clipOnly"> {{ root.data.t[root.data.c.planNow].correlation[a+t] && "✓" || ''}} </span>  -->
            </tr>
+           <tr ng-repeat = "f in root.data.t[root.data.c.planNow].fields">
+              <th>{{f}}</th>
+
+                <td ng-repeat = "t in root.data.t[root.data.c.planNow]['主題']">
+                
+
+                <a id = "aCheckbox" class="{{root.data.t[root.data.c.planNow].correlation[f+t] || 'false noPrint'  }}" 
+
+                 ng-click="root.data.t[root.data.c.planNow].correlation[f+t] = !root.data.t[root.data.c.planNow].correlation[f+t]">
+                  {{(root.data.t[root.data.c.planNow].correlation[f+t] && '✓') || ' '}}
+                </a>
+           </tr>
+
+
         </table>
 
+        <div ng-show = "root.data.t[root.data.c.planNow].enable7F">
          <span id = "status" class = "noPrint" ng-show = "count(root.data.t[root.data.c.planNow].correlation, sevenFields, root.data.t[root.data.c.planNow]['主題']) > 0">尚餘{{count(root.data.t[root.data.c.planNow].correlation, sevenFields, root.data.t[root.data.c.planNow]['主題'])}}個領域 </span>
 
          <span id = "status" class = "noPrint" ng-hide= "count(root.data.t[root.data.c.planNow].correlation, sevenFields, root.data.t[root.data.c.planNow]['主題']) > 0">都對到了!!</span>
+        </div>
+
+
+        <div class="noPrint">
+         <br/>
+         <br/>
+         <input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].enable7F" /> 七大領域
+
+         <br/>
+         <br/>
+          <textarea id = "y" rows = "3" cols = "25"
+         ng-model = "addField" ng-keydown = "adTPC($event, 'addField', root.data.t[root.data.c.planNow].fields);" placeholder = "寫上新領域，再按Enter新增"> </textarea>
+
+          <span ng-repeat = "f in root.data.t[root.data.c.planNow].fields"> <a id = "x" ng-click = "root.data.t[root.data.c.planNow].fields = removeElem(root.data.t[root.data.c.planNow].fields, f)">{{f}}✘</a></span>
+
+        </div>
   </div>
 
 
@@ -1075,6 +1105,8 @@ $(document).ready(function(){
         initData.t[inn].resources = {};
         
         initData.t[inn]['主題'] = ['生活自理','運動','收集資訊'];
+        initData.t[inn].fields = [];
+        initData.t[inn].enable7F = true;
 
         initData.t[inn].timeline = [];
 
@@ -1268,14 +1300,31 @@ $(document).ready(function(){
        return list.filter(function(str){ return str.indexOf(elem) == -1})
     }
 
-    $scope.adTPC = function(ev){
-      if ((ev.keyCode && ev.keyCode != 13) || !$scope.addTopic) return;
-      $scope.root.data.t[$scope.root.data.c.planNow]['主題'].push($scope.addTopic);
-      $scope.addTopic = '';
+    $scope.adTPC = function(ev, fromI, to){
+      if ((ev.keyCode && ev.keyCode != 13) || !$scope[fromI]) return;
+      if (!to) to = new Array;      
+      var item = $scope[fromI].split('///')[0];
+      var insert = $scope[fromI].split('///')[1];
+      if (typeof(insert) == 'undefined') insert = to.length - 1;
+      to.splice(insert, 0, item);
+      $scope[fromI] = '';
     }
 
-    $scope.count = function(table, set1, set2) {
+/*
+    $scope.adFLD = function(ev) {
+      if ((ev.keyCode && ev.keyCode != 13) || !$scope.addField) return;
+      if (!$scope.root.data.t[$scope.root.data.c.planNow].fields) $scope.root.data.t[$scope.root.data.c.planNow].fields = new Array;
 
+      var item = $scope.addField.split('///')[0];
+      var insert = $scope.addField.split('///')[1];
+      if (typeof(insert) == 'undefined') insert = $scope.root.data.t[$scope.root.data.c.planNow].fields.length - 1;
+
+       $scope.root.data.t[$scope.root.data.c.planNow].fields.splice(insert, 0, item);
+
+      $scope.addField = '';  //
+    } */
+
+    $scope.count = function(table, set1, set2) {
 
       var ans = set1.length;
 

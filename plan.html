@@ -1304,7 +1304,7 @@ $(document).ready(function(){
       if ((ev.keyCode && ev.keyCode != 13) || !$scope[fromI]) return;
       if (!to) to = new Array;      
       var item = $scope[fromI].split('///')[0];
-      var insert = $scope[fromI].split('///')[1];
+      var insert = ($scope[fromI].split('///')[1] || 0);
       if (typeof(insert) == 'undefined') insert = to.length - 1;
       to.splice(insert, 0, item);
       $scope[fromI] = '';

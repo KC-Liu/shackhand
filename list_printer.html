@@ -3,9 +3,10 @@
 <html ng-app = "listApp">
 
 <head>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="javascripts/lib/jquery-1.10.2.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script src="javascripts/lib/angular.min.js"></script>
+
 <meta charset=utf-8 />
 
 <title>自學支持與學習資源。可列印。</title>
@@ -40,8 +41,7 @@
 </head>
 
 
-<body ng-controller = "Ctrl">
-
+<body ng-controller = "Ctrl" class = "{{root.data.c.theme}}">
 
 
 
@@ -49,13 +49,13 @@
 
 
   <div id = "all" >
-    <span ng-show = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked" >
+    <span ng-show = "root.gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked" >
       
-      <input id = "forceNo" type="checkbox" checked ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:false ; $('#forceNo').prop('checked', true);"> 取消全部
+      <input id = "forceNo" type="checkbox" checked ng-click = "root.gifts = root.gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:false ; $('#forceNo').prop('checked', true);"> 取消全部
     </span>
 
-    <span ng-hide = "gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked">
-      <input id = "forceYes" type="checkbox" ng-click = "gifts = gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:true; $('#forceYes').prop('checked', false);" > 選取全部
+    <span ng-hide = "root.gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | allChecked">
+      <input id = "forceYes" type="checkbox" ng-click = "root.gifts = root.gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal | forceChecked:true; $('#forceYes').prop('checked', false);" > 選取全部
      </span>
 
   </div>
@@ -64,11 +64,11 @@
 
   <div id = "rightCustom" class="noPrint"> 
 
-        <span ng-hide = "gifts">資料讀取中...</span>
+        <span ng-hide = "root.gifts">資料讀取中...</span>
         
         <ul id = "sands">
 
-            <li ng-repeat = "gift in gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal "> <!--  | useKey:keySelect -->
+            <li ng-repeat = "gift in root.gifts | useKey:key | useKey:keyLocal | useKey:keySpecial | useKey:yesAge | useKey:keySelect |  useKey:no:1 | useKey:noSelect:1 | useKey:noAge:1 | sortByLocal:keyLocal "> <!--  | useKey:keySelect -->
             	<input type="checkbox" ng-model = "gift.checked">
             	
    				
@@ -79,7 +79,7 @@
             </a>
 
             <br/>
-            {{gift.tags}}  <input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">    
+            {{gift.tags}}  <input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = root.gifts.indexOf(gift)">    
             </span>
 
           <hr>
@@ -94,20 +94,74 @@
 
 
 
-<div id = "page" class="print" style="font-size: {{size}}pt"> 
+<div id = "page" class="print {{root.data.c.theme}}" style="font-size: {{size}}pt"> 
   
     <div id = "header" class="noPrint">
-      <button id = "doPrint" class="noPrint" onclick="window.print()">列印紙本</button>
+      <!-- TOOL -->
+      <span id = 'updownload'>
+
+        <a id = "download" class ="d" ng-href="{{root | forDownload}} " download = "{{root.myName | forDownloadName }}" target = "_blank"
+        ng-mouseover = "hintD = true"
+        ng-mouseout = "hintD = false"
+        ng-click = "save()"> 儲存檔案
+
+
+        <span ng-show = "hintD">
+        <br>
+          <span ng-bind = " '如出現一個很多字的頁面，請依下列指示：在空白處按「右鍵」→ 選「將網頁諸存為」→ 「'+ root.myName + '的學習資源.deck.json」'">  <!-- 改這裡 -->
+
+         </span>
+        </a>
+
+      </span>
+     
+      <span>
+
+          <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.public" value="2"/>公開
+<!--          <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.public" value="1"/>不公開         --> 
+          <input style = "width:16px" name = "pub" type = "radio" ng-model = "root.public" value="0" />私人
+
+
+        <a id = "info" class = "msg-icon msg-icon-info"
+            ng-click = "askPublic()">
+         </a>
+    
+        </span>
+
+        <span>
+
+      開啟舊檔
+      
+        <input id ="upload" type="file" fileread = "root" filetype = "json" accept="application/json"/>
+
+    <select ng-model = "root.data.c.theme" class = "s">
+      <option ng-selected ="root.data.c.theme == '春'" value = "spring">春</option>
+      <option ng-selected ="root.data.c.theme == '夏'" value = "summer">夏</option>
+      <option ng-selected ="root.data.c.theme == '秋'" value = "fall">秋</option>
+      <option ng-selected ="root.data.c.theme == '冬'" value = "winter">冬</option>
+      <option ng-selected ="!root.data.c.theme" value = "">自訂主題</option>
+    </select>
+
+        <input ng-model = "root.myName" placeholder = "自訂標題">
+
+      </span>
+      
+<!-- TOOL -->
+
+
 
       <span>自訂字級：</span>
-  <input type = "number" class = "num" ng-model ="size" ng-init = " size = 14 ">
+  <input type = "number" class = "num" ng-model ="root.c.size" ng-init = " root.c.size = 14 ">
     <span>顯示標籤上限：</span>
-  <input type = "number" class = "num"  ng-model ="tagsLimit" ng-init = " tagsLimit = 6">
+  <input type = "number" class = "num"  ng-model ="root.c.tagsLimit" ng-init = " root.c.tagsLimit = 6">
+
+      <button id = "doPrint" class="noPrint" onclick="window.print()">列印</button>
   <br/>
-    <input type="checkbox" ng-model = "qr" ng-init = "qr = true">
+    <input type="checkbox" ng-model = "root.c.qr" ng-init = "root.c.qr = true">
     <span>顯示QR碼&nbsp;&nbsp;&nbsp;&nbsp;</span>
     <span>標號類別</span>
-    <select name = "ol" ng-model = "ol" ng-init = "ol = 'cjk-ideographic'">
+
+    <select name = "ol" ng-model = "root.c.ol" ng-init = "root.c.ol = 'cjk-ideographic'">
       <option value="cjk-ideographic">cjk-ideographic</option>
       <option ng-repeat = "op in ['circle','square','disk','decimal','lower-roman','upper-roman','lower-alpha','upper-alpha','lower-greek']" value="{{op}}">{{op}}</option>
     </select>
@@ -142,15 +196,16 @@
     <span>不包含：</span>
   <input id = "tags" type = "search" auto-complete ui-items="tags" ng-model ="no" ng-init = "no = '付費'">
 
-    <select name = "no" ng-model ="noSelect">      
+  <!--  <select name = "no" ng-model ="noSelect">      
       <option value = "">--所有標籤--</option>
       <option ng-repeat = "tag in tags | notNullTag | orderBy:'n':true " value = "{{tag.t}}">{{tag.t}}({{tag.n}})</option>
-    </select>
+    </select>  
 
     <select name = "noAge" type = "number" ng-model ="noAge">
       <option value = "">--年齡--</option>
       <option ng-repeat = "age in ages" value = "{{age}}">{{ age}}歲</option>
-    </select>
+    </select>-->
+
     <hr>
 
     </div>
@@ -159,13 +214,13 @@
 
     <br/>    <br/>
 
-  <div id = "listA4">
+  <div id = "listA4" class = "{{root.data.c.theme}}">
 
-      <ol style="list-style-type: {{ol}}">
-        <li ng-repeat = "gift in gifts | checked | orderBy:'ord'">
+      <ol style="list-style-type: {{root.c.ol}}">
+        <li ng-repeat = "gift in root.gifts | checked | orderBy:'ord'">
          
             <input class = "noPrint" type="checkbox" ng-model = "gift.checked">
-            <input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = gifts.indexOf(gift)">  
+            <input id = "ord" class="noPrint" type = "number" ng-model = "gift.ord" ng-init = "gift.ord = root.gifts.indexOf(gift)">  
 
             {{gift.title}}
             <a href = "http://{{ gift.url | makeQR }}" target = "_blank">
@@ -174,7 +229,7 @@
 
             <span id = "tags"> {{gift.tags | limitTag:tagsLimit | addQuote }}</span>    
             
-            <span ng-show = "qr && gift.url">
+            <span ng-show = "root.c.qr && gift.url">
 
                 <a href = "http://{{gift.url | makeQR}}" target="_blank">
 
@@ -184,19 +239,19 @@
 
         </li>
 
-        <li ng-hide = "(gifts | checked | orderBy:'ord').length > 0">
+        <li ng-hide = "(root.gifts | checked | orderBy:'ord').length > 0">
              以勾選和關鍵字，找到要列印的資源。
         </li>
 
-        <li ng-hide = "(gifts | checked | orderBy:'ord').length > 0">
+        <li ng-hide = "(root.gifts | checked | orderBy:'ord').length > 0">
              從右側欄中，將方框打勾，將支持與資源加入中央的白紙。
         </li>
 
-        <li ng-hide = "(gifts | checked | orderBy:'ord').length > 0">
+        <li ng-hide = "(root.gifts | checked | orderBy:'ord').length > 0">
              改變右側欄中的順序排號，即可重新排序。
         </li>
 
-        <li ng-hide = "(gifts | checked | orderBy:'ord').length > 0">
+        <li ng-hide = "(root.gifts | checked | orderBy:'ord').length > 0">
              按列印鍵，分享你的支持與祝福。
         </li>
 
@@ -228,7 +283,10 @@
   
   var listApp = new angular.module("listApp", []);
 
-  listApp.filter('makeQR',function(){
+///TOOL///
+  listApp.config(['$compileProvider', function($compileProvider) {  // fix unsafe bug
+      $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|tel|data):/);
+  }]).filter('makeQR',function(){
   	return function(str){
   		return str.replace('https://','').replace('http://','');
   	}
@@ -425,21 +483,69 @@
                   }
             });
         }
-
-
      }
-    return p;
-  });
+    return p;  /* TOOL */
+  }).filter('forDownload',function(){
+    return function(obj){
+      return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj))
+    }   
+  }).filter('forDownloadName',function(){
+    return function(str){
+      if (!str) {str = '' } else {str += '的'};
+      return str+'資源分享.list.json';  //改這裡
+    }   
+    return function(list, x){
+      var ans = [];
+      var m = list.length;
+      for (var i = 0; i < m; i++) {
+        var k = (x+i-1) % m;
+        ans.push(list[k]);
+      };
+      return ans;
+    } 
+  }).directive("fileread", [function () {
+    return {
+        scope: {
+            fileread: "="
+        },
+        link: function (scope, element, attributes) {
+            element.bind("change", function (changeEvent) {
+                var reader = new FileReader();
+
+                reader.onload = function (loadEvent) {
+                    scope.$apply(function () {
+                        var f = loadEvent.target.result; 
+                        
+                        if (f.substr(0,1) == '{') {
+                            f = JSON.parse(f);
+                        }                    
+                        
+                        scope.fileread = f;
+                      
+                    });
+                }
+
+                if (attributes.filetype == 'json') {
+                  reader.readAsText(changeEvent.target.files[0]);
+                } else {
+                  reader.readAsDataURL(changeEvent.target.files[0]);
+                
+                }
+            });
+        }
+      }
+  }]);   /* TOOL */;
 
   function Ctrl ($scope) {
 
 //    $scope.Math = window.Math;
     $scope.$ = jQuery;
-
     $scope.key = decodeURI(location.hash).replace('#','');
-
     $scope.counter = 0;
-    $scope.gifts = [];
+    $scope.root = {};
+    $scope.root.gifts = [];
+    $scope.root.public = 2;  /// TOOL ///
+
     $scope.lrList = ["https://ethercalc.org/1v3161t7tu.csv"]; // "data/learning_resouces.csv""
     $scope.metaList = ["local_taiwan", "special_edu"];
     $scope.tags =[];  // $scope.tags = [{t: '數學', n: 3}, {t: '科學', n: 6}];
@@ -449,8 +555,6 @@
 
     $scope.local_taiwan = []; 
     $scope.special_edu = []; 
-
-    $scope.names = ["john", "bill", "charlie", "robert", "alban", "oscar", "marie", "celine", "brad", "drew", "rebecca", "michel", "francis", "jean", "paul", "pierre", "nicolas", "alfred", "gerard", "louis", "albert", "edouard", "benoit", "guillaume", "nicolas", "joseph"];
 
     $.ajax({
     type: "GET",    url: 'data/local_taiwan.txt',    dataType: "text",
@@ -478,7 +582,7 @@
         url: $scope.lrList[i],
         dataType: "text",
             success: function(data) {
-              $scope.gifts = $scope.gifts.concat($scope.processData(data));
+              $scope.root.gifts = $scope.root.gifts.concat($scope.processData(data));
               $scope.tags = $scope.processTags(data, $scope.tags);        	
               
               $scope.$digest();
@@ -487,78 +591,106 @@
 			        type: "GET",     url: 'json/shackhand-autolearn-export.json',   dataType: "json",
 			            success: function(data) {
 			     //         console.log(data.hands);
-
 			// console.log($scope.tags.filter(function(o){ return o.t == '字典'} ));
 
   		             	  var newtagObjs = [];
 
-			              for (var i = 0; i < data.hands.length; i++) {
+  			              for (var i = 0; i < data.hands.length; i++) {
 
-			                if (!data.hands[i]) continue;
+  			                if (!data.hands[i]) continue;
 
-			                var newTags = (data.hands[i].learner_habit.split(/\s/).join()+','+data.hands[i].share.split(/\s/).join()+','+data.hands[i].address).split(/[,，.、\/;]\s?/);
+  			                var newTags = (data.hands[i].learner_habit.split(/\s/).join()+','+data.hands[i].share.split(/\s/).join()+','+data.hands[i].address).split(/[,，.、\/;]\s?/);
 
-			                
-			                $scope.gifts.push({
-			                  title: data.hands[i].name,
-			                  url: 'http://bestian.github.io/shackhand/auto20#'+data.hands[i].name,
-			                  tags: newTags.join(' ')
-			                });
-			             
-			                for (var j = 0; j < newTags.length; j++) {
-			                  if (typeof (newtagObjs[newTags[j]]) == 'undefined') {
-			                  	newtagObjs[newTags[j]] = 0;
-			                  }
-			           
-			                  newtagObjs[newTags[j]] += 1;
-			                };
+  			                
+  			                $scope.root.gifts.push({
+  			                  title: '自學夥伴-'+data.hands[i].name,
+  			                  url: 'http://bestian.github.io/shackhand/auto20#'+data.hands[i].name,
+  			                  tags: newTags.join(' ')
+  			                });
+  			             
+  			                for (var j = 0; j < newTags.length; j++) {
+  			                  if (typeof (newtagObjs[newTags[j]]) == 'undefined') {
+  			                  	newtagObjs[newTags[j]] = 0;
+  			                  }
+  			           
+  			                  newtagObjs[newTags[j]] += 1;
+  			                };
 
-			                var goodObjs = [];
+  			                var goodObjs = [];
 
-			                for (var j = 0; j < Object.keys(newtagObjs).length; j++) {
-			                		var k = Object.keys(newtagObjs)[j];
-			                	goodObjs.push({
-				                	t: k,
-				                	n: newtagObjs[k]
-				                });
-			                };
-			            }
+  			                for (var j = 0; j < Object.keys(newtagObjs).length; j++) {
+  			                		var k = Object.keys(newtagObjs)[j];
+  			                	goodObjs.push({
+  				                	t: k,
+  				                	n: newtagObjs[k]
+  				                });
+  			                };
+  			            }
 
-			            console.log(goodObjs);
+  			            console.log(goodObjs);
 
-						$scope.tags = $scope.tags.concat(goodObjs); 
+        						$scope.tags = $scope.tags.concat(goodObjs); 
 
-						// 合而為一
+        						var usedkeys = [];
+        						var usedObjs = [];
 
-						var usedkeys = [];
-						var usedObjs = [];
+        						for (var i = 0; i < $scope.tags.length; i++) {
+        							if ($.inArray($scope.tags[i].t, usedkeys) > -1) {
+        								usedObjs[$scope.tags[i].t] += $scope.tags[i].n;
+        							}
+        							else {
+        								usedkeys.push($scope.tags[i].t);
+        								usedObjs[$scope.tags[i].t] = $scope.tags[i].n;
+        							}	
+        						};
 
-						for (var i = 0; i < $scope.tags.length; i++) {
-							if ($.inArray($scope.tags[i].t, usedkeys) > -1) {
-								usedObjs[$scope.tags[i].t] += $scope.tags[i].n;
-							}
-							else {
-								usedkeys.push($scope.tags[i].t);
-								usedObjs[$scope.tags[i].t] = $scope.tags[i].n;
-							}	
-						};
+        						$scope.tags = [];
 
-						$scope.tags = [];
+        						for (var i = 0; i < usedkeys.length; i++) {
+        							$scope.tags.push({
+        								t: usedkeys[i],
+        								n: usedObjs[usedkeys[i]]
+        							});
+        						};
 
-						for (var i = 0; i < usedkeys.length; i++) {
-							$scope.tags.push({
-								t: usedkeys[i],
-								n: usedObjs[usedkeys[i]]
-							});
-						};
-
-
-			            $scope.$digest();
-			        }            
-			    });
+  			            $scope.$digest();
+    			        }            
+    			    });
             }
          });
     };
+
+
+/// Tool
+  if(location.hash) { 
+          console.log(location.hash.replace('#',''));
+      if (location.hash.indexOf('http') > -1) {
+        $.getJSON( location.hash.replace('#',''), function(data){          
+          console.log(data);
+          $scope.root = data;
+          $scope.$digest;
+        });
+      }
+  }
+
+  $scope.save = function (){
+
+      var d = new Date;
+      console.log(d.getTime());
+      console.log($scope.root);
+      $scope.root.data.time = d.getTime();
+
+      var ref = new Firebase('https://listShare.firebaseio.com/' + encodeURI($scope.root.myName));   ///改這裡
+
+      $scope.base = $firebase(ref);
+      $scope.base.$set($scope.root);
+
+      return;
+  }
+
+/// Tool ///
+/// Tool
+
 
 
     $scope.readTxt = function(allText, name) {
@@ -636,6 +768,18 @@
         return ans;
 
     }
+
+
+/// Tool ///
+
+  $scope.askPublic = function() {
+            $scope.root.public = (confirm(
+               '公開: 公開分享\n\n'
+      //        +'不公開: 資料僅供研發團隊改進參考，不公開分享\n\n'
+              +'私人: 研發團隊也不會儲存您的資料') && 2) || 1;
+    }
+
+/// TOOL ///
 
   };
 

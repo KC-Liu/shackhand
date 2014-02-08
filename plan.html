@@ -4,7 +4,6 @@
 
 <head>
 <script src="javascripts/lib/jquery-1.10.2.js"></script>
-
 <script src="javascripts/lib/jquery-ui.js"></script>
 <script src="javascripts/lib/angular.min.js"></script>
 
@@ -44,20 +43,21 @@
 <div id = "headInfos" class = "noPrint {{root.data.c.theme}}">
 
   <div>
-
+<!-- TOOL -->
     <span id = 'updownload'>
 
-      <a id = "download" class ="d" ng-href="{{root | forDownload}} " download = "{{root.data.myName | forDownloadName }}" target = "_blank" ng-mouseover = "hintD = true" ng-mouseout = "hintD = false"
-      ng-click = "save('noAlert')"> 儲存檔案
+        <a id = "download" class ="d" ng-href="{{root | forDownload}} " download = "{{root.data.myName | forDownloadName }}" target = "_blank" ng-mouseover = "hintD = true" ng-mouseout = "hintD = false"
+        ng-click = "save('noAlert')"> 儲存檔案
 
-      <span ng-show = "hintD">
-      <br>
+        <span ng-show = "hintD">
+        <br>
 
-        <span ng-bind = " '如出現一個很多字的頁面，請依下列指示：在空白處按「右鍵」→ 選「將網頁諸存為」→ 「'+ root.data.myName + '的學習計劃.plan.json」'">
+          <span ng-bind = " '如出現一個很多字的頁面，請依下列指示：在空白處按「右鍵」→ 選「將網頁諸存為」→ 「'+ root.data.myName + '的學習計劃.plan.json」'">
 
-       </span>
-      
-      </span></a>
+         </span>
+        
+        </span>
+        </a>
 
         <span>
 
@@ -82,6 +82,9 @@
 
     </span>
   </div>
+
+
+<!-- TOOL -->
 
   <div ng-show = "tube">
 
@@ -126,8 +129,10 @@
     </div>
 
     <select ng-model = "root.data.c.theme" class = "s">
-      <option ng-selected ="root.data.c.theme == '冬'" value = "winter">冬</option>
       <option ng-selected ="root.data.c.theme == '春'" value = "spring">春</option>
+      <option ng-selected ="root.data.c.theme == '夏'" value = "summer">夏</option>
+      <option ng-selected ="root.data.c.theme == '秋'" value = "fall">秋</option>
+      <option ng-selected ="root.data.c.theme == '冬'" value = "winter">冬</option>
       <option ng-selected ="!root.data.c.theme" value = "">自訂主題</option>
     </select>
   </div>
@@ -895,7 +900,8 @@ $(document).ready(function(){
     }   //的學習計劃.json
   }).filter('forDownloadName',function(){
     return function(str){
-      return str+'的學習計劃.plan.json'
+      if (!str) {str = '' } else {str += '的'};
+      return str+'的學習計劃.plan.json';
     }   
     return function(list, x){
     	var ans = [];
@@ -1227,10 +1233,7 @@ $(document).ready(function(){
     if(location.hash) {
           console.log(location.hash.replace('#',''));
       if (location.hash.indexOf('http') > -1) {
-        console.log('A');
-        
-        $.getJSON( location.hash.replace('#',''), function(data){
-          
+        $.getJSON( location.hash.replace('#',''), function(data){          
           console.log(data);
           $scope.root = data;
           $scope.$digest;

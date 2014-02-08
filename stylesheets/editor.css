@@ -28,8 +28,7 @@
 form#frm {
   z-index: 1;
   background: rgb(200, 220, 200);
- /* width: 20%; */
-  height: 297mm;  
+ /* width: 20%; */ 
   width: 50%;
   top: 0;
   right: 0;
@@ -125,11 +124,11 @@ span#present.true {
     display: none;
   }
 
-  #page #main {
+  #page #main, #listA4 {
     position: absolute;
     top: 0px;
-    cursor: 'all-scroll';
-  }  
+  }
+
 
 }
 
@@ -260,7 +259,7 @@ input#tags {
   position: absolute;
   right: 5px;
   padding: 3px;
-  width: 50px;
+  width: 150px;
   height: 24px;
   font-size: 16px;
   cursor: pointer;
@@ -381,6 +380,7 @@ span#updownload {
   display: block;
   border-radius: 15px;
   overflow: auto;
+  cursor: progress;
 }
 
 #main {
@@ -520,10 +520,18 @@ body.winter {
   background-color: #CDFEFF;
 }
 
-
 body.spring {
   background-color: #FFE7CD;
 }
+
+body.summer {
+  background-color: #FFAC55;
+}
+
+body.fall {
+  background-color: #D77F23;
+}
+
 
 
 #headInfos {
@@ -550,6 +558,24 @@ body.spring {
   background-image: linear-gradient(#FEFFCD 0%, #fff 180%);
 }
 
+#headInfos.summer {
+  background-color: #FFAC55;  
+  background-image: -webkit-linear-gradient(#FFAC55 0%, #fff 180%);
+  background-image: -moz-linear-gradient(#FFAC55 0%, #fff 180%);
+  background-image: -o-linear-gradient(#FFAC55 0%, #fff 180%);
+  background-image: linear-gradient(#FFAC55 0%, #fff 180%);
+}
+
+
+#headInfos.fall {
+  background-color: #D77F23;  
+  background-image: -webkit-linear-gradient(#D77F23 0%, #fff 180%);
+  background-image: -moz-linear-gradient(#D77F23 0%, #fff 180%);
+  background-image: -o-linear-gradient(#D77F23 0%, #fff 180%);
+  background-image: linear-gradient(#D77F23 0%, #fff 180%);
+}
+
+
 
 #rightPages, #leftSupports {
   background-color: #E4D7CA;
@@ -560,22 +586,43 @@ body.spring {
   background-color: #fff;
 }
 
-
 #rightPages.spring, #leftSupports.spring {
   background-color: #FEFFCD;
 }
 
+#rightPages.summer, #leftSupports.summer {
+  background-color: #FFAC55;
+}
+#rightPages.summer li, #leftSupports.summer li{
+  color: #000;
+}
 
 
-#main.winter {
+#rightPages.fall, #leftSupports.fall {
+  background-color: #D77F23;
+  color: #eee;
+}
+
+#rightPages.fall li, #leftSupports.fall li{
+  color: #eee;
+}
+#rightPages.fall li:hover, #rightPages.fall li.focus, #leftSupports.fall li:hover {
+  background-color: #fff; 
+  color: #000;
+}
+
+
+
+
+#main.winter,#listA4.winter {
   background-image: url(../img/backgrounds/dotWinter.jpg);
 }
-#main.spring {
+#main.spring,#listA4.spring {
   background-image: url(../img/backgrounds/dotSpring.jpg);
 }
-#main.summer {
+#main.summer,#listA4.summer {
   background-image: url(../img/backgrounds/dotSummer.jpg);
 }
-#main.fall {
+#main.fall,#listA4.fall {
   background-image: url(../img/backgrounds/dotFall.jpg);
 }

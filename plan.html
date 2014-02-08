@@ -374,7 +374,7 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
 
     <div class="noPrint">
       <textarea id = "y" rows = "3" cols = "25"
-     ng-model = "addTopic" ng-keydown = "adTPC($event,'addTopic',root.data.t[root.data.c.planNow]['主題']);" placeholder = "寫上新主題，再按Enter新增"> </textarea>
+     ng-model = "addTopic" ng-keydown = "adTPC($event,'addTopic','主題');" placeholder = "寫上新主題，再按Enter新增"> </textarea>
 
       <span ng-repeat = "t in root.data.t[root.data.c.planNow]['主題']"> <a id = "x" ng-click = "root.data.t[root.data.c.planNow]['主題'] = removeElem(root.data.t[root.data.c.planNow]['主題'], t)">{{t}}✘</a></span>
 
@@ -447,7 +447,7 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
          <br/>
          <br/>
           <textarea id = "y" rows = "3" cols = "25"
-         ng-model = "addField" ng-keydown = "adTPC($event, 'addField', root.data.t[root.data.c.planNow].fields);" placeholder = "寫上新領域，再按Enter新增"> </textarea>
+         ng-model = "addField" ng-keydown = "adTPC($event, 'addField', 'fields');" placeholder = "寫上新領域，再按Enter新增"> </textarea>
 
           <span ng-repeat = "f in root.data.t[root.data.c.planNow].fields"> <a id = "x" ng-click = "root.data.t[root.data.c.planNow].fields = removeElem(root.data.t[root.data.c.planNow].fields, f)">{{f}}✘</a></span>
 
@@ -1225,8 +1225,21 @@ $(document).ready(function(){
       $scope.root.data.myName = '請輸入您的大名'
 
     if(location.hash) {
-      $scope.root.data.myName = decodeURI(location.hash.replace('#',''));
-      $scope.name = decodeURI(location.hash.replace('#',''));
+          console.log(location.hash.replace('#',''));
+      if (location.hash.indexOf('http') > -1) {
+        console.log('A');
+        
+        $.getJSON( location.hash.replace('#',''), function(data){
+          
+          console.log(data);
+          $scope.root = data;
+          $scope.$digest;
+        });
+      }
+      else {
+        $scope.root.data.myName = decodeURI(location.hash.replace('#',''));
+        $scope.name = decodeURI(location.hash.replace('#',''));
+      }
     }
 
       
@@ -1264,7 +1277,6 @@ $(document).ready(function(){
     }
 
     $scope.draw = function (ev,y,x,plan, colorNow) {
-   //   console.log($scope.root.data.t[root.data.c.planNow]);
 
       if (!colorNow) colorNow = false;
 
@@ -1300,13 +1312,18 @@ $(document).ready(function(){
        return list.filter(function(str){ return str.indexOf(elem) == -1})
     }
 
-    $scope.adTPC = function(ev, fromI, to){
+    $scope.adTPC = function(ev, fromI, toI){
       if ((ev.keyCode && ev.keyCode != 13) || !$scope[fromI]) return;
-      if (!to) to = new Array;      
+
+      var planNow = $scope.root.data.c.planNow;
+      if (!$scope.root.data.t[planNow][toI]) $scope.root.data.t[planNow][toI] = new Array;      
       var item = $scope[fromI].split('///')[0];
-      var insert = ($scope[fromI].split('///')[1] || 0);
-      if (typeof(insert) == 'undefined') insert = to.length - 1;
-      to.splice(insert, 0, item);
+      var insert = $scope[fromI].split('///')[1];
+      if (typeof(insert) == 'undefined') {
+        $scope.root.data.t[planNow][toI].push(item);
+      } else {
+        $scope.root.data.t[planNow][toI].splice(insert, 0, item);
+      }
       $scope[fromI] = '';
     }
 

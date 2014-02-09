@@ -591,20 +591,25 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
 
 		字體大小 → <input type = "number" ng-model = "root.data.c.fontTT">%
 
+		<input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].showFields" />
+		<input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].outCheck" />
+
+
    </div>
 
    <table ng-style=" root.data.c.fontDT| makeCss:'font-size':'%' " >
   		<tr>
   			<th></th>
-  			<th ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']">{{tp}}</th>
+  			<th ng-hide = "root.data.t[root.data.c.planNow].showFields" ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']">{{tp}}</th>
+
+  			<th ng-show = "root.data.t[root.data.c.planNow].showFields" ng-repeat = "tp in root.data.t[root.data.c.planNow].fields">{{tp}}</th>
   		</tr>
 
-      <tr>
+      <tr ng-show = "root.data.t[root.data.c.planNow].outCheck">
         <th>自學評鑑項目</th>
-        <td ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']">
-          
-            <span  
-            ng-repeat = "m in ['口頭說明','學習檔案','教師評量','家長自評','考試檢定']">
+
+        <td ng-hide = "root.data.t[root.data.c.planNow].showFields" ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']">
+            <span ng-repeat = "m in ['口頭說明','學習檔案','教師評量','家長自評','考試檢定']">
 
               <span id = "present" class = "{{root.data.t[root.data.c.planNow].checkGoal[tp+m] || 'false noPrint' }}">
               	{{m}}
@@ -612,14 +617,7 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
               <a id = "aCheckbox" class="{{root.data.t[root.data.c.planNow].checkGoal[tp+m] }}" 
                ng-click="root.data.t[root.data.c.planNow].checkGoal[tp+m] = !root.data.t[root.data.c.planNow].checkGoal[tp+m]">
                 	{{(root.data.t[root.data.c.planNow].checkGoal[tp+m] && '✓') || ''}}
-                </a>
-
-              </span>
-
-     <!--         <span class = "clipOnly"> {{ root.data.t[root.data.c.planNow].checkGoal[tp+m] && "✓" || ''}} </span>  -->
-
-              <br>
-
+                </a></span><br>
             </span>
 			
 			<span id = "present">
@@ -632,7 +630,38 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
                 	{{(root.data.t[root.data.c.planNow].checkGoal[tp+'自訂'] && '✓') || ''}}
                 </a>
 
-        </span>
+        	</span>
+
+        </td>
+
+        <td ng-show = "root.data.t[root.data.c.planNow].showFields" ng-repeat = "tp in root.data.t[root.data.c.planNow].fields">
+
+        <!-- Dirty -->
+
+        <span ng-repeat = "m in ['口頭說明','學習檔案','教師評量','家長自評','考試檢定']">
+
+              <span id = "present" class = "{{root.data.t[root.data.c.planNow].checkGoal[tp+m] || 'false noPrint' }}">
+              	{{m}}
+
+              <a id = "aCheckbox" class="{{root.data.t[root.data.c.planNow].checkGoal[tp+m] }}" 
+               ng-click="root.data.t[root.data.c.planNow].checkGoal[tp+m] = !root.data.t[root.data.c.planNow].checkGoal[tp+m]">
+                	{{(root.data.t[root.data.c.planNow].checkGoal[tp+m] && '✓') || ''}}
+                </a></span><br>
+            </span>
+			
+			<span id = "present">
+
+				<textarea cols="4" rows="1" ng-model = "root.data.t[root.data.c.planNow].checkGoal[tp+'自訂評量']"  ng-show = "root.data.t[root.data.c.planNow].checkGoal[tp+'自訂']">
+				</textarea>
+
+				<a id = "aCheckbox" class="{{root.data.t[root.data.c.planNow].checkGoal[tp+'自訂'] }}" 
+               ng-click="root.data.t[root.data.c.planNow].checkGoal[tp+'自訂'] = !root.data.t[root.data.c.planNow].checkGoal[tp+'自訂']">
+                	{{(root.data.t[root.data.c.planNow].checkGoal[tp+'自訂'] && '✓') || ''}}
+                </a>
+        	</span>
+
+        <!-- Dirty -->
+
 
         </td>
       </tr>
@@ -643,40 +672,54 @@ ng-dblclick = "focusCol = onlyTrue(focusCol,'none')"
   				{{j}}
   			</th>
 
-  			<td ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']"
+  			<td ng-hide = "root.data.t[root.data.c.planNow].showFields" ng-repeat = "tp in root.data.t[root.data.c.planNow]['主題']"
+	          ng-mouseover = "focusCol = onlyTrue(focusCol,tp)"
+	          style = "width:150px"
+	        >
+	          {{tp + j}} <br><br>
 
-          ng-mouseover = "focusCol = onlyTrue(focusCol,tp)"
+	        <span ng-hide = "focusCol[tp]" ng-bind = "root.data.t[root.data.c.planNow].goal[tp + j]"></span>
 
-          style = "width:150px"
-        >
+	  			<textarea ng-show = "focusCol[tp]" cols="4" rows="6" 
+	 ng-model = "root.data.t[root.data.c.planNow].goal[tp + j]"
+	 onfocus="$(this).attr('cols', 6)" onblur="$(this).attr('cols', 4)" placeholder= "目標或記錄"></textarea>  				
 
-          {{tp + j}}        
-        <br>
-        <br>
+	        <br>
 
-        <span ng-hide = "focusCol[tp]" ng-bind = "root.data.t[root.data.c.planNow].goal[tp + j]">
+	         <input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].checkGoal[tp+j]" ng-show = "root.data.t[root.data.c.planNow].goal[tp + j]"/>
+	         
+	        <span class = "clipOnly"> {{ root.data.t[root.data.c.planNow].checkGoal[tp+j] && "✓" || ''}} </span>
 
-        </span>
-
-  			<textarea ng-show = "focusCol[tp]" cols="4" rows="6" 
-  				ng-model = "root.data.t[root.data.c.planNow].goal[tp + j]"
-  				   onfocus="$(this).attr('cols', 6)"
- 				     onblur="$(this).attr('cols', 4)" 
-  				   placeholder= "目標">
-
-				</textarea>  				
-
-        <br>
-
-         <input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].checkGoal[tp+j]" ng-show = "root.data.t[root.data.c.planNow].goal[tp + j]"/>
-         
-        <span class = "clipOnly"> {{ root.data.t[root.data.c.planNow].checkGoal[tp+j] && "✓" || ''}} </span>
-
-
-          <span ng-show = "root.data.t[root.data.c.planNow].checkGoal[tp+j]">成功</a>
-
+	          <span ng-show = "root.data.t[root.data.c.planNow].checkGoal[tp+j]">成功</a>
   				
-  			</td> 			
+  			</td>
+
+  			<!--Dirty-->
+  			<td ng-show = "root.data.t[root.data.c.planNow].showFields" ng-repeat = "tp in root.data.t[root.data.c.planNow].fields"
+	          ng-mouseover = "focusCol = onlyTrue(focusCol,tp)"
+	          style = "width:150px"
+	        >
+	          {{tp + j}} <br><br>
+
+	        <span ng-hide = "focusCol[tp]" ng-bind = "root.data.t[root.data.c.planNow].goal[tp + j]"></span>
+
+	  			<textarea ng-show = "focusCol[tp]" cols="4" rows="6" 
+	 ng-model = "root.data.t[root.data.c.planNow].goal[tp + j]"
+	 onfocus="$(this).attr('cols', 6)" onblur="$(this).attr('cols', 4)" placeholder= "目標"></textarea>  				
+
+	        <br>
+
+	         <input type = "checkbox" ng-model = "root.data.t[root.data.c.planNow].checkGoal[tp+j]" ng-show = "root.data.t[root.data.c.planNow].goal[tp + j]"/>
+	         
+	        <span class = "clipOnly"> {{ root.data.t[root.data.c.planNow].checkGoal[tp+j] && "✓" || ''}} </span>
+
+	          <span ng-show = "root.data.t[root.data.c.planNow].checkGoal[tp+j]">成功</a>
+  				
+  			</td>
+
+  			<!--Dirty-->		
+
+
   		</tr>
   		
   	</table>
@@ -901,7 +944,7 @@ $(document).ready(function(){
   }).filter('forDownloadName',function(){
     return function(str){
       if (!str) {str = '' } else {str += '的'};
-      return str+'的學習計劃.plan.json';
+      return str+'學習計劃.plan.json';
     }   
     return function(list, x){
     	var ans = [];
@@ -1109,35 +1152,13 @@ $(document).ready(function(){
         initData.t[inn].checkGoal = {};
 
         initData.t[inn].resources = {};
-        
+
         initData.t[inn]['主題'] = ['生活自理','運動','收集資訊'];
         initData.t[inn].fields = [];
         initData.t[inn].enable7F = true;
-
+        initData.t[inn].outCheck = true;
+        initData.t[inn].showFields = false;
         initData.t[inn].timeline = [];
-
-  //       for (var i = 0; i < 10; i++) {
-  //          $scope.root.data.t[root.data.c.planNow].timeline[i][0] = true;
-
-    //        for (var j = 1; j < 72; j++) {
-      //        initData.t[inn].timeline[i][j] = false;
-     //       };
-    //      };
-
-    /*
-          initData.t[inn].timeline[8][12] = true;
-          initData.t[inn].timeline[9][12] = true;
-
-          initData.t[inn].timeline[8][36] = true;
-          initData.t[inn].timeline[9][36] = true;
-
-          initData.t[inn].timeline[8][48] = true;
-          initData.t[inn].timeline[9][48] = true;
-
-          initData.t[inn].timeline[8][60] = true;
-          initData.t[inn].timeline[9][60] = true; */
-
-
       };
 
   console.log(initData);
